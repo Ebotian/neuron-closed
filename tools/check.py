@@ -69,6 +69,8 @@ def render_status():
     rows.append(f'| 路线 | {routes} |')
     rows.append('| 判据 | ' + ' · '.join(f'`{k}`' for k in m['gates']) +
                 '（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |')
+    if m.get('verdict_short'):
+        rows.append(f'| 结论 | {m["verdict_short"]} |')
     rows.append('| 实测 | G1 r=%.3f/J64=%.3f（%d 条 prompt） · G2 r=%.3f–%.3f / J64=%.3f–%.3f（%s / %s） · verify %d/%d p=%.4f（%s） |' % (
         m['measured']['g1']['r'], m['measured']['g1']['J64'], m['measured']['g1']['n_prompts'],
         m['measured']['g2_split_blocks']['r'], m['measured']['g2_split_parity']['r'],

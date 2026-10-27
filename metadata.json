@@ -1,14 +1,14 @@
 {
   "workstream": "qwentest",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "status": "draft",
   "date": "2026-10-27",
-  "current": "R2 — J2 readout; G2 passes at 19 discovery prompts (G1 0.524 / G2 0.471–0.662)",
+  "current": "R2 closed — directional lever confirmed, trait specificity refuted (S2 FAIL)",
   "routes": {
     "R0": "done (sparsity: top-64 = 1.65%/2.13% of sum|g|)",
     "R2a": "done (slot census; Empath 1/20 vs HurtLex 13/20 coverage)",
     "R2b": "done, minimal (Jibes pool: adj 19/19, verb 14/14)",
-    "R2": "active (G2 passes with 19 prompts; held-out replication 8/8)",
+    "R2": "closed (effect real & directional, 8-32x controls; NOT hostility-specific)",
     "R1": "todo",
     "R3": "todo",
     "R4": "todo",
@@ -62,6 +62,41 @@
       "losses": 0,
       "p": 0.0078125,
       "heldout": "6 reused probes -> replication, not confirmation"
+    },
+    "plan06_dose": {
+      "dose": [
+        0.005,
+        0.01,
+        0.02,
+        0.05
+      ],
+      "target_dJ2": [
+        0.00587,
+        0.00954,
+        0.01913,
+        0.04842
+      ],
+      "control_mean_dJ2": {
+        "0.02": 0.00235,
+        "0.05": 0.00153
+      },
+      "controls_below_target": "6/6 at 0.02 and 0.05",
+      "mirror_dJ2": [
+        0.00109,
+        -0.0055,
+        -0.01207,
+        -0.03532
+      ]
+    },
+    "plan06_crosstrait": {
+      "dose": 0.02,
+      "greed": 0.04077,
+      "sycophancy": 0.03795,
+      "risk_aversion": 0.03767,
+      "avoidance": 0.03288,
+      "hostility": 0.02754,
+      "placebo": 0.00119,
+      "generic_logP": -0.00319
     }
   },
   "notes": "Numbers are copied from the runs recorded in qwentest/05_plan-gradient-discovery.md; the doc renders them, so they must be edited here first.",
@@ -70,6 +105,15 @@
     "verify_run": "AutoDL /root/autodl-tmp/runs/v7/verify_j2_19p (6 reused held-out probes, dose 0.02)",
     "previous_9prompt_runs": "AutoDL /root/autodl-tmp/runs/v6/j2_9p_* and verify_j2_9p",
     "fd_check": "AutoDL /root/autodl-tmp/runs/v6/j2_hurtlex_fd/fd_check.json",
-    "plan": "05_plan-gradient-discovery.md §§2.9-2.12"
+    "plan": "05_plan-gradient-discovery.md §§2.9-2.12",
+    "plan06_run": "AutoDL /root/autodl-tmp/runs/spec/dose_l14n8949 (dose.json, dose.md; 167 measurements, package v6 tree)"
+  },
+  "verdict_short": "S1 PASS · S2 FAIL · S3 PASS · S4 PASS ⇒ H1 (hostility-specific) refuted; readout measures evaluative register",
+  "verdict": {
+    "S1_monotone": true,
+    "S2_specific": false,
+    "S3_not_generic": true,
+    "S4_placebo_flat": true,
+    "meaning": "L14N8949 is a real, directional, dose-monotone lever on the J2 slot-mass readout and beats 6/6 same-layer random controls by 8x (0.02) and 32x (0.05); the mirror arm is negative and growing, so it is not a generic perturbation. It is however NOT hostility-specific: on shared contexts it raises all five trait margins and hostility the least (greed 0.041 > syc 0.038 > risk 0.038 > avoid 0.033 > hostility 0.028). Pre-registered branch: S2 fail = write the negative result and close the line."
   }
 }
