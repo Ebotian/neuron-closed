@@ -12,6 +12,37 @@
 
 ---
 
+<!-- auto:workstream-status:start -->
+| 项 | 值 |
+|---|---|
+| 工作流 | `qwentest` |
+| 版本 / 状态 | `0.3.0` / `draft`（2026-10-27） |
+| 现役 | R2 — language-mass readout J2 (package v6) |
+| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` active · `R1` todo · `R3` todo · `R4` todo · `R5` todo |
+| 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
+| 实测 | G1 r=0.684/J64=0.506 · G2 r=0.487–0.633/J64=0.347–0.488 · verify 8/8 p=0.0078 |
+<!-- auto:workstream-status:end -->
+
+## 工程约束（一条命令：`make -C qwentest check`）
+
+本目录的**每一条对外声明都必须能被重新推导**，而不是靠记忆。数字与状态只有一个来源，其余都是渲染出来的。
+
+| 规则 | 机制 |
+|---|---|
+| 版本 / 状态 / 判据 / 路线 / 实测数字 | **唯一来源 `metadata.json`**；`00_README.md` 里的状态块是渲染结果（`make meta` 重渲染，`make check` 校验） |
+| 包清单（md5 / sha256 / 文本文件数） | 由 `01_packages/*.zip` 现算后渲染进受管段；`make check` 校验区块与磁盘一致 |
+| zip 与解包树 | 逐成员比对（`ziptrees`）；不等即失败 |
+| 包内自校验 | 每个 `03_unpacked/*/<root>/CHECKSUMS.sha256` 必须验过 |
+| 代码 | 全部 `.py` 可编译（`compile`） |
+| 测试 | 免 torch 的单测必须通过；其余标为 skipped 并提示到 GPU 机跑 |
+| 去重 | 版本族内允许重复，**跨族重复即失败**（`dedup`，只读不删） |
+| Git 边界 | 任何 `*.zip / *.tar.gz / *.pyc / *.pt` 被跟踪即失败（`git`） |
+
+- 入口：`make -C qwentest check`（stdlib-only，无网络、无 GPU、无 torch）；分项可用 `make -C qwentest blocks|ziptrees|checksums|compile|tests|dedup|git`。
+- 钩子（opt-in）：`make -C qwentest hooks` → `core.hooksPath=.githooks`，`pre-commit` 只在 `qwentest/` 被暂存时跑 `make check`（约 2 s），非 qwentest 提交不受影响。
+- 工具：`tools/check.py`（本文件的校验器）、`tools/migrate_repo_packages.py`（解包 + 受管段，仓库级**规范副本**）、`tools/dedup_check.py`（只报告，不删）。包内同名工具是随包冻结的副本，改动以 `tools/` 为准。
+- 改数字的顺序：**先改 `metadata.json`（或重跑实验）→ `make -C qwentest meta` → `make -C qwentest check` → 提交**。手改状态块会被 `check` 抓住（已实测：改一个数字即 FAIL）。
+
 ## 目录结构
 
 ```

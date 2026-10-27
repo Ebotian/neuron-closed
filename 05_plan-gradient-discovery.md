@@ -322,5 +322,5 @@ VERB 敌意：`hold, wait, stop, run, handle, read, hide, grow, roast, spell, li
 
 ## 5. 记录方式
 
-每次实验只写三样东西：`scan` 的 manifest、`stability` 的 json、`verify/calibrate` 的 summary；把它们与本文件的 G1–G5 对照表抄进结论段，并注明**代码版本**（v6 起 `package_release` 会写进 manifest）。
+每次实验只写三样东西：`scan` 的 manifest、`stability` 的 json、`verify/calibrate` 的 summary；**数字先进 `metadata.json`，再 `make -C qwentest meta && make -C qwentest check`**；把它们与本文件的 G1–G5 对照表抄进结论段，并注明**代码版本**（v6 起 `package_release` 会写进 manifest）。
 跨版本比较只允许比较「同一判据下的数字」，不允许跨版本比较绝对值。
