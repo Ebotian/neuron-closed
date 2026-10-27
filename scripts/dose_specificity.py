@@ -10,6 +10,10 @@ Four readouts, pre-registered decisions S1-S4 (see 06_plan-specificity-dose.md):
   R3  placebo: neutral_2 vs neutral_1 on the same contexts
   R4  generic: mean log-probability of engine.REFERENCE_TEXT (catches "everything gets better")
 
+  --mirror additionally measures the flipped-sign arm of the same coordinate. It is
+  DESCRIPTIVE ONLY: the frozen rules S1-S4 are unchanged, and asymmetry is expected
+  (a first-order sensitivity is not a symmetric lever).
+
 Every measurement prints `[i/N] elapsed, eta ...` via the package's progress.Progress.
 --dry-run needs no GPU and no torch: it prints the plan and the measurement count.
 """
@@ -48,6 +52,8 @@ def main():
     ap.add_argument('--doses', default='0.005,0.01,0.02,0.05')
     ap.add_argument('--primary', type=float, default=0.02)
     ap.add_argument('--controls', type=int, default=6, help='same-layer random neurons (own predicted sign)')
+    ap.add_argument('--mirror', action='store_true',
+                    help='also measure the flipped-sign arm (descriptive, not part of S1-S4)')
     ap.add_argument('--seed', type=int, default=1729)
     ap.add_argument('--max-seq', type=int, default=384)
     ap.add_argument('--out', default='out/dose')
@@ -78,13 +84,15 @@ def main():
     n_trait = len(spec) * len(spec[0]['continuations'])
     n_placebo = len(spec)
     n_generic = len(doses) + 1
-    total = n_j2_base + n_target + n_ctrl + n_trait * 2 + n_placebo * 2 + n_generic
+    n_mirror = len(heldout) * len(doses) if a.mirror else 0
+    total = n_j2_base + n_target + n_ctrl + n_trait * 2 + n_placebo * 2 + n_generic + n_mirror
     print(f'Plan: candidate L{cand["layer"]}N{cand["neuron"]}{cand["sign"]:+d}; doses {doses} '
           f'(primary {a.primary}); {a.controls} same-layer random controls; '
           f'{len(heldout)} held-out probes; {len(spec)} shared contexts x '
           f'{len(spec[0]["continuations"])} traits')
     print(f'      measurements: J2 baseline {n_j2_base} + target {n_target} + controls {n_ctrl} '
-          f'+ cross-trait {n_trait} x2 + placebo {n_placebo} x2 + generic {n_generic} = {total}')
+          f'+ cross-trait {n_trait} x2 + placebo {n_placebo} x2 + generic {n_generic}'
+          + (f' + mirror {n_mirror}' if a.mirror else '') + f' = {total}')
     print(f'      package {pkg} | scan {scan.name} | estimate ~{total * 0.25 + 40:.0f} s '
           f'(0.25 s/measurement + 40 s hash/load; first run after a reboot pays Triton compile)')
     if a.dry_run:
@@ -154,6 +162,17 @@ def main():
             vals.append(v - base_j2[r['id']])
             prog.step(f'J2 target d={d} {r["id"]} dJ2={vals[-1]:+.5f}')
         curve[d] = {'mean': statistics.mean(vals), 'sd': statistics.stdev(vals), 'per_probe': vals}
+    curve_mirror = {}
+    if a.mirror:
+        mirrored = {'layer': cand['layer'], 'neuron': cand['neuron'], 'sign': -cand['sign']}
+        for d in doses:
+            vals = []
+            for r in heldout:
+                v = j2_mean(r['prompt'], iv_of(mirrored, d))
+                vals.append(v - base_j2[r['id']])
+                prog.step(f'J2 mirror (sign {-cand["sign"]:+d}) d={d} {r["id"]} dJ2={vals[-1]:+.5f}')
+            curve_mirror[d] = {'mean': statistics.mean(vals), 'sd': statistics.stdev(vals),
+                               'per_probe': vals}
     ctrl = {d: [] for d in control_doses}
     for cd in control_doses:
         for c in controls:
@@ -193,7 +212,9 @@ def main():
     s3 = abs(generic[a.primary]) < 0.5 * abs(tm.get('hostility', 0.0))
     s4 = abs(statistics.mean(placebo['delta'])) < abs(tm.get('hostility', 0.0)) / 3
     ctrl_primary = [c['mean'] for c in ctrl[a.primary]]
-    out.update({'curve': curve, 'controls_by_dose': ctrl, 'trait_matrix': matrix,
+    out.update({'curve': curve, 'curve_mirror': curve_mirror,
+                'asymmetry': {d: curve[d]['mean'] - curve_mirror[d]['mean']
+                              for d in doses} if a.mirror else {}, 'controls_by_dose': ctrl, 'trait_matrix': matrix,
                 'trait_means': tm, 'placebo': placebo, 'generic': generic,
                 'verdict': {'S1_monotone': s1, 'S1_ups': ups, 'S2_specific': s2,
                             'S2_ranking': ordered, 'S3_not_generic': s3,
@@ -217,6 +238,16 @@ def main():
         if d in ctrl:
             cmp = f'{sum(1 for c in ctrl[d] if c["mean"] < curve[d]["mean"])}/{len(ctrl[d])} controls below'
         lines.append(f'| {d} | {curve[d]["mean"]:+.5f} | {curve[d]["sd"]:.5f} | {cmp} |')
+    if curve_mirror:
+        lines += ['', '## Mirror arm (descriptive only — frozen rules unchanged)', '',
+                  '| dose | ΔJ2 (+sign) | ΔJ2 (−sign) | asymmetry |', '|---|---:|---:|---:|']
+        for d in doses:
+            lines.append(f'| {d} | {curve[d]["mean"]:+.5f} | {curve_mirror[d]["mean"]:+.5f} | '
+                         f'{out["asymmetry"][d]:+.5f} |')
+        lines.append('')
+        lines.append('Asymmetry is expected: a first-order sensitivity is not a symmetric lever. '
+                     'A mirror arm that is *equally* strong would instead suggest a generic '
+                     'perturbation effect rather than a direction.')
     lines += ['', '## Cross-trait (J1 string margin, shared contexts, primary dose)', '',
               '| trait | mean Δmargin |', '|---|---:|']
     for t, v in ordered:
