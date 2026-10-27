@@ -96,7 +96,34 @@
       "avoidance": 0.03288,
       "hostility": 0.02754,
       "placebo": 0.00119,
-      "generic_logP": -0.00319
+      "generic_logP": -0.00319,
+      "per_context": {
+        "c1": {
+          "hostility": 0.0291,
+          "best_other": "avoidance 0.0816"
+        },
+        "c2": {
+          "hostility": 0.0057,
+          "best_other": "greed 0.0383"
+        },
+        "c3": {
+          "hostility": 0.0479,
+          "best_other": "sycophancy 0.0665"
+        }
+      },
+      "hostility_minus_best_other": [
+        -0.0525,
+        -0.0326,
+        -0.0187
+      ],
+      "sd_by_trait": {
+        "avoidance": 0.0439,
+        "greed": 0.0111,
+        "hostility": 0.0212,
+        "risk_aversion": 0.0172,
+        "sycophancy": 0.0248
+      },
+      "power": "n=3 contexts; hostility 95% CI [-0.025, +0.080]"
     }
   },
   "notes": "Numbers are copied from the runs recorded in qwentest/05_plan-gradient-discovery.md; the doc renders them, so they must be edited here first.",
@@ -108,12 +135,18 @@
     "plan": "05_plan-gradient-discovery.md §§2.9-2.12",
     "plan06_run": "AutoDL /root/autodl-tmp/runs/spec/dose_l14n8949 (dose.json, dose.md; 167 measurements, package v6 tree)"
   },
-  "verdict_short": "S1 PASS · S2 FAIL · S3 PASS · S4 PASS ⇒ H1 (hostility-specific) refuted; readout measures evaluative register",
+  "verdict_short": "S1 PASS · S2 FAIL(判据未达；3 上下文功效不足) · S3 PASS · S4 PASS ⇒ 特异性未证明，不等于被否定；该坐标是暴力搜索的一次抽样，不是任何敌意判据的最优点",
   "verdict": {
     "S1_monotone": true,
     "S2_specific": false,
     "S3_not_generic": true,
     "S4_placebo_flat": true,
-    "meaning": "L14N8949 is a real, directional, dose-monotone lever on the J2 slot-mass readout and beats 6/6 same-layer random controls by 8x (0.02) and 32x (0.05); the mirror arm is negative and growing, so it is not a generic perturbation. It is however NOT hostility-specific: on shared contexts it raises all five trait margins and hostility the least (greed 0.041 > syc 0.038 > risk 0.038 > avoid 0.033 > hostility 0.028). Pre-registered branch: S2 fail = write the negative result and close the line."
+    "meaning": "L14N8949 is a real, directional, dose-monotone lever that does act on the hostility readout: J2 (hostility-vs-neutral slot mass) rises +0.0059/+0.0095/+0.0191/+0.0484 over doses 0.005-0.05, positive on 6/6 held-out probes at 0.02, 8x the same-layer random control mean at 0.02 and 32x at 0.05, and the mirrored arm is negative and growing (so not a generic perturbation). What is NOT shown is exclusivity: on 3 shared contexts it never ranks first among the five hand-written trait contrasts. Two caveats keep that from being a refutation: (i) the coordinate came from one brute-force generation-based scan, i.e. a draw, not the optimum of any hostility criterion; (ii) n=3 contexts with wide per-trait spread cannot separate \"not specific\" from \"specific but small\".",
+    "S2_note": "pre-registered rule not met (hostility never the max of five traits, 3/3 contexts). Power is low: 3 contexts, per-trait sd 0.011-0.044, hostility mean 0.0275 with 95% CI [-0.025, +0.080]; hostility ranks 2nd in one context (0.048 vs 0.067). So this run does not show \"not hostility-specific\"; it shows specificity is undemonstrated."
+  },
+  "provenance": {
+    "coordinate": "L14 N8949 +1",
+    "origin": "one hit from a brute-force generation-based scan (dose 1.0, persona-matrix line); recorded as KNOWN_EVIL in the package engine; NOT a maximiser of any hostility criterion",
+    "consequence": "specificity measured on a single draw cannot speak for the class of hostility directions"
   }
 }
