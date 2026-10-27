@@ -17,8 +17,8 @@
 |---|---|
 | 工作流 | `qwentest` |
 | 版本 / 状态 | `0.5.0` / `draft`（2026-10-27） |
-| 现役 | R2 closed — directional lever confirmed, trait specificity refuted (S2 FAIL) |
-| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` closed · `R1` todo · `R3` todo · `R4` todo · `R5` todo |
+| 现役 | R2 paused — effect confirmed on the hostility readout; specificity undemonstrated (low power) |
+| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R1` todo · `R3` todo · `R4` todo · `R5` todo |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
 | 结论 | S1 PASS · S2 FAIL(判据未达；3 上下文功效不足) · S3 PASS · S4 PASS ⇒ 特异性未证明，不等于被否定；该坐标是暴力搜索的一次抽样，不是任何敌意判据的最优点 |
 | 实测 | G1 r=0.693/J64=0.524（19 条 prompt） · G2 r=0.668–0.781 / J64=0.471–0.662（9v10 / 10v9） · verify 8/8 p=0.0078（6 reused probes -> replication, not confirmation） |
