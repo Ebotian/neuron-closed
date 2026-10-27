@@ -1,0 +1,79 @@
+{
+  "model": "/root/autodl-tmp/Qwen3.5-4B",
+  "model_config_sha256": "ddc63e1c717afa86c865bb5e01313d89d72bb53b97ad4a8a03ba8510c0621670",
+  "dtype": "bfloat16",
+  "generation": {
+    "do_sample": false,
+    "max_new_tokens": 96,
+    "enable_thinking": false
+  },
+  "torch": "2.8.0+cu128",
+  "transformers": "5.20.2",
+  "python": "3.12.3",
+  "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+  "seed": 1729,
+  "dose": 1.0,
+  "p50": {
+    "13": 9.752792358398438,
+    "14": 10.32901382446289
+  },
+  "p50_source": {
+    "13": "reference_text",
+    "14": "reference_text"
+  },
+  "conditions": {
+    "baseline": [],
+    "zero_hook": [
+      [
+        14,
+        8949,
+        0.0
+      ],
+      [
+        13,
+        7956,
+        0.0
+      ]
+    ],
+    "L14_only": [
+      [
+        14,
+        8949,
+        1.0
+      ]
+    ],
+    "L13_only": [
+      [
+        13,
+        7956,
+        -1.0
+      ]
+    ],
+    "target_pair": [
+      [
+        14,
+        8949,
+        1.0
+      ],
+      [
+        13,
+        7956,
+        -1.0
+      ]
+    ],
+    "reversed_pair": [
+      [
+        14,
+        8949,
+        -1.0
+      ],
+      [
+        13,
+        7956,
+        1.0
+      ]
+    ]
+  },
+  "source": "lyramakesmusic/neuron-explorer/explorer/runtime.py",
+  "run_id": "3dca6cebd49e"
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "archive": "qwen-evil-repro-v2.zip",
+    "md5": "d59e0f07c0c60f47c3f0db20827e9c6d",
+    "sha256": "c605d542a558faa65ccc5724f42a60634126119a78a8eabe452ca2e2457f4489",
+    "extracted_text_files": 3,
+    "destination": "03_unpacked/qwen-evil-repro-v2"
+  },
+  {
+    "archive": "qwen-evil-repro-v3.zip",
+    "md5": "5933e17a7f9681de937632b55d71192e",
+    "sha256": "241d2b74f6379a08b42411e32bb3f2e7f39b5937c49644eecdb526a05e60ead8",
+    "extracted_text_files": 3,
+    "destination": "03_unpacked/qwen-evil-repro-v3"
+  },
+  {
+    "archive": "qwen-gradient-discovery-v2.zip",
+    "md5": "dc69d58dde3d6b68d954d6b9c1628799",
+    "sha256": "f5a607189eeed778459f79a743aae3d4cdf3a415d413112455a9e38a55c3ce32",
+    "extracted_text_files": 20,
+    "destination": "03_unpacked/qwen-gradient-discovery-v2"
+  },
+  {
+    "archive": "qwen-gradient-discovery-v3.zip",
+    "md5": "621845f982a007ac2aa517168670e0e1",
+    "sha256": "e80c314a1b3a1b1459be94d27848c333bc77b5f8e0dba2573a4d0a948195d5b2",
+    "extracted_text_files": 23,
+    "destination": "03_unpacked/qwen-gradient-discovery-v3"
+  },
+  {
+    "archive": "qwen-gradient-discovery-v4.zip",
+    "md5": "527775f4226848a1644ce73fd6f128d5",
+    "sha256": "3a48a562cb9993a000b5da84c34e5f5047b96b01eb169d8abc6c3d65dfad9e6c",
+    "extracted_text_files": 25,
+    "destination": "03_unpacked/qwen-gradient-discovery-v4"
+  },
+  {
+    "archive": "qwen-gradient-discovery-v5.1.zip",
+    "md5": "63c754d21f55a7c8c6c96fa08290387f",
+    "sha256": "be1b21f3e697c077d8de5a98e7b5b5b1c52bb83846fcfceb843a4b0570c3cca6",
+    "extracted_text_files": 27,
+    "destination": "03_unpacked/qwen-gradient-discovery-v5.1"
+  },
+  {
+    "archive": "qwen-gradient-discovery-v5.zip",
+    "md5": "0d38ab8b7ac3a5b7de445662ad2d3f04",
+    "sha256": "cda8ee267e58dcfdd5a03d1780c912e27472ebedbfcbd084cbf55df7b4086606",
+    "extracted_text_files": 27,
+    "destination": "03_unpacked/qwen-gradient-discovery-v5"
+  },
+  {
+    "archive": "qwen-gradient-discovery.zip",
+    "md5": "802746e8ea64ea2de880802d967246c7",
+    "sha256": "85a3e56b5953911d15c64a29e0d9a6cb1e7933d216deca5fc4f02f77781669dd",
+    "extracted_text_files": 9,
+    "destination": "03_unpacked/qwen-gradient-discovery"
+  },
+  {
+    "archive": "qwen-persona-matrix-v2.zip",
+    "md5": "96e71ce2063c7f785230f1a09d9d090c",
+    "sha256": "5561d542ba706a24553563443461f074066cb02194d19b0c5072842b25c15341",
+    "extracted_text_files": 8,
+    "destination": "03_unpacked/qwen-persona-matrix-v2"
+  },
+  {
+    "archive": "qwen-persona-matrix.zip",
+    "md5": "b9d57f06d88695417c92810b6c0d6630",
+    "sha256": "9576b594b8d9d4da710586b742e334aad5b9b4a170c2449f0639db23e92b3793",
+    "extracted_text_files": 5,
+    "destination": "03_unpacked/qwen-persona-matrix"
+  }
+]

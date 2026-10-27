@@ -1,0 +1,32 @@
+# qwentest/ — archive of the Qwen3.5-4B neuron-steering / persona-matrix experiments
+# (2026-10-26/27, AutoDL instance). The rule is the one the rest of this repo uses:
+# text is tracked, packaged binaries are not.
+#
+# Every binary below is redundant here: 03_unpacked/ holds its content as text, and
+# I checked that file by file (md5sum of the unpacked file against `unzip -p` /
+# `tar xzOf` of the archive) — not inferred from the names. The md5 of each artifact
+# is also recorded in 00_README.md, so a file that turns up again (a re-download here,
+# or `tar czf` of the unpacked tree) can be checked against that record.
+
+# 01_packages/: the experiment packages as delivered. Their text is extracted into
+# 03_unpacked/<zip name>/<zip root>/ by tools/migrate_repo_packages.py, and each
+# archive's MD5/SHA256 is in the managed table in 00_README.md. The zips stay out of
+# git, so a package that is never extracted is invisible to git: run that tool after
+# you add one. v1 was the last exception and is now extracted like the others.
+01_packages/*.zip
+
+# 02_archives/: result and rebuild tarballs. Their trees are unpacked and identical:
+# qwen-results/ , persona-single-d0.5/ , rebuild-kit/ .
+02_archives/*.tar.gz
+
+# 03_unpacked/rebuild-kit/: the kit's own copies of three of those artifacts were byte-
+# identical to the 01_packages/ and 02_archives/ files and are now deleted (see 00_README.md).
+# These two lines stay as a guard: extracting rebuild-kit.tar.gz into that directory again
+# brings the copies back, and they must not enter git a second time.
+03_unpacked/rebuild-kit/*.zip
+03_unpacked/rebuild-kit/*.tar.gz
+
+# scripts/out/: written by scripts/stats_single.py and scripts/stats_timing.py
+# (--out DIR, default ./out) out of the tracked results JSONL. The directory holds
+# exactly the eight names those two scripts emit, so it is derived, not evidence.
+scripts/out/

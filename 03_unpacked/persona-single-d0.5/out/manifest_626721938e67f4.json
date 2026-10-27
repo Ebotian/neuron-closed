@@ -1,0 +1,268 @@
+{
+  "model": "/root/autodl-tmp/Qwen3.5-4B",
+  "model_config_sha256": "ddc63e1c717afa86c865bb5e01313d89d72bb53b97ad4a8a03ba8510c0621670",
+  "prompts_sha256": "3761e3eeba1c292a8579ae490294c3f7d35cb6c96a8253964ec5b73e87db9c8a",
+  "phase": "single",
+  "dose": 0.5,
+  "nodes": [
+    "evil_A",
+    "evil_B",
+    "panic",
+    "desire",
+    "limitation",
+    "bubbly",
+    "refusal",
+    "gentle",
+    "coarse",
+    "conspiracy"
+  ],
+  "conditions": {
+    "baseline": [],
+    "zero_hook": [
+      [
+        14,
+        8949,
+        0.0
+      ],
+      [
+        13,
+        7956,
+        0.0
+      ],
+      [
+        19,
+        9066,
+        0.0
+      ],
+      [
+        18,
+        8737,
+        0.0
+      ],
+      [
+        12,
+        699,
+        0.0
+      ],
+      [
+        11,
+        6261,
+        0.0
+      ],
+      [
+        18,
+        8827,
+        0.0
+      ],
+      [
+        19,
+        7839,
+        0.0
+      ]
+    ],
+    "single:evil_A": [
+      [
+        14,
+        8949,
+        0.5
+      ]
+    ],
+    "single:evil_B": [
+      [
+        13,
+        7956,
+        -0.5
+      ]
+    ],
+    "single:panic": [
+      [
+        19,
+        9066,
+        0.5
+      ]
+    ],
+    "single:desire": [
+      [
+        18,
+        8737,
+        0.5
+      ]
+    ],
+    "single:limitation": [
+      [
+        12,
+        699,
+        0.5
+      ]
+    ],
+    "single:bubbly": [
+      [
+        12,
+        699,
+        -0.5
+      ]
+    ],
+    "single:refusal": [
+      [
+        11,
+        6261,
+        0.75
+      ]
+    ],
+    "single:gentle": [
+      [
+        18,
+        8827,
+        0.5
+      ]
+    ],
+    "single:coarse": [
+      [
+        18,
+        8827,
+        -0.5
+      ]
+    ],
+    "single:conspiracy": [
+      [
+        19,
+        7839,
+        -0.5
+      ]
+    ]
+  },
+  "max_new_tokens": 128,
+  "max_context_tokens": 3072,
+  "seed": 1729,
+  "p50": {
+    "11": 9.133934020996094,
+    "12": 9.303200721740723,
+    "13": 9.752792358398438,
+    "14": 10.32901382446289,
+    "18": 13.89737319946289,
+    "19": 16.282630920410156
+  },
+  "p50_sources": {
+    "11": "reference_text",
+    "12": "reference_text",
+    "13": "reference_text",
+    "14": "reference_text",
+    "18": "reference_text",
+    "19": "reference_text"
+  },
+  "package_version": "v2-p1",
+  "node_strengths": {
+    "evil_A": 1.0,
+    "evil_B": -1.0,
+    "panic": 1.0,
+    "desire": 1.0,
+    "limitation": 1.0,
+    "bubbly": -1.0,
+    "refusal": 1.5,
+    "gentle": 1.0,
+    "coarse": -1.0,
+    "conspiracy": -1.0
+  },
+  "strength_sources": {
+    "evil_A": "author_note_1.0",
+    "evil_B": "author_note_1.0",
+    "panic": "author_note_1.0",
+    "desire": "author_note_1.0",
+    "limitation": "author_note_1.0",
+    "bubbly": "author_note_1.0",
+    "refusal": "author_note_1.5",
+    "gentle": "author_note_1.0",
+    "coarse": "author_note_1.0",
+    "conspiracy": "author_note_1.0"
+  },
+  "effective_alpha_per_node": {
+    "evil_A": 0.5,
+    "evil_B": -0.5,
+    "panic": 0.5,
+    "desire": 0.5,
+    "limitation": 0.5,
+    "bubbly": -0.5,
+    "refusal": 0.75,
+    "gentle": 0.5,
+    "coarse": -0.5,
+    "conspiracy": -0.5
+  },
+  "randdir_conditions": {
+    "randdir:L11:s0": [
+      {
+        "layer": 11,
+        "seed": 0,
+        "dose": 0.5
+      }
+    ],
+    "randdir:L12:s0": [
+      {
+        "layer": 12,
+        "seed": 0,
+        "dose": 0.5
+      }
+    ],
+    "randdir:L13:s0": [
+      {
+        "layer": 13,
+        "seed": 0,
+        "dose": 0.5
+      }
+    ],
+    "randdir:L14:s0": [
+      {
+        "layer": 14,
+        "seed": 0,
+        "dose": 0.5
+      }
+    ],
+    "randdir:L18:s0": [
+      {
+        "layer": 18,
+        "seed": 0,
+        "dose": 0.5
+      }
+    ],
+    "randdir:L19:s0": [
+      {
+        "layer": 19,
+        "seed": 0,
+        "dose": 0.5
+      }
+    ]
+  },
+  "randdir_meta": {
+    "L11:s0": {
+      "vec_sha256_12": "ac97bfbaa71c",
+      "residual_norm_at_dose": 4.566967
+    },
+    "L12:s0": {
+      "vec_sha256_12": "ac97bfbaa71c",
+      "residual_norm_at_dose": 4.6516
+    },
+    "L13:s0": {
+      "vec_sha256_12": "ac97bfbaa71c",
+      "residual_norm_at_dose": 4.876396
+    },
+    "L14:s0": {
+      "vec_sha256_12": "ac97bfbaa71c",
+      "residual_norm_at_dose": 5.164507
+    },
+    "L18:s0": {
+      "vec_sha256_12": "ac97bfbaa71c",
+      "residual_norm_at_dose": 6.948687
+    },
+    "L19:s0": {
+      "vec_sha256_12": "ac97bfbaa71c",
+      "residual_norm_at_dose": 8.141315
+    }
+  },
+  "torch": "2.8.0+cu128",
+  "transformers": "5.20.2",
+  "fla_core": "0.5.2",
+  "causal_conv1d": "1.7.0",
+  "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+  "greedy": true,
+  "thinking": false,
+  "run_id": "626721938e67f4"
+}
