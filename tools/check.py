@@ -69,12 +69,13 @@ def render_status():
     rows.append(f'| 路线 | {routes} |')
     rows.append('| 判据 | ' + ' · '.join(f'`{k}`' for k in m['gates']) +
                 '（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |')
-    rows.append('| 实测 | G1 r=%.3f/J64=%.3f · G2 r=%.3f–%.3f/J64=%.3f–%.3f · verify %d/%d p=%.4f |' % (
-        m['measured']['g1_jibes_9prompts']['r'], m['measured']['g1_jibes_9prompts']['J64'],
-        m['measured']['g2_9prompts_first4_last5']['r'], m['measured']['g2_9prompts_odd_even']['r'],
-        m['measured']['g2_9prompts_first4_last5']['J64'], m['measured']['g2_9prompts_odd_even']['J64'],
-        m['measured']['verify_jibes_9prompts']['wins'], m['measured']['verify_jibes_9prompts']['wins'] +
-        m['measured']['verify_jibes_9prompts']['losses'], m['measured']['verify_jibes_9prompts']['p']))
+    rows.append('| 实测 | G1 r=%.3f/J64=%.3f（%d 条 prompt） · G2 r=%.3f–%.3f / J64=%.3f–%.3f（%s / %s） · verify %d/%d p=%.4f（%s） |' % (
+        m['measured']['g1']['r'], m['measured']['g1']['J64'], m['measured']['g1']['n_prompts'],
+        m['measured']['g2_split_blocks']['r'], m['measured']['g2_split_parity']['r'],
+        m['measured']['g2_split_blocks']['J64'], m['measured']['g2_split_parity']['J64'],
+        m['measured']['g2_split_blocks']['n'], m['measured']['g2_split_parity']['n'],
+        m['measured']['verify']['wins'], m['measured']['verify']['wins'] + m['measured']['verify']['losses'],
+        m['measured']['verify']['p'], m['measured']['verify']['heldout']))
     return STATUS[0] + '\n' + '\n'.join(rows) + '\n' + STATUS[1]
 
 

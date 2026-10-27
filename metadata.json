@@ -1,14 +1,14 @@
 {
   "workstream": "qwentest",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "status": "draft",
   "date": "2026-10-27",
-  "current": "R2 — language-mass readout J2 (package v6)",
+  "current": "R2 — J2 readout; G2 passes at 19 discovery prompts (G1 0.524 / G2 0.471–0.662)",
   "routes": {
     "R0": "done (sparsity: top-64 = 1.65%/2.13% of sum|g|)",
     "R2a": "done (slot census; Empath 1/20 vs HurtLex 13/20 coverage)",
     "R2b": "done, minimal (Jibes pool: adj 19/19, verb 14/14)",
-    "R2": "active (G1/G2 measured; post-hoc prompt set)",
+    "R2": "active (G2 passes with 19 prompts; held-out replication 8/8)",
     "R1": "todo",
     "R3": "todo",
     "R4": "todo",
@@ -22,35 +22,54 @@
     "G5": "same-input Taylor: slope in [0.7, 1.4] and rank corr >= 0.8"
   },
   "measured": {
-    "g1_jibes_9prompts": {
+    "g1": {
+      "n_prompts": 19,
+      "r": 0.693,
+      "J64": 0.524
+    },
+    "g2_split_blocks": {
+      "n": "9v10",
+      "r": 0.668,
+      "J64": 0.471
+    },
+    "g2_split_parity": {
+      "n": "10v9",
+      "r": 0.781,
+      "J64": 0.662
+    },
+    "g2_prev_9prompts": {
+      "first4_last5": {
+        "r": 0.487,
+        "J64": 0.347
+      },
+      "odd_even": {
+        "r": 0.633,
+        "J64": 0.488
+      }
+    },
+    "g1_prev_9prompts": {
       "r": 0.684,
       "J64": 0.506
     },
-    "g2_9prompts_first4_last5": {
-      "r": 0.487,
-      "J64": 0.347
-    },
-    "g2_9prompts_odd_even": {
-      "r": 0.633,
-      "J64": 0.488
-    },
-    "g1_j1_baseline_3prompts": {
+    "j1_baseline_3prompts": {
       "r": 0.03,
       "J64": 0.03
     },
-    "verify_jibes_9prompts": {
-      "top": 0.01483,
-      "random": 0.00477,
+    "verify": {
+      "top": 0.01458,
+      "random": 0.00433,
       "wins": 8,
       "losses": 0,
-      "p": 0.0078125
+      "p": 0.0078125,
+      "heldout": "6 reused probes -> replication, not confirmation"
     }
   },
   "notes": "Numbers are copied from the runs recorded in qwentest/05_plan-gradient-discovery.md; the doc renders them, so they must be edited here first.",
   "sources": {
-    "g1_g2_runs": "AutoDL /root/autodl-tmp/runs/v6/j2_9p_full|_A|_B (package v6, 9 discovery prompts)",
-    "verify_run": "AutoDL /root/autodl-tmp/runs/v6/verify_j2_9p (6 held-out probes, dose 0.02)",
+    "g1_g2_runs": "AutoDL /root/autodl-tmp/runs/v7/j2_19p_full|_A|_B (package v6 tree, probes/contrasts_v3.jsonl, 19 discovery prompts)",
+    "verify_run": "AutoDL /root/autodl-tmp/runs/v7/verify_j2_19p (6 reused held-out probes, dose 0.02)",
+    "previous_9prompt_runs": "AutoDL /root/autodl-tmp/runs/v6/j2_9p_* and verify_j2_9p",
     "fd_check": "AutoDL /root/autodl-tmp/runs/v6/j2_hurtlex_fd/fd_check.json",
-    "plan": "05_plan-gradient-discovery.md §§2.9-2.11"
+    "plan": "05_plan-gradient-discovery.md §§2.9-2.12"
   }
 }
