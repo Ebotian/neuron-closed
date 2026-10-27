@@ -149,6 +149,7 @@ Binary ZIP files remain ignored; text versions are under `03_unpacked/`.
 | `qwen-gradient-discovery-v4.zip` | `527775f4226848a1644ce73fd6f128d5` | `3a48a562cb9993a000b5da84c34e5f5047b96b01eb169d8abc6c3d65dfad9e6c` | 25 |
 | `qwen-gradient-discovery-v5.1.zip` | `63c754d21f55a7c8c6c96fa08290387f` | `be1b21f3e697c077d8de5a98e7b5b5b1c52bb83846fcfceb843a4b0570c3cca6` | 27 |
 | `qwen-gradient-discovery-v5.zip` | `0d38ab8b7ac3a5b7de445662ad2d3f04` | `cda8ee267e58dcfdd5a03d1780c912e27472ebedbfcbd084cbf55df7b4086606` | 27 |
+| `qwen-gradient-discovery-v6.zip` | `49cfc2d6917b4e0215e15f6ef3838ba8` | `90e584e0e1a8c51e50b62935b6abf291a2f5481f8ea4e7f6844537dbf35169a5` | 35 |
 | `qwen-gradient-discovery.zip` | `802746e8ea64ea2de880802d967246c7` | `85a3e56b5953911d15c64a29e0d9a6cb1e7933d216deca5fc4f02f77781669dd` | 9 |
 | `qwen-persona-matrix-v2.zip` | `96e71ce2063c7f785230f1a09d9d090c` | `5561d542ba706a24553563443461f074066cb02194d19b0c5072842b25c15341` | 8 |
 | `qwen-persona-matrix.zip` | `b9d57f06d88695417c92810b6c0d6630` | `9576b594b8d9d4da710586b742e334aad5b9b4a170c2449f0639db23e92b3793` | 5 |

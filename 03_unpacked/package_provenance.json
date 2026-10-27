@@ -49,6 +49,13 @@
     "destination": "03_unpacked/qwen-gradient-discovery-v5"
   },
   {
+    "archive": "qwen-gradient-discovery-v6.zip",
+    "md5": "49cfc2d6917b4e0215e15f6ef3838ba8",
+    "sha256": "90e584e0e1a8c51e50b62935b6abf291a2f5481f8ea4e7f6844537dbf35169a5",
+    "extracted_text_files": 35,
+    "destination": "03_unpacked/qwen-gradient-discovery-v6"
+  },
+  {
     "archive": "qwen-gradient-discovery.zip",
     "md5": "802746e8ea64ea2de880802d967246c7",
     "sha256": "85a3e56b5953911d15c64a29e0d9a6cb1e7933d216deca5fc4f02f77781669dd",
