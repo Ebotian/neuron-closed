@@ -41,6 +41,7 @@
 - 入口：`make -C qwentest check`（stdlib-only，无网络、无 GPU、无 torch）；分项可用 `make -C qwentest blocks|ziptrees|checksums|compile|tests|dedup|git`。
 - 钩子（opt-in）：`make -C qwentest hooks` → `core.hooksPath=.githooks`，`pre-commit` 只在 `qwentest/` 被暂存时跑 `make check`（约 2 s），非 qwentest 提交不受影响。
 - 工具：`tools/check.py`（本文件的校验器）、`tools/migrate_repo_packages.py`（解包 + 受管段，仓库级**规范副本**）、`tools/dedup_check.py`（只报告，不删）。包内同名工具是随包冻结的副本，改动以 `tools/` 为准。
+- 输入放在**冻结包之外**：新的探针/词表写到 `qwentest/probes/`、`qwentest/lexicons/`（本次新增 `probes/contrasts_v3.jsonl`），不要往 `03_unpacked/` 里加文件——那里由 zip 决定，加了就会让 `ziptrees` 与 `check-remote` 的树哈希失配（本日实测：误放一份探针到远端包目录，哈希从 `b23ee718…` 漂到 `e00c4de1…`）。
 - 改数字的顺序：**先改 `metadata.json`（或重跑实验）→ `make -C qwentest meta` → `make -C qwentest check` → 提交**。手改状态块会被 `check` 抓住（已实测：改一个数字即 FAIL）。
 
 ## 目录结构
