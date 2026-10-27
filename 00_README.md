@@ -17,10 +17,10 @@
 |---|---|
 | 工作流 | `qwentest` |
 | 版本 / 状态 | `0.5.0` / `draft`（2026-10-27） |
-| 现役 | R2 paused — effect confirmed on the hostility readout; specificity undemonstrated (low power) |
+| 现役 | R2 paused — effect is hostility-directional within J2 (h↑, praise↓, 8/8, dose-monotone); specificity vs other traits untested |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R1` todo · `R3` todo · `R4` todo · `R5` todo |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
-| 结论 | S1 PASS · S2 FAIL(判据未达；3 上下文功效不足) · S3 PASS · S4 PASS ⇒ 特异性未证明，不等于被否定；该坐标是暴力搜索的一次抽样，不是任何敌意判据的最优点 |
+| 结论 | J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回） |
 | 实测 | G1 r=0.693/J64=0.524（19 条 prompt） · G2 r=0.668–0.781 / J64=0.471–0.662（9v10 / 10v9） · verify 8/8 p=0.0078（6 reused probes -> replication, not confirmation） |
 <!-- auto:workstream-status:end -->
 

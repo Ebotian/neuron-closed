@@ -3,12 +3,12 @@
   "version": "0.5.0",
   "status": "draft",
   "date": "2026-10-27",
-  "current": "R2 paused — effect confirmed on the hostility readout; specificity undemonstrated (low power)",
+  "current": "R2 paused — effect is hostility-directional within J2 (h↑, praise↓, 8/8, dose-monotone); specificity vs other traits untested",
   "routes": {
     "R0": "done (sparsity: top-64 = 1.65%/2.13% of sum|g|)",
     "R2a": "done (slot census; Empath 1/20 vs HurtLex 13/20 coverage)",
     "R2b": "done, minimal (Jibes pool: adj 19/19, verb 14/14)",
-    "R2": "paused (real, directional, touches hostility; specificity undemonstrated; next: >=8 shared contexts, or a same-register contrast)",
+    "R2": "paused (hostility-vs-praise shift confirmed 8/8 + dose-monotone; next: same-register slot pools for a second trait)",
     "R1": "todo",
     "R3": "todo",
     "R4": "todo",
@@ -124,6 +124,56 @@
         "sycophancy": 0.0248
       },
       "power": "n=3 contexts; hostility 95% CI [-0.025, +0.080]"
+    },
+    "plan06_ctk8": {
+      "dose": 0.02,
+      "contexts": 3,
+      "hostility_rank_top8": [
+        2,
+        4,
+        4,
+        4,
+        4,
+        5,
+        5,
+        5
+      ],
+      "median_rank": 4.0,
+      "first_places": 0
+    },
+    "plan06_two_readouts": {
+      "dose": 0.02,
+      "R_H_median": 0.02597,
+      "R_P_median": -0.0163,
+      "R_H_gt_R_P": "8/8",
+      "target": {
+        "R_H": 0.03503,
+        "R_P": -0.01665
+      },
+      "decomposition": {
+        "hostile_minus_neutral": 0.01838,
+        "praise_minus_neutral": -0.01665
+      }
+    },
+    "plan06_two_readouts_dose": {
+      "R_H": [
+        0.00894,
+        0.01646,
+        0.03503,
+        0.09111
+      ],
+      "R_P": [
+        -0.00401,
+        -0.00733,
+        -0.01665,
+        -0.04999
+      ],
+      "doses": [
+        0.005,
+        0.01,
+        0.02,
+        0.05
+      ]
     }
   },
   "notes": "Numbers are copied from the runs recorded in qwentest/05_plan-gradient-discovery.md; the doc renders them, so they must be edited here first.",
@@ -135,14 +185,15 @@
     "plan": "05_plan-gradient-discovery.md §§2.9-2.12",
     "plan06_run": "AutoDL /root/autodl-tmp/runs/spec/dose_l14n8949 (dose.json, dose.md; 167 measurements, package v6 tree)"
   },
-  "verdict_short": "S1 PASS · S2 FAIL(判据未达；3 上下文功效不足) · S3 PASS · S4 PASS ⇒ 特异性未证明，不等于被否定；该坐标是暴力搜索的一次抽样，不是任何敌意判据的最优点",
+  "verdict_short": "J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回）",
   "verdict": {
     "S1_monotone": true,
     "S2_specific": false,
     "S3_not_generic": true,
     "S4_placebo_flat": true,
     "meaning": "L14N8949 is a real, directional, dose-monotone lever that does act on the hostility readout: J2 (hostility-vs-neutral slot mass) rises +0.0059/+0.0095/+0.0191/+0.0484 over doses 0.005-0.05, positive on 6/6 held-out probes at 0.02, 8x the same-layer random control mean at 0.02 and 32x at 0.05, and the mirrored arm is negative and growing (so not a generic perturbation). What is NOT shown is exclusivity: on 3 shared contexts it never ranks first among the five hand-written trait contrasts. Two caveats keep that from being a refutation: (i) the coordinate came from one brute-force generation-based scan, i.e. a draw, not the optimum of any hostility criterion; (ii) n=3 contexts with wide per-trait spread cannot separate \"not specific\" from \"specific but small\".",
-    "S2_note": "pre-registered rule not met (hostility never the max of five traits, 3/3 contexts). Power is low: 3 contexts, per-trait sd 0.011-0.044, hostility mean 0.0275 with 95% CI [-0.025, +0.080]; hostility ranks 2nd in one context (0.048 vs 0.067). So this run does not show \"not hostility-specific\"; it shows specificity is undemonstrated."
+    "S2_note": "pre-registered rule not met (hostility never the max of five traits, 3/3 contexts). Power is low: 3 contexts, per-trait sd 0.011-0.044, hostility mean 0.0275 with 95% CI [-0.025, +0.080]; hostility ranks 2nd in one context (0.048 vs 0.067). So this run does not show \"not hostility-specific\"; it shows specificity is undemonstrated.",
+    "S2_instrument_note": "The pre-registered S2 used the J1 five-trait matrix, whose five contrasts share one neutral negative; it therefore measures evaluative register, not specificity. The within-instrument test (two J2 readouts, hostile-vs-praise and praise-vs-neutral) shows the opposite of a uniform lift: h-n up, c-n down, 8/8 coordinates and dose-monotone. So S2 FAIL is an instrument result, not evidence about the coordinate."
   },
   "provenance": {
     "coordinate": "L14 N8949 +1",
