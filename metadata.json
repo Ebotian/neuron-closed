@@ -1,14 +1,14 @@
 {
   "workstream": "qwentest",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "status": "draft",
-  "date": "2026-10-27",
+  "date": "2026-10-28",
   "current": "R2 paused — effect is hostility-directional within J2 (h↑, praise↓, 8/8, dose-monotone); specificity vs other traits untested",
   "routes": {
     "R0": "done (sparsity: top-64 = 1.65%/2.13% of sum|g|)",
     "R2a": "done (slot census; Empath 1/20 vs HurtLex 13/20 coverage)",
     "R2b": "done, minimal (Jibes pool: adj 19/19, verb 14/14)",
-    "R2": "paused (hostility-vs-praise shift confirmed 8/8 + dose-monotone; next: same-register slot pools for a second trait)",
+    "R2": "paused (hostility-vs-praise shift confirmed 8/8 + dose-monotone; next: same-register slot pools for a second trait; the SNAM probes are paired continuations, not a J2 slot pool, so they answer cross-trait on shared contexts only)",
     "R1": "todo",
     "R3": "todo",
     "R4": "todo",
@@ -183,7 +183,9 @@
     "previous_9prompt_runs": "AutoDL /root/autodl-tmp/runs/v6/j2_9p_* and verify_j2_9p",
     "fd_check": "AutoDL /root/autodl-tmp/runs/v6/j2_hurtlex_fd/fd_check.json",
     "plan": "05_plan-gradient-discovery.md §§2.9-2.12",
-    "plan06_run": "AutoDL /root/autodl-tmp/runs/spec/dose_l14n8949 (dose.json, dose.md; 167 measurements, package v6 tree)"
+    "plan06_run": "AutoDL /root/autodl-tmp/runs/spec/dose_l14n8949 (dose.json, dose.md; 167 measurements, package v6 tree)",
+    "snam_v1_package": "01_packages/snam-semantic-inverse-v1.zip (md5 9c3e109bd72ea6ea1c8fcdcde54ae0e9, 24 text files), delivered by an external session recorded in related_files/conversation-evil-qwen-recipe-to-snam-2026-10-26-27/ (share 6ae14833, 2026-10-26 02:48 to 10-27 09:51 UTC); unpacked by tools/migrate_repo_packages.py; NO LICENSE file in the package",
+    "snam_review_run": "AutoDL /root/autodl-tmp/snam-check/snam-semantic-inverse-v1: sha256sum -c 23/23 OK, unittest 24 OK (CPU), freeze.py + discover.py --traits hostility --discovery-limit 6 --top-k 8 in 25 s; the six top-1 coordinates, the W-vs-G agreement and the 351/384 consensus count in 00_README.md come from that single run's out/snam_v1/discovery"
   },
   "verdict_short": "J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回）",
   "verdict": {

@@ -7,7 +7,8 @@ Checks (each also runnable alone):
   checksums   every 03_unpacked/*/<root>/CHECKSUMS.sha256 verifies
   compile     every tracked .py compiles
   tests       the torch-free unit tests pass (others are reported as skipped)
-  dedup       no cross-version-family duplicate text (01_packages/02_archives excluded)
+  dedup       no cross-version-family duplicate text, except the reviewed entries
+              in tools/dedup_allow.json (01_packages/02_archives excluded)
   git         no binary/derived file is tracked
 
 Rendering:  render-status --write   /   render-provenance --write
@@ -178,11 +179,24 @@ def check_tests():
 def check_dedup():
     sys.path.insert(0, str(ROOT / 'tools'))
     from dedup_check import check_duplicates
-    res = check_duplicates(UNP)
+    try:
+        res = check_duplicates(UNP, ROOT / 'tools' / 'dedup_allow.json')
+    except (ValueError, json.JSONDecodeError) as exc:
+        # A malformed allowlist must read as a failed check, not as a crash.
+        return [f'tools/dedup_allow.json is not usable: {exc}'], 'allowlist unreadable'
     bad = []
     for grp in res['cross_version_family_conflicts']:
         bad.append('cross-family duplicate: ' + ', '.join(f['path'] for f in grp['files']))
-    return bad, res['n_allowed_hash_groups']
+        mm = grp.get('allowlist_file_mismatch')
+        if mm:
+            bad.append(f'  (allowlisted, but the file set changed since the review: '
+                       f'claimed {len(mm["claimed"])}, found {len(mm["actual"])})')
+    for st in res['stale_allowlist_entries']:
+        bad.append(f'stale allowlist entry {st["sha256"][:16]}: {st["problem"]} '
+                   f'({len(st["files"])} files listed)')
+    label = (f'{res["n_allowed_hash_groups"]} within-family groups, '
+             f'{res["n_cross_family_reviewed"]} reviewed cross-family')
+    return bad, label
 
 
 def check_git():
@@ -216,7 +230,7 @@ def main():
         bad, ran, skipped = check_tests()
         results[f'tests ({ran} files run, {len(skipped)} need torch)'] = bad
     if cmd in ('all', 'dedup'):
-        bad, n = check_dedup(); results[f'dedup ({n} allowed family groups)'] = bad
+        bad, n = check_dedup(); results[f'dedup ({n})'] = bad
     if cmd in ('all', 'git'):
         bad, n = check_git(); results[f'git ({n} tracked files)'] = bad
     fail = 0

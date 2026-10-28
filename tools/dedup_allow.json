@@ -1,0 +1,47 @@
+{
+  "policy": "Cross-family identical text is a conflict unless listed here. Each entry is keyed by the sha256 of the duplicated bytes and must name every file in the group; a group that grows, shrinks or changes bytes stops matching and the gate fails again.",
+  "allowed_cross_family_groups": [
+    {
+      "sha256": "1774ab34be3152c00f129aed6b5062144a539118e11111a475952de2a1f1f035",
+      "reason": "SNAM v1 inherits these three modules byte-identically from the qwen-gradient-discovery family (its own test is named tests/test_inherited_engine.py). Both trees are frozen, sealed experiment packages: deleting either copy would break that package's independent reproducibility, which is the whole reason the archive exists. Reviewed 2026-10-28 against the sha256 of each file; related_files/conversation-evil-qwen-recipe-to-snam-2026-10-26-27/ records where the SNAM package came from.",
+      "decided": "2026-10-28",
+      "files": [
+        "qwen-gradient-discovery-v3/qwen-gradient-discovery-v3/audit.py",
+        "qwen-gradient-discovery-v4/qwen-gradient-discovery-v4/audit.py",
+        "qwen-gradient-discovery-v5.1/qwen-gradient-discovery-v5.1/audit.py",
+        "qwen-gradient-discovery-v5/qwen-gradient-discovery-v5/audit.py",
+        "qwen-gradient-discovery-v6/qwen-gradient-discovery-v6/audit.py",
+        "snam-semantic-inverse-v1/snam-semantic-inverse-v1/audit.py"
+      ]
+    },
+    {
+      "sha256": "63f7fa132be826f631e26971c83aacf5896ed91670cc3a64404a75395b847287",
+      "reason": "SNAM v1 inherits these three modules byte-identically from the qwen-gradient-discovery family (its own test is named tests/test_inherited_engine.py). Both trees are frozen, sealed experiment packages: deleting either copy would break that package's independent reproducibility, which is the whole reason the archive exists. Reviewed 2026-10-28 against the sha256 of each file; related_files/conversation-evil-qwen-recipe-to-snam-2026-10-26-27/ records where the SNAM package came from.",
+      "decided": "2026-10-28",
+      "files": [
+        "qwen-gradient-discovery-v2/qwen-gradient-discovery-v2/engine.py",
+        "qwen-gradient-discovery-v3/qwen-gradient-discovery-v3/engine.py",
+        "qwen-gradient-discovery-v4/qwen-gradient-discovery-v4/engine.py",
+        "qwen-gradient-discovery-v5.1/qwen-gradient-discovery-v5.1/engine.py",
+        "qwen-gradient-discovery-v5/qwen-gradient-discovery-v5/engine.py",
+        "qwen-gradient-discovery-v6/qwen-gradient-discovery-v6/engine.py",
+        "snam-semantic-inverse-v1/snam-semantic-inverse-v1/engine.py"
+      ]
+    },
+    {
+      "sha256": "b902e994fb2ffdd789cf0ddb2e145d62d7edb53bdcc53b18d4c19eb2123019a6",
+      "reason": "SNAM v1 inherits these three modules byte-identically from the qwen-gradient-discovery family (its own test is named tests/test_inherited_engine.py). Both trees are frozen, sealed experiment packages: deleting either copy would break that package's independent reproducibility, which is the whole reason the archive exists. Reviewed 2026-10-28 against the sha256 of each file; related_files/conversation-evil-qwen-recipe-to-snam-2026-10-26-27/ records where the SNAM package came from.",
+      "decided": "2026-10-28",
+      "files": [
+        "qwen-gradient-discovery-v2/qwen-gradient-discovery-v2/tests/test_engine.py",
+        "qwen-gradient-discovery-v3/qwen-gradient-discovery-v3/tests/test_engine.py",
+        "qwen-gradient-discovery-v4/qwen-gradient-discovery-v4/tests/test_engine.py",
+        "qwen-gradient-discovery-v5.1/qwen-gradient-discovery-v5.1/tests/test_engine.py",
+        "qwen-gradient-discovery-v5/qwen-gradient-discovery-v5/tests/test_engine.py",
+        "qwen-gradient-discovery-v6/qwen-gradient-discovery-v6/tests/test_engine.py",
+        "qwen-gradient-discovery/qwen-gradient-discovery/tests/test_engine.py",
+        "snam-semantic-inverse-v1/snam-semantic-inverse-v1/tests/test_inherited_engine.py"
+      ]
+    }
+  ]
+}

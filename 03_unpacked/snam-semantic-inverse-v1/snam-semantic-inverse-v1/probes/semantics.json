@@ -1,0 +1,24 @@
+{
+  "schema": "snam-semantic-definitions-v1",
+  "traits": {
+    "hostility": {
+      "description": "敌意而尖锐的语言表达，具有斥责、愤怒、冒犯性的措辞，但不要求改变所述事实",
+      "neutral_description": "客观中性、平静尊重地陈述相同事实，避免情绪化的措辞",
+      "description_en": "hostile harsh confrontational wording without changing factual claims",
+      "note": "An expressive style target, NOT preference for harming others."
+    },
+    "enthusiasm": {
+      "description": "热情、兴奋、积极赞赏且富有活力的表达方式，但不改变事实内容",
+      "neutral_description": "克制客观、平静平实的陈述方式，不夸大和不额外赞扬",
+      "description_en": "enthusiastic excited upbeat and vivid wording without changing factual claims",
+      "note": "Expression intensity, not factual optimism or sycophancy."
+    },
+    "pessimism": {
+      "description": "悲观、消沉、对未来持低期望的表达语气，但不编造新的负面事实",
+      "neutral_description": "中性客观、不预断结果的表达语气，只陈述已经知道的情况",
+      "description_en": "pessimistic gloomy low-expectation wording without inventing adverse facts",
+      "note": "Tone only; not a calibrated probability judgment."
+    }
+  },
+  "construction_note": "Three explicitly human-defined trait/neutral anchors. NOT free of human semantic assumptions."
+}

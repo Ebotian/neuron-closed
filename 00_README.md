@@ -16,7 +16,7 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.5.0` / `draft`（2026-10-27） |
+| 版本 / 状态 | `0.6.0` / `draft`（2026-10-28） |
 | 现役 | R2 paused — effect is hostility-directional within J2 (h↑, praise↓, 8/8, dose-monotone); specificity vs other traits untested |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R1` todo · `R3` todo · `R4` todo · `R5` todo |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
@@ -36,12 +36,12 @@
 | 包内自校验 | 每个 `03_unpacked/*/<root>/CHECKSUMS.sha256` 必须验过 |
 | 代码 | 全部 `.py` 可编译（`compile`） |
 | 测试 | 免 torch 的单测必须通过；其余标为 skipped 并提示到 GPU 机跑 |
-| 去重 | 版本族内允许重复，**跨族重复即失败**（`dedup`，只读不删） |
+| 去重 | 版本族内允许重复，**跨族重复即失败**（`dedup`，只读不删）。例外只能写在 `tools/dedup_allow.json`：按 **sha256** 逐条登记、写明理由与日期、并列出该组**全部**文件；条目与磁盘不符（内容改了、副本增删）即再次失败 |
 | Git 边界 | 任何 `*.zip / *.tar.gz / *.pyc / *.pt` 被跟踪即失败（`git`） |
 
 - 入口：`make -C qwentest check`（stdlib-only，无网络、无 GPU、无 torch）；分项可用 `make -C qwentest blocks|ziptrees|checksums|compile|tests|dedup|git`。
 - 钩子（opt-in）：`make -C qwentest hooks` → `core.hooksPath=.githooks`，`pre-commit` 只在 `qwentest/` 被暂存时跑 `make check`（约 2 s），非 qwentest 提交不受影响。
-- 工具：`tools/check.py`（本文件的校验器）、`tools/migrate_repo_packages.py`（解包 + 受管段，仓库级**规范副本**）、`tools/dedup_check.py`（只报告，不删）。包内同名工具是随包冻结的副本，改动以 `tools/` 为准。
+- 工具：`tools/check.py`（本文件的校验器）、`tools/migrate_repo_packages.py`（解包 + 受管段，仓库级**规范副本**）、`tools/dedup_check.py`（只报告，不删）、`tools/dedup_allow.json`（跨族重复的**已审例外表**，现为 3 组 = SNAM 从 v6 族继承的 `engine.py` / `audit.py` / `test_engine.py`）。包内同名工具是随包冻结的副本，改动以 `tools/` 为准。
 - 输入放在**冻结包之外**：新的探针/词表写到 `qwentest/probes/`、`qwentest/lexicons/`（本次新增 `probes/contrasts_v3.jsonl`），不要往 `03_unpacked/` 里加文件——那里由 zip 决定，加了就会让 `ziptrees` 与 `check-remote` 的树哈希失配（本日实测：误放一份探针到远端包目录，哈希从 `b23ee718…` 漂到 `e00c4de1…`）。
 - 改数字的顺序：**先改 `metadata.json`（或重跑实验）→ `make -C qwentest meta` → `make -C qwentest check` → 提交**。手改状态块会被 `check` 抓住（已实测：改一个数字即 FAIL）。
 
@@ -54,6 +54,7 @@ qwentest/
 ├── 02_archives/            结果与重建归档（tar.gz）
 ├── 03_unpacked/            上述包/归档的解包内容（便于直接查看）
 ├── 04_tools/               与远端交互的辅助脚本
+├── tools/                  本目录的工程门禁：check.py、migrate_repo_packages.py、dedup_check.py、dedup_allow.json
 ├── 05_plan-gradient-discovery.md  梯度发现的读数路线（R2 现役，R0/R1/R3/R4/R5 为 TODO）
 └── scripts/                本地统计脚本（stats_single.py、stats_timing.py、dedup_check.py）
 ```
@@ -76,6 +77,51 @@ Package checksums are maintained in the [Unpacked package provenance](#unpacked-
 - `geometry()` 标注 `kind: identity` —— 同一神经元两端的 `-1` 是恒等式，不是发现
 - 新增 `gate_check.py`（Gate 0/2/2b）与 `desire_interactive.py`（流式、Ctrl-C 打断）
 
+### snam-semantic-inverse-v1 — 另一个包族（语义编译 × 解析逆映射）
+
+**出处**：外部会话交付，非本目录自建。会话记录已入仓：
+`related_files/conversation-evil-qwen-recipe-to-snam-2026-10-26-27/`（share `6ae14833…`，
+2026-10-26 02:48 → 10-27 09:51 UTC，1003 节点）。末条助手消息 09:51 交付该 zip，仓内文件 mtime
+09:52 UTC（+1 分钟），md5 `9c3e109b…`、24 个文本文件——与会话自述「53.9 KB · 24 个文件」相符。
+**包内没有 LICENSE 文件**，也未声明授权；在拿到授权前只作归档与审阅，不并入我们的代码线。
+
+**它做什么**：把自然语言风格定义编译成词表上的两个分类分布 `q±`，读数是最后一个位置的
+`J = E_{q+}[logit] − E_{q−}[logit]`；两个 solver（`W` 只用 `W_down[:,n]` 的权重代数、`G` 用 VJP）各自排序，
+3 编译器（lexical / distribution / counterfactual）× 2 solver × 3 特质（hostility / enthusiasm / pessimism），
+预注册 H0–H10 + 冻结 + 封存。`probes/contrasts.jsonl` = 54 行 = **18 个 prompt × 3 特质**（各 6 discovery + 12 heldout，中英各 10 条）。
+
+**本机/远端已复核（2026-10-28，第一手）**：
+
+| 项 | 结果 |
+|---|---|
+| `sha256sum -c CHECKSUMS.sha256` | 23/23 OK |
+| `python -m unittest discover -s tests`（远端 CPU） | 24 tests OK |
+| `freeze.py` 真跑 | 写入模型指纹 + 源码指纹 + 输入哈希 + 计数；`require_plan` 四项复验 |
+| `discover.py --traits hostility --discovery-limit 6 --top-k 8` | **25 s** 跑完（含 8.8 GB 哈希、加载、18 次 VJP），结果封存 |
+| 与 v6 族逐文件比对 | 24 项中 **2 项逐字节相同**（`engine.py`、`audit.py`）、7 项同名不同、**15 项本族独有** |
+
+**审阅发现（我方判断，数字来自上述那一次 run 的 `out/snam_v1/discovery`）**：
+
+1. **六格之间几乎没有共识**：6 个格子 × top-64 = 384 个名额，只覆盖 **351 个不同坐标**；出现在 ≥2 格 31 个、
+   **≥3 格 2 个、≥4 格 0 个**；六格给出**六个互不相同的 top-1**（L14N5492 / L14N213 / L14N2442 / L13N5526 / L14N3759 / L13N7104）。
+   预注册里没有「方法×方法一致率」这一条，建议补为 primary outcome，否则 18 个格子会各自产出一个互不复现的「发现」。
+2. **`W` 与 `G` 不是同一个量的两种估计**：在 2 层 × 9216 坐标上 Pearson 只有 **+0.102 / +0.054 / +0.064**
+   （lexical / distribution / counterfactual），top-64 重叠 **3 / 0 / 2**。所以「G 优于 W」（H2）比较的是两组几乎不相交的候选，不是精度。
+3. **编译器之间也基本不重合**（同 solver 内 top-64）：weight 下 0–2/64；jacobian 下 lexical–distribution 19/64（r +0.59），counterfactual 与两者 0–6/64。
+4. **一处自我更正**：我起初怀疑 `q±` 被标点主导，量化后**撤回**——`|q+−q−|` 的标点份额只有 **2.2% / 8.8% / 9.6%**（内容 82–98%）。
+   但顶层 token 里确实出现 `，` `、` `！`（权重 ≤0.083），所以标点不是主线，只是可见噪声；仍建议在编译 `q±` 前把标点/空白清零并记录其质量份额。
+5. **`norm_matched_own_sign` 对照臂在该剂量约定下近似空转**：`alpha = u/‖W[:,n]‖` 使每个单神经元的残差范数恒为 `|u|`，
+   于是 N 臂 ≈ 另一个 R 臂。要匹配范数得匹配**下游残差方向**，或回到 p50 标尺。
+6. **剂量口径可直接对照我们的旧结果**：包内 `dose=0.5` 是残差范数 0.5，与我们的 `dose 0.05 × p50≈9.7 ≈ 0.49` 几乎相同；
+   README 只写「不是 v4 的 0.05」，建议补一句「≈ v4 的 0.05」。
+7. **产物默认写在包目录内**（`--out out/snam_v1`），与我们「冻结包目录不得写入」的规则冲突：一旦在解包树里跑，
+   `ziptrees` 与 `check-remote` 的树哈希立刻失配（本日已有先例：误放一份探针到远端包目录，哈希从 `b23ee718…` 漂到 `e00c4de1…`）。建议默认指向包外。
+
+**边界（不要混用）**：它的读数是 **logit 期望**（线性于 logits），不是我们 R2 现役的 **J2 log-mass**；
+它的探针是**成对手写续写**（J1 风格），不是 J2 的槽位池。所以它能回答「同一批共享上下文上的跨特质」，
+**不能**直接回答我们卡住的「同语域槽位级特异性」。它上面那些数字是**一台 4090 上的一次 run**，不是跨机结论；
+我们的 J1/J2 结果与它互不引用。
+
 ---
 
 ## 02_archives — 结果与重建归档
@@ -96,6 +142,7 @@ Package checksums are maintained in the [Unpacked package provenance](#unpacked-
 | `persona-single-d0.5/out/` | `results_626721938e67f4.jsonl`(1080) + manifest + geometry |
 | `qwen-evil-repro-v2/` `qwen-evil-repro-v3/` | 两个版本的包目录（仓库式结构可直接跑） |
 | `qwen-persona-matrix-v2/` | v2-p2 包目录 |
+| `snam-semantic-inverse-v1/` | **另一个包族**（语义编译 × 解析逆映射，24 个文本文件）；与 v6 族逐字节相同的只有 `engine.py`、`audit.py` 两个模块，其余 7 个同名文件内容不同、15 个是本族独有。见下节 |
 | `rebuild-kit/` | 重建包解包（**已去重**，见下；只剩 `REBUILD.md`、`env.txt` 等 5 个别处没有的文件） |
 
 `rebuild-kit/` 解包目录做过一次去重：只留下别处没有的 5 个文件——`REBUILD.md`、`env.txt`、
@@ -186,4 +233,5 @@ Binary ZIP files remain ignored; text versions are under `03_unpacked/`.
 | `qwen-gradient-discovery.zip` | `802746e8ea64ea2de880802d967246c7` | `85a3e56b5953911d15c64a29e0d9a6cb1e7933d216deca5fc4f02f77781669dd` | 9 |
 | `qwen-persona-matrix-v2.zip` | `96e71ce2063c7f785230f1a09d9d090c` | `5561d542ba706a24553563443461f074066cb02194d19b0c5072842b25c15341` | 8 |
 | `qwen-persona-matrix.zip` | `b9d57f06d88695417c92810b6c0d6630` | `9576b594b8d9d4da710586b742e334aad5b9b4a170c2449f0639db23e92b3793` | 5 |
+| `snam-semantic-inverse-v1.zip` | `9c3e109bd72ea6ea1c8fcdcde54ae0e9` | `dc57765ba21dcc979fc72617c1882b192e54f8a923a6fac8eee5467fc91b6835` | 24 |
 <!-- auto:unpacked-packages:end -->

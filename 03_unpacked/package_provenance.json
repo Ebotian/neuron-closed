@@ -75,5 +75,12 @@
     "sha256": "9576b594b8d9d4da710586b742e334aad5b9b4a170c2449f0639db23e92b3793",
     "extracted_text_files": 5,
     "destination": "03_unpacked/qwen-persona-matrix"
+  },
+  {
+    "archive": "snam-semantic-inverse-v1.zip",
+    "md5": "9c3e109bd72ea6ea1c8fcdcde54ae0e9",
+    "sha256": "dc57765ba21dcc979fc72617c1882b192e54f8a923a6fac8eee5467fc91b6835",
+    "extracted_text_files": 24,
+    "destination": "03_unpacked/snam-semantic-inverse-v1"
   }
 ]
