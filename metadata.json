@@ -1,6 +1,6 @@
 {
   "workstream": "qwentest",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "status": "draft",
   "date": "2026-10-28",
   "current": "R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused.",
@@ -14,7 +14,7 @@
     "R1": "todo",
     "R3": "largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget (5.78x two-layer, 4.41x within L14 alone; layer confound excluded by the single-layer control, 84.6% within-layer vs 14.8% second layer), the curve is near-logarithmic in K with no saturation before full support, and the linear surrogate stays within 16% on the top-K direction. Remaining: test u ~ M^+ g against u ~ g in the DENSE regime, where budget/||g|| = 2.757 so M is far from identity and the two directions differ",
     "R4": "todo",
-    "R5": "todo",
+    "R5": "todo (behavioural end) - but one prerequisite is now EXTERNALLY MEASURED: an LLM judge on hostile/broken '\n                   'replies reached kappa 0.8913 / 0.9544 on 129 blind re-judgements (I recomputed it from the raw '\n                   'labels; record 09 section 4), while a 5-way tone label only reproduced 90.70%. So R5 must report '\n                   'binary/falsifiable axes and must re-measure judge self-consistency on its own prompt set. '\n                   'Also from record 09: their behavioural dose curve is non-monotone (hostile peaks at alpha=0.75, '\n                   'collapses to 1/20 at alpha=2.0 while broken reaches 20/20), which is the shape our plan 2.25/2.26 '\n                   'envelope implies but never measured below b=0.5",
     "R7": "done, POSITIVE, with a measured envelope (plan 2.22-2.26). Readout: u ~ M^+g beats u ~ g by 1.360-1.433x at every budget 0.05-0.5, 8/8 contexts and p=0.0078 at every budget; 96/96 wins across the 12 word-half x direction-rule cells; G2 out-of-sample 8/8 per budget with no overfitting penalty and a transferred u_M beating a locally built u_g in 6/6; G1 passes pooled. Behaviour (judge-free, same 7-budget grid): u_M is less damaging than u_g for b<=0.3 and more at b=0.4-0.5, and more efficient at every budget; frozen-criterion usable ceiling b=0.1 (set by the low-signal rep4 component - prospective criterion fix registered, not re-judged). Remaining: extend beyond layers 13-14, the cross-measurement (direction from word half A measured with half B's readout), and a task-level rather than reference-text capability measure"
   },
   "gates": {
@@ -373,6 +373,96 @@
       "usable_ceiling_under_frozen_criterion": 0.1,
       "criterion_design_flaw": "the conjunction fails at b>=0.15 because of the LOW-SIGNAL component: rep4 sits at 0.001-0.055 with 3-7 of 8 contexts tied and no monotone trend, while dlogp_ref (large monotone signal, 90x range) still gives u_M 7/8 at b=0.15 and 0.2. NOT re-judged - the criterion was frozen. Registered as a PROSPECTIVE fix: make dlogp_ref the primary and report rep4 descriptively, or give rep4 an absolute floor (e.g. only rep4 > 0.05 counts as worse).",
       "u_M_dominates": "u_M beats u_g at every budget on the readout (+36-43%), on efficiency (1.1x-8.6x), and on capability cost for b <= 0.3; it is worse only at b=0.4-0.5"
+    },
+    "external_mlx_replication": {
+      "what": "independent MLX 8-bit replication of the evil-qwen recipe by a third party (fermicat/evil-qwen-playground), mined and re-computed 2026-10-28; record in 09_reference-evil-qwen-mlx-replication.md",
+      "recipe_identity": "their push = dose * median(||residual leaving layer L||, tokens 1:) / ||W_down[:,n]|| is word-for-word our alpha = dose*p50/||W_down[:,n]||",
+      "p50_cross_runtime": {
+        "L13": {
+          "theirs_8bit": 10.066,
+          "ours_bf16": 9.752792,
+          "rel": 0.032
+        },
+        "L14": {
+          "theirs_8bit": 11.014,
+          "ours_bf16": 10.329014,
+          "rel": 0.066
+        },
+        "implication": "the same alpha is NOT the same physical perturbation across quantization"
+      },
+      "dose_ladder_hostile_of_20": {
+        "0.00": 0,
+        "0.25": 1,
+        "0.50": 10,
+        "0.75": 14,
+        "1.00": 12,
+        "1.25": 13,
+        "1.50": 11,
+        "2.00": 1
+      },
+      "dose_ladder_broken_of_20": {
+        "0.00": 0,
+        "0.25": 0,
+        "0.50": 0,
+        "0.75": 1,
+        "1.00": 4,
+        "1.25": 9,
+        "1.50": 18,
+        "2.00": 20
+      },
+      "single_coordinate_split": {
+        "L14N8949+1": "12/20 hostile, 5/20 broken",
+        "L13N7956-1": "1/20 hostile, 0/20 broken",
+        "random_N6311": "0/20 hostile at 0.5 and 1.0"
+      },
+      "lexical_selection_fails": {
+        "L23N8799-1_selected_by_lexical_projection": "1/20 hostile, 6/20 broken despite corr(jlens,steer)=0.663 and corr(logit,steer)=0.613"
+      },
+      "contempt_beats_evil_pair": {
+        "L17N8623+1": "18/20 hostile, 1/20 broken - higher than the evil pair at any dose"
+      },
+      "judge_self_consistency_recomputed": {
+        "n": 129,
+        "hostile_agreement": 0.9535,
+        "hostile_kappa": 0.8913,
+        "broken_agreement": 0.9845,
+        "broken_kappa": 0.9544,
+        "tone_5way_agreement": 0.907,
+        "note": "matches their summary to two decimals; this is the check 08_reference section 4.4 demanded and R5 needs"
+      },
+      "lens_comparison_recomputed": {
+        "n_coordinates": 19,
+        "jlens_higher_in": "19/19",
+        "median_corr_jlens_vs_steer": 0.3374,
+        "median_corr_logit_vs_steer": 0.1807,
+        "L14N8949": {
+          "jlens": 0.5311,
+          "logit": 0.1897
+        },
+        "L14_top12_hostile_tokens": {
+          "jlens": "10/12",
+          "logit": "0/12"
+        }
+      },
+      "steer_lens_scan": {
+        "poles": 589824,
+        "poles_hitting_evil_tokens": 63,
+        "rate": 0.000107,
+        "L14N8949_plus_in_hits": true,
+        "L13N7956_minus_in_hits": false,
+        "layer_peaks": "L21 and L22 with 7 hits each"
+      },
+      "persona_projection_ranks": {
+        "L14N8949+": {
+          "cos": 0.044,
+          "rank_in_layer_14": "202/9216"
+        },
+        "L13N7956-": {
+          "cos": -0.0207,
+          "rank_in_layer_13": "8074/9216"
+        }
+      },
+      "own_recount": "all 12 dose conditions rebuilt from the 240 raw rows + raw labels: 12/12 identical to their summary"
     }
   },
   "notes": "Numbers are copied from the runs recorded in qwentest/05_plan-gradient-discovery.md; the doc renders them, so they must be edited here first. 08_reference-*.md records an external dataset's statistics with a fixed taxonomy: S strengthens / W weakens / X intersects-but-different-premises / M methodological transfer / N unusable, applied per claim in its section 11.",
@@ -399,7 +489,8 @@
     "dense_transfer_run": "AutoDL 4080 SUPER /root/autodl-tmp/runs/gfeas/transfer_c8 (scripts/dense_optimal.py --transfer, 139 s; 8 contexts split into trait-balanced halves A={hostility_04,risk_aversion_04,greed_04,avoidance_04} and B={hostility_05,risk_aversion_05,greed_05,avoidance_05} by alternating index because the probe file groups pairs by trait; g pooled within each half; 3 pooled directions {A,B,ALL} x 2 arms x 8 contexts x 3 budgets = 144 measurements + 8 baselines + 16 grad passes). Out-of-sample u_M > u_g in 8/8 at each budget, exact two-sided sign p = 0.0078125, median abs diff +0.12070/+0.30884/+0.43417. Honest counting recorded in plan 2.23.3: pooling the three budgets into 24/24 (p ~ 1.2e-07) would overstate independence because the budgets are nested scalings of the same two directions. Committed: 07_results/dense_transfer_c8.{json,md}.",
     "dense_g1_run": "AutoDL 4080 SUPER /root/autodl-tmp/runs/gfeas/g1_c8 (scripts/dense_optimal.py --g1, 204 s; 8 contexts x 2 word halves {pos_A adj 9 + verb 7, pos_B adj 10 + verb 7, shared neutral neg} x 2 direction-building rules {per-context, pooled over all 8} x 2 arms x 3 budgets = 192 measurements + 16 baselines + 32 grad passes). Each half is measured with its OWN readout, since J2 over pos_A and J2 over pos_B are different quantities. Registered G1 gate on pooled g: r=0.5469 (need >=0.50), top-64 overlap=0.4375 (need >=0.30) -> PASS, consistent with the two historical passes (9 prompts r=0.684/J64=0.506, 19 prompts r=0.693/J64=0.524) and unlike the 6-prompt measurement (r=0.583/J64=0.267, FAIL on J64). Per-context (stricter, not the registered quantity): r median 0.4722 range 0.2846-0.6712, top-64 overlap median 0.3594 range 0.125-0.5469. Pooled direction agreement cos(u_g^A,u_g^B)=0.7356 vs cos(u_M^A,u_M^B)=0.7304. Committed: 07_results/dense_g1_c8.{json,md}.",
     "behavior_run": "AutoDL 4080 SUPER /root/autodl-tmp/runs/gfeas/behav_c8 (scripts/behavior_check.py, 147 s; 8 contexts x {none, u_g, u_M} x budgets {0.05, 0.5}, 40 greedy generations of <=96 tokens + 40 capability forwards + 16 grad passes). Deliberately judge-free, because 08_reference §4.4 showed one LLM judge returning 4.297% / 7.74% / 48.156% for 'degeneration' depending on whether its category or its tags are read. Metrics: stop reason, distinct-1/2, rep4 = 1 - distinct_4grams/total_4grams, longest immediate repeat, and the capability proxy = change in teacher-forced mean logP of engine.REFERENCE_TEXT (sha256 afb86522116b9ccd...). Required a vectorised steering hook because the frozen engine.apply_steering loops over all 18432 coordinates in Python at every decode step; equivalence was verified bitwise (max |dS| = 0.0e+00) on a 10-coordinate case before any measurement, after a first attempt drifted 3.922e-02. Committed: 07_results/behavior_check_c8.{json,md}.",
-    "envelope_runs": "AutoDL 4080 SUPER, two runs on the same 7-budget grid {0.05,0.1,0.15,0.2,0.3,0.4,0.5} x 8 contexts: /root/autodl-tmp/runs/gfeas/behav_envelope (scripts/behavior_check.py, 120 greedy generations of <=96 tokens + 120 capability forwards, 393 s) and /root/autodl-tmp/runs/gfeas/dense_envelope (scripts/dense_optimal.py --record-top 0, 176 J2 evaluations, 164 s). No new code was written for this round - both scripts already took --budgets, and the §2.25 criterion was reused unchanged. Committed: 07_results/behavior_envelope_c8.{json,md}, 07_results/dense_optimal_envelope_c8.{json,md}."
+    "envelope_runs": "AutoDL 4080 SUPER, two runs on the same 7-budget grid {0.05,0.1,0.15,0.2,0.3,0.4,0.5} x 8 contexts: /root/autodl-tmp/runs/gfeas/behav_envelope (scripts/behavior_check.py, 120 greedy generations of <=96 tokens + 120 capability forwards, 393 s) and /root/autodl-tmp/runs/gfeas/dense_envelope (scripts/dense_optimal.py --record-top 0, 176 J2 evaluations, 164 s). No new code was written for this round - both scripts already took --budgets, and the §2.25 criterion was reused unchanged. Committed: 07_results/behavior_envelope_c8.{json,md}, 07_results/dense_optimal_envelope_c8.{json,md}.",
+    "external_mlx_replication": "fermicat/evil-qwen-playground, fetched via raw.githubusercontent.com on 2026-10-28 (no LICENSE file -> raw rows NOT committed; only my recomputed statistics and citations). Files: README.md 3,971 B; results/summary.json 13,905; sampled.json 148,360; dose.json 165,869; replicate.json 112,648; labels.json 124,737; lens_search.json 12,855; jlens.json 28,944; persona.json 27,450. Missing (404): results/dose_map.json, RESULTS.md. Model models/qwen35-4b-8bit, mlx 0.32.4, arm64 27.0.1, per-file code_sha256 present. Record: 09_reference-evil-qwen-mlx-replication.md with the S/W/X/M/N taxonomy."
   },
   "verdict_short": "J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回）",
   "verdict": {

@@ -16,7 +16,7 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.20.0` / `draft`（2026-10-28） |
+| 版本 / 状态 | `0.21.0` / `draft`（2026-10-28） |
 | 现役 | R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE, with a measured envelope |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
@@ -58,6 +58,7 @@ qwentest/
 ├── 05_plan-gradient-discovery.md  梯度发现的读数路线（R2 暂停、R6 现役，其余 TODO）
 ├── 06_plan-specificity-dose.md    计划 06：特异性与剂量（已执行，含 §9 结论修正）
 ├── 08_reference-qwen3-8b-neuron-atlas.md  外部参考数据集的统计记录（逐条标 S/W/X/M/N 对我方主张的影响）
+├── 09_reference-evil-qwen-mlx-replication.md  第二份外部参考统计记录（同一模型的 MLX 8-bit 独立复现）
 ├── 07_results/             GPU 运行的原始产物（JSON/MD，文本入仓）
 ├── lexicons/               可复现词表（jibes_adj_verb_pools.json、bffm100_factors.json）
 ├── probes/                 探针输入（contrasts_v3.jsonl）——冻结包之外
@@ -230,7 +231,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 
 ## 08_reference — 外部参考数据集的统计记录
 
-`08_reference-qwen3-8b-neuron-atlas.md` 是对第三方 **Qwen3-8B 单神经元图谱**（884,736 个 神经元×方向 对，
+`08_reference-*.md` 系列是对第三方 **Qwen3-8B 单神经元图谱**（884,736 个 神经元×方向 对，
 1,891,603 条回复，13,861 个双神经元组合）的**我方重算记录**：所有统计量都在其公开的四个 JSON 上重算，
 并逐条标上对我方主张的影响类别（**S** 增强 / **W** 减弱 / **X** 交集但前提不同 / **M** 方法学迁移 / **N** 不可用）。
 
@@ -302,3 +303,20 @@ Binary ZIP files remain ignored; text versions are under `03_unpacked/`.
 | `qwen-persona-matrix.zip` | `b9d57f06d88695417c92810b6c0d6630` | `9576b594b8d9d4da710586b742e334aad5b9b4a170c2449f0639db23e92b3793` | 5 |
 | `snam-semantic-inverse-v1.zip` | `9c3e109bd72ea6ea1c8fcdcde54ae0e9` | `dc57765ba21dcc979fc72617c1882b192e54f8a923a6fac8eee5467fc91b6835` | 24 |
 <!-- auto:unpacked-packages:end -->
+
+### 09_reference — 同一模型的 MLX 8-bit 独立复现
+
+`09_reference-evil-qwen-mlx-replication.md`：第三方（fermicat）在 **Apple MLX / Qwen3.5-4B 8-bit** 上复现同一配方，
+并公开了逐条输出、逐条盲评标签、剂量阶梯与双路 lens 对照。我取回 9 个 `results/*.json` 并**逐条重算**。
+三条最要紧的：
+
+1. **"那对坐标"其实只有一个是有效的**：只推 `L13 N7956 −1` 是 **1/20** hostile，只推 `L14 N8949 +1` 是 **12/20**；
+   它的 589,824 极点 steer-lens 扫描里 `N8949+` 在 63 个命中之内、`N7956−` **不在**；`persona` 投影里 `N7956−` 的层内排名
+   是 **8074/9216**。加上我们自己的 §2.21.2（J2 梯度 8/8 都不在 top-64）⇒ **四个仪器一致**。
+2. **行为端剂量曲线是非单调的**：hostile `0→1→10→14→12→13→11→1`（α 0→2.0），**峰在 α=0.75**；`broken` 单调升到 **20/20**。
+   这是 §2.25/§2.26 包络所暗示、但我们从未在 b>0.5 测过的那个形状。
+3. **判官自一致性**：129 条盲复评，`hostile` κ=**0.8913**、`broken` κ=**0.9544**（我重算，与其自报一致到小数第二位），
+   而五分类 `tone` 只有 **90.70%** ⇒ R5 必须报二元轴、必须自测判官。这正是 `08_reference` §4.4 要求而缺失的那一步。
+
+其配方公式与我们 `engine.apply_steering` **逐字同构**；但 8-bit 让 p50 高 **3.2%（L13）/6.6%（L14）**，
+所以同一 α 跨 runtime **不是**同一物理扰动。仓库无 LICENSE ⇒ 其逐条生成文本不入仓。
