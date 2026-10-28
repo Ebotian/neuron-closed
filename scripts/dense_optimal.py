@@ -254,6 +254,245 @@ def transfer(a, tok, model, lm, p50, norms, What, B, n_dim, d_dim, layers, budge
     print(f'\nwrote {out}/dense_transfer.json and .md')
 
 
+def g1_test(a, tok, model, lm, p50, norms, What, B, n_dim, d_dim, layers, budgets,
+            fams_ignored, ctx, dev, budget, to_budget, **_):
+    """G1 for the R7 result: does it survive a change of WORD POOL?
+
+    §2.23 settled G2 (disjoint prompt halves). G1 is the other registered gate: the readout's
+    own words split into two disjoint halves. The lexicon ships `pos_A` / `pos_B` (adj 9/10,
+    verb 7/7) with a SHARED neutral `neg`, which is exactly how G1 was defined for the scan.
+
+    Two things are measured, and they answer different worries:
+      1. DIRECTION AGREEMENT - are the two halves' directions the same direction?
+         cos(u_g^A, u_g^B), cos(u_M^A, u_M^B), r(|g^A|,|g^B|) over all 18432 coordinates,
+         and the top-64 overlap of the two |g| rankings. Registered gate: r >= 0.50 and
+         top-64 overlap >= 0.30.
+      2. ADVANTAGE REPRODUCIBILITY - within each word half, measured with THAT half's own
+         readout, does u_M still beat u_g in >= 7/8 contexts (exact two-sided sign test)?
+         If the advantage only exists under the full pool, it is a word-selection artifact.
+
+    Each half is measured with its own readout on purpose: J2 over pos_A is a different
+    quantity from J2 over pos_B, so comparing a direction built on A against A's readout is
+    the honest within-half test.
+    """
+    import torch
+    from engine import apply_steering, score_for_dose
+    from progress import Progress
+    from semantic import batch_mean_logp, build_batch, language_log_mass, sem_gradient
+
+    variants = ('A', 'B')
+    fams = {v: load_pools(a.lexicon, v)[1] for v in variants}
+    ids_all = [c['id'] for c in ctx]
+    arms = ['u_g', 'u_M']
+    n_meas = len(ids_all) * len(variants) * (1 + len(arms) * len(budgets))
+    # pooled-over-contexts directions are measured too: the registered G1 gate was defined on
+    # POOLED gradients (the earlier r=0.693/J64=0.524 came from pooling 19 prompts), so
+    # per-context agreement is a different and stricter quantity. Report both, labelled.
+    n_meas += len(variants) * len(arms) * len(budgets) * len(ids_all)
+    prog = Progress(len(ids_all) * len(variants) * len(fams['A']) + n_meas)
+
+    G, batches, base = {}, {}, {}
+    for v in variants:
+        for c in ctx:
+            cid = c['id']
+            gsum = None
+            for fam, f in sorted(fams[v].items()):
+                _j2, gg = sem_gradient(tok, model, lm, layers, c['prompt'], f['template'], f,
+                                       dev, a.max_seq)
+                sc = {l: score_for_dose(gg[l].float(), p50[l], norms[l].to(gg[l].device))
+                      for l in layers}
+                gsum = sc if gsum is None else {l: gsum[l] + sc[l] for l in layers}
+                prog.step(f'{cid} g pool{v} {fam}')
+            G[(v, cid)] = {l: (gsum[l] / len(fams[v])).double().to(dev) for l in layers}
+            batches[(v, cid)] = {fam: build_batch(tok, c['prompt'], f['template'], f['pos'],
+                                                 f['neg'], dev, a.max_seq)
+                                 for fam, f in sorted(fams[v].items())}
+
+    def j2_of(v, cid, iv):
+        with apply_steering(lm, iv, p50, norms), torch.inference_mode():
+            vals = []
+            for fam, (ids, pre, suf, kinds) in batches[(v, cid)].items():
+                S = batch_mean_logp(model, ids, pre, suf)
+                jp, _ = language_log_mass(S[kinds > 0].detach().float())
+                jn, _ = language_log_mass(S[kinds < 0].detach().float())
+                vals.append(jp - jn)
+        return sum(vals) / len(vals)
+
+    for v in variants:
+        for cid in ids_all:
+            base[(v, cid)] = j2_of(v, cid, [])
+            prog.step(f'{cid} base pool{v} J2={base[(v, cid)]:+.6f}')
+
+    dirs, flat = {}, {}
+    for v in variants:
+        for cid in ids_all:
+            g = G[(v, cid)]
+            e = {l: What[l].T @ g[l] for l in layers}
+            ds = {l: torch.linalg.solve(B[l], e[l]) for l in layers}
+            dirs[(v, cid)] = {'u_g': g,
+                              'u_M': {l: What[l] @ torch.linalg.solve(B[l], ds[l]) for l in layers}}
+            flat[(v, cid)] = torch.cat([g[l] for l in layers])
+
+    res = {}
+    for v in variants:
+        for cid in ids_all:
+            for arm in arms:
+                for b in budgets:
+                    u, _s = to_budget(dirs[(v, cid)][arm], b)
+                    iv = [{'layer': l, 'neuron': i, 'dose': float(u[l][i])}
+                          for l in layers
+                          for i in torch.nonzero(u[l].abs() > 1e-15).flatten().tolist()]
+                    res[(v, cid, arm, b)] = j2_of(v, cid, iv) - base[(v, cid)]
+                    prog.step(f'{cid} pool{v} {arm} b={b} dJ2={res[(v, cid, arm, b)]:+.5f}')
+
+    # ---- pooled-over-contexts directions, measured with each half's own readout ----
+    Gpool = {v: {l: sum(G[(v, c)][l] for c in ids_all) / len(ids_all) for l in layers}
+             for v in variants}
+    dirs_pool, flat_pool = {}, {}
+    for v in variants:
+        gp = Gpool[v]
+        e = {l: What[l].T @ gp[l] for l in layers}
+        ds = {l: torch.linalg.solve(B[l], e[l]) for l in layers}
+        dirs_pool[v] = {'u_g': gp,
+                        'u_M': {l: What[l] @ torch.linalg.solve(B[l], ds[l]) for l in layers}}
+        flat_pool[v] = torch.cat([gp[l] for l in layers]).cpu()
+    res_pool = {}
+    for v in variants:
+        for arm in arms:
+            for b in budgets:
+                u, _s = to_budget(dirs_pool[v][arm], b)
+                iv = [{'layer': l, 'neuron': i, 'dose': float(u[l][i])}
+                      for l in layers
+                      for i in torch.nonzero(u[l].abs() > 1e-15).flatten().tolist()]
+                for cid in ids_all:
+                    res_pool[(v, arm, b, cid)] = j2_of(v, cid, iv) - base[(v, cid)]
+                    prog.step(f'POOLED {v} {arm} b={b} {cid} '
+                              f'dJ2={res_pool[(v, arm, b, cid)]:+.5f}')
+
+    # ---------------- frozen analysis ----------------
+    agree = []
+    for cid in ids_all:
+        gA, gB = flat[('A', cid)].cpu(), flat[('B', cid)].cpu()
+        topA = set(torch.topk(gA.abs(), 64).indices.tolist())
+        topB = set(torch.topk(gB.abs(), 64).indices.tolist())
+        cos = lambda x, y: float(x @ y / (x.norm() * y.norm()))
+        uA = torch.cat([dirs[('A', cid)]['u_M'][l].cpu() for l in layers])
+        uB = torch.cat([dirs[('B', cid)]['u_M'][l].cpu() for l in layers])
+        vA = torch.cat([dirs[('A', cid)]['u_g'][l].cpu() for l in layers])
+        vB = torch.cat([dirs[('B', cid)]['u_g'][l].cpu() for l in layers])
+        agree.append({'context': cid,
+                      'pearson_abs_g': statistics.correlation([float(x) for x in gA.abs()],
+                                                              [float(x) for x in gB.abs()]),
+                      'top64_overlap': len(topA & topB) / 64,
+                      'cos_u_g_A_B': cos(vA, vB), 'cos_u_M_A_B': cos(uA, uB)})
+    gA, gB = flat_pool['A'], flat_pool['B']
+    cosv = lambda x, y: float(x @ y / (x.norm() * y.norm()))
+    pooled = {
+        'pearson_abs_g': statistics.correlation([float(x) for x in gA.abs()],
+                                                [float(x) for x in gB.abs()]),
+        'top64_overlap': len(set(torch.topk(gA.abs(), 64).indices.tolist())
+                             & set(torch.topk(gB.abs(), 64).indices.tolist())) / 64,
+        'cos_u_g_A_B': cosv(torch.cat([dirs_pool['A']['u_g'][l].cpu() for l in layers]),
+                            torch.cat([dirs_pool['B']['u_g'][l].cpu() for l in layers])),
+        'cos_u_M_A_B': cosv(torch.cat([dirs_pool['A']['u_M'][l].cpu() for l in layers]),
+                            torch.cat([dirs_pool['B']['u_M'][l].cpu() for l in layers]))}
+
+    rec = {'schema': 'qwentest-dense-g1-v2', 'machine': platform.node(),
+           'gpu': torch.cuda.get_device_name(0), 'model': a.model, 'layers': layers,
+           'budgets': budgets, 'contexts': ids_all,
+           'pools': {v: {f: {'pos': len(fams[v][f]['pos']), 'neg': len(fams[v][f]['neg']),
+                             'template': fams[v][f]['template']} for f in fams[v]} for v in variants},
+           'p50': {str(l): p50[l] for l in layers}, 'cond_B': {str(l): float(torch.linalg.cond(B[l]))
+                                                               for l in layers},
+           'agreement': agree,
+           'agreement_pooled_over_contexts': pooled,
+           'g1_gate_pass_pooled': bool(pooled['pearson_abs_g'] >= 0.50
+                                       and pooled['top64_overlap'] >= 0.30),
+           'measurements_pooled': {f'{v}|{arm}|{b}|{c}': val
+                                   for (v, arm, b, c), val in res_pool.items()},
+           'g1_median_pearson_abs_g': statistics.median(x['pearson_abs_g'] for x in agree),
+           'g1_median_top64_overlap': statistics.median(x['top64_overlap'] for x in agree),
+           'measurements': {f'{v}|{c}|{arm}|{b}': val for (v, c, arm, b), val in res.items()},
+           'analysis': {}}
+    rec['g1_gate_pass'] = bool(rec['g1_median_pearson_abs_g'] >= 0.50
+                               and rec['g1_median_top64_overlap'] >= 0.30)
+    for v in variants:
+        for b in budgets:
+            diffs = [res_pool[(v, 'u_M', b, cid)] - res_pool[(v, 'u_g', b, cid)]
+                     for cid in ids_all]
+            p, n = exact_sign_p(diffs)
+            rel = [(res_pool[(v, 'u_M', b, cid)] - res_pool[(v, 'u_g', b, cid)])
+                   / abs(res_pool[(v, 'u_g', b, cid)]) for cid in ids_all
+                   if abs(res_pool[(v, 'u_g', b, cid)]) > 1e-12]
+            rec['analysis'][f'POOLED pool{v}|b={b}'] = {
+                'n': n, 'wins': sum(d > 0 for d in diffs), 'sign_p': p,
+                'median_abs_diff': statistics.median(diffs),
+                'median_relative_gain': statistics.median(rel) if rel else None,
+                'mean_dJ2_u_g': statistics.fmean(res_pool[(v, 'u_g', b, c)] for c in ids_all),
+                'mean_dJ2_u_M': statistics.fmean(res_pool[(v, 'u_M', b, c)] for c in ids_all)}
+    for v in variants:
+        for b in budgets:
+            diffs = [res[(v, cid, 'u_M', b)] - res[(v, cid, 'u_g', b)] for cid in ids_all]
+            p, n = exact_sign_p(diffs)
+            rel = [(res[(v, cid, 'u_M', b)] - res[(v, cid, 'u_g', b)])
+                   / abs(res[(v, cid, 'u_g', b)]) for cid in ids_all
+                   if abs(res[(v, cid, 'u_g', b)]) > 1e-12]
+            rec['analysis'][f'pool{v}|b={b}'] = {
+                'n': n, 'wins': sum(d > 0 for d in diffs), 'sign_p': p,
+                'median_abs_diff': statistics.median(diffs),
+                'median_relative_gain': statistics.median(rel) if rel else None,
+                'mean_dJ2_u_g': statistics.fmean(res[(v, cid, 'u_g', b)] for cid in ids_all),
+                'mean_dJ2_u_M': statistics.fmean(res[(v, cid, 'u_M', b)] for cid in ids_all)}
+
+    out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    (out / 'dense_g1.json').write_text(json.dumps(rec, ensure_ascii=False, indent=1), encoding='utf8')
+    lines = ['# G1 for R7: does the advantage survive a change of WORD POOL?', '',
+             f'- machine `{rec["machine"]}` / {rec["gpu"]} · layers {layers} · {len(ids_all)} contexts',
+             f'- pools: ' + '; '.join(f'{v}: ' + ', '.join(
+                 f'{f} pos={rec["pools"][v][f]["pos"]}/neg={rec["pools"][v][f]["neg"]}'
+                 for f in sorted(rec['pools'][v])) for v in variants) + ' (neg shared)',
+             f'- **G1 gate, PER-CONTEXT g** (stricter than the registered gate): median '
+             f'r(|g_A|,|g_B|) = {rec["g1_median_pearson_abs_g"]:.4f} (need >=0.50), median top-64 '
+             f'overlap = {rec["g1_median_top64_overlap"]:.3f} (need >=0.30) -> '
+             f'{"PASS" if rec["g1_gate_pass"] else "**FAIL**"}',
+             f'- **G1 gate, g POOLED over all {len(ids_all)} contexts** (how the gate was '
+             f'originally measured): r = {pooled["pearson_abs_g"]:.4f}, top-64 overlap = '
+             f'{pooled["top64_overlap"]:.3f} -> '
+             f'{"PASS" if rec["g1_gate_pass_pooled"] else "**FAIL**"}',
+             f'- pooled directions: cos(u_g^A,u_g^B) = {pooled["cos_u_g_A_B"]:.4f}, '
+             f'cos(u_M^A,u_M^B) = {pooled["cos_u_M_A_B"]:.4f}', '',
+             '## direction agreement between the two word halves, per context', '',
+             r'| context | r(\|g_A\|,\|g_B\|) | top-64 overlap | cos(u_g^A,u_g^B) | cos(u_M^A,u_M^B) |',
+             '|---|---:|---:|---:|---:|']
+    for x in agree:
+        lines.append(f'| `{x["context"]}` | {x["pearson_abs_g"]:.4f} | {x["top64_overlap"]:.3f} | '
+                     f'{x["cos_u_g_A_B"]:.4f} | {x["cos_u_M_A_B"]:.4f} |')
+    lines += ['', '## within each word half, measured with that half\'s own readout', '',
+              'direction built PER CONTEXT:', '',
+              '| pool | budget | mean dJ2 u_g | mean dJ2 u_M | mean ratio | median ratio | wins | exact sign p |',
+              '|---|---:|---:|---:|---:|---:|---:|---:|']
+    for v in variants:
+        for b in budgets:
+            x = rec['analysis'][f'pool{v}|b={b}']
+            sp = 'n/a' if x['sign_p'] is None else f'{x["sign_p"]:.4f}'
+            lines.append(f'| {v} | {b} | {x["mean_dJ2_u_g"]:+.5f} | {x["mean_dJ2_u_M"]:+.5f} | '
+                         f'{x["mean_dJ2_u_M"] / x["mean_dJ2_u_g"]:.4f} | '
+                         f'{1 + x["median_relative_gain"]:.4f} | {x["wins"]}/{x["n"]} | {sp} |')
+    lines += ['', 'direction built from g POOLED over all contexts:', '',
+              '| pool | budget | mean dJ2 u_g | mean dJ2 u_M | mean ratio | median ratio | wins | exact sign p |',
+              '|---|---:|---:|---:|---:|---:|---:|---:|']
+    for v in variants:
+        for b in budgets:
+            x = rec['analysis'][f'POOLED pool{v}|b={b}']
+            sp = 'n/a' if x['sign_p'] is None else f'{x["sign_p"]:.4f}'
+            lines.append(f'| {v} | {b} | {x["mean_dJ2_u_g"]:+.5f} | {x["mean_dJ2_u_M"]:+.5f} | '
+                         f'{x["mean_dJ2_u_M"] / x["mean_dJ2_u_g"]:.4f} | '
+                         f'{1 + x["median_relative_gain"]:.4f} | {x["wins"]}/{x["n"]} | {sp} |')
+    (out / 'dense_g1.md').write_text('\n'.join(lines) + '\n', encoding='utf8')
+    print('\n' + '\n'.join(lines))
+    print(f'\nwrote {out}/dense_g1.json and .md')
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--pkg', default='')
@@ -273,6 +512,9 @@ def main():
     ap.add_argument('--transfer', action='store_true',
                     help='G2-style transfer test: build the direction on one half of the contexts '
                          'and measure it on the other half (in-sample vs out-of-sample)')
+    ap.add_argument('--g1', action='store_true',
+                    help='G1 test: rebuild and re-measure everything under the two disjoint '
+                         'word halves pos_A / pos_B instead of the full pool')
     ap.add_argument('--out', default='out/dense_optimal')
     ap.add_argument('--dry-run', action='store_true')
     a = ap.parse_args()
@@ -357,6 +599,11 @@ def main():
     if a.transfer:
         return transfer(a, tok, model, lm, p50, norms, What, B, n_dim, d_dim, layers, budgets,
                         fams, ctx, dev, budget, to_budget, n_dim_per_layer=None)
+
+    # ------------------------------------------------------------------ G1 (word halves)
+    if a.g1:
+        return g1_test(a, tok, model, lm, p50, norms, What, B, n_dim, d_dim, layers, budgets,
+                       fams, ctx, dev, budget, to_budget)
 
     prog = Progress(len(ctx) * len(fams) + n_meas)
     rec = {'schema': 'qwentest-dense-optimal-v1', 'machine': platform.node(),
