@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 """Which layer should the dense budget-optimal direction act on?
 
+STATUS (2026-10-28): WRITTEN BUT NEVER RUN. It was committed by accident inside the record-10 commit
+(37487411). It has not been dry-run, not executed, and not validated, so nothing in it is evidence.
+Treat it as a draft: run `--dry-run` first, then a single-layer smoke test, before trusting any number.
+Registered questions and frozen reading are in the docstring below, unchanged.
+
 Every result in this line so far was measured on layers 13-14, inherited from the original
 persona-matrix scan -- it was never chosen by measurement. Two registered questions need
 this sweep:
