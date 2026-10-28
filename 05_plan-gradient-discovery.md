@@ -352,6 +352,11 @@ Big-Five 单极标记形容词（*Psychological Assessment* 4(1):26–42，doi `
 本机 `--dry-run` 已验（100 词、10 池、过滤串与冻结管线一致）；**真跑被阻**：2026-10-28 09:50 UTC 起
 GPU 机 `connect.westd.seetacloud.com:11168` 连接被拒（实例已关），本机无 `tokenizers` 也无 Qwen 的 `tokenizer.json`。
 
+> **⛔ 门槛已于 2026-10-28 在另一台机（4080 SUPER，`connect.westc:25785`）跑完，结果是不通过。**
+> 100 词里只有 **56** 是单 token；`II-` 只剩 **5**（需 ≥6）、`III-` **5**、`V-` **2**、`IV+` **1**。
+> 按下面“分支”的第三条：**记为不可执行**。详情、根因（`build_batch` 的等长要求是实现便利而非语义要求）
+> 与三条可选路线见 **§2.19**。
+
 **实验设计（门槛过了才跑）**：
 - 上下文：`probes/contrasts_v3.jsonl` 的 held-out 批扩到 **≥8 条共享上下文**（§2.13 的补功效路径①）。
 - 坐标：J2 扫描 top-8（含 `L14N8949 +1`）。
@@ -731,6 +736,61 @@ p50 与 W_down 列范数（只在 bf16 算一次）、稠密方向 u（从已冻
 
 产物：`07_results/j2_precision_c8.{json,md}`。远端：`/root/autodl-tmp/runs/gfeas/precision`。
 脚本：`scripts/j2_precision_check.py`。
+
+### 2.19 R2c 的前置门槛：**未通过**（BFFM-100 槽位普查，2026-10-28）
+
+§2.14 把普查定为阻塞门槛，判据是“每个要用的池 ≥ 6 个存活槽位”（才能拆两个 ≥3 的不相交半池供 G1）。
+已在 4080 SUPER 机上用冻结模型自己的 `tokenizer.json`（vocab **248,070**）跑完，**1.7 秒**。
+
+**结果：100 个形容词里只有 56 个是单 token**（前导空格 + 单 token，与 `build_lexicon.py::ntoks` 同一调用）。
+被剔的 44 个里：24 个 2 piece、15 个 3 piece、5 个 4 piece。失败模式很集中：**`un-` 前缀词系统性地碎**
+（`unkind` → `['Ġun','kind']`、`uncooperative` → `['Ġun','co','operative']`），以及 `-ful` / `-ive` / `-ant` 结尾词
+（`distrustful` → `['Ġdistrust','ful']`、`irritable` → `['Ġir','ritable']`、`moody` → `['Ġmo','ody']`）。
+
+| 池 | 源 | 存活 | 半池 | 达门槛（≥6） | 存活词 |
+|---|---:|---:|---:|---|---|
+| `I+` | 10 | 6 | 3 | ✓ | active, bold, daring, energetic, verbal, vigorous |
+| `I-` | 10 | 6 | 3 | ✓ | inhibited, quiet, reserved, shy, timid, withdrawn |
+| `II+` | 10 | 7 | 3 | ✓ | cooperative, generous, helpful, kind, pleasant, sympathetic, warm |
+| **`II-`** | 10 | **5** | 2 | **✗** | cold, demanding, harsh, rude, selfish |
+| `III+` | 10 | 9 | 4 | ✓ | careful, efficient, neat, organized, practical, prompt, steady, systematic, thorough |
+| **`III-`** | 10 | **5** | 2 | **✗** | careless, inconsistent, inefficient, negligent, sloppy |
+| **`IV+`** | 6 | **1** | 0 | **✗** | relaxed |
+| `IV-` | 14 | 6 | 3 | ✓ | anxious, emotional, fearful, insecure, jealous, nervous |
+| `V+` | 10 | 9 | 4 | ✓ | artistic, bright, complex, creative, deep, imaginative, innovative, intellectual, philosophical |
+| **`V-`** | 10 | **2** | 1 | **✗** | shallow, simple |
+
+#### 2.19.1 对 R2c 的直接后果
+
+§2.14 的判别集是 `II-` 对 `I- / III- / IV- / V-`。普查后：**`II-`（敌意/对抗轴，正是我们要的那一极）只剩 5 词**，
+`III-` 5 词、`V-` **2 词**（几乎没了），`IV+` **1 词**（对照侧坍了）。只有 `I-` 与 `IV-` 达门槛。
+
+**按 §2.14 预注册的分支：门槛不过 ⇒ 记为“不可执行”**。不降门槛：把 ≥6 改成 ≥5 是**看到结果之后改判据**，
+而且 5 词的半池是 2/3，G1 的不相交半池检验在那个规模上没有意义。
+
+#### 2.19.2 为什么它会失败（根因不是词表选错）
+
+`build_batch` 要求**所有槽位序列等长**（`len({len(s) for s in seqs}) != 1` 就 raise），
+因为 `batch_mean_logp` 用固定的 `logits[:, pre-1 : pre-1+suf]` 切片。这是个**实现上的便利**，
+不是语义要求：`S(w)` 的定义是“该词自己 suffix 上的平均 logP”，J2 是池上的 log-mean-exp，
+所以**按 suffix 长度分组、分组内等长、组间把逐序列的 S 拼接后再做 log-mean-exp 是数学上精确的**。
+
+⇒ 三条路（本轮不选，等定）：
+- **① 按预注册分支回退**：记 R2c 不可执行，转 §2.13 路径①（只把共享上下文从 3 扩到 ≥8，用现有 Jibes 敌意/赞美读数重测 S2）。
+  便宜、无新代码，但**仍不回答“敌意 vs 其他特质”**，只是把已有检验的 CI 收紧。
+- **② 建混合长度的读数路径**：按 suffix 长度分组，恢复全部 10 个池（`II-` 5→10、`III-` 5→10、`V-` 2→10、`IV+` 1→6），
+  R2c 就能按原判据跑。代价：新代码路径 + **必须先证明它在全单 token 池上与 `semantic.py` 逐位相等**（等价测试）。
+- **③ 换一个第二特质词源**：像敌意那样从公开语料挖槽位。但已确认没有干净许可的第二评价性特质语料（§2.6/§2.10 的结论）。
+
+#### 2.19.3 边界
+
+- 普查只用了 tokenizer，**没加载模型**，所以与 GPU/精度无关；结果是硬事实（只依赖 `tokenizer.json`，vocab 248,070）。
+- 本机的 `tokenizer.json` 属于 4080 SUPER 机上的 `Qwen3.5-4B`；与 4090 机上同一模型目录的 tokenizer 应相同，
+  但**本次没有跨机比对**（4090 机仍不可达）。
+- “存活”只判单 token，**没判词频、没判与现有 Jibes 池的重叠、也没判语义适当性**——那些是 §2.14 后续步骤，门槛不过就不进入。
+
+产物：`07_results/slot_census_bffm100.{json,md}`（逐词 piece 分解与全 10 池统计）。
+远端：`/root/autodl-tmp/runs/spec/slot_census`。脚本：`scripts/slot_census_bffm.py`。
 
 ## 3. TODO（本文件登记，暂不动手）
 

@@ -1,0 +1,2083 @@
+{
+ "schema": "qwentest-slot-census-v1",
+ "lexicon": "bffm100_factors.json",
+ "lexicon_sha256": "70e8705f1fff09e292891d8d77288c50d250cad2abf5917a1435c075b004e08d",
+ "tokenizer": "/root/autodl-tmp/Qwen3.5-4B/tokenizer.json",
+ "tokenizer_vocab_size": 248070,
+ "filter": "len(Tokenizer.encode(' ' + w).tokens) == 1",
+ "n_terms": 100,
+ "n_single_token": 56,
+ "n_multi_token": 44,
+ "min_pool": 6,
+ "pools": {
+  "I+": {
+   "source_n": 10,
+   "survivors": [
+    "active",
+    "bold",
+    "daring",
+    "energetic",
+    "verbal",
+    "vigorous"
+   ],
+   "n": 6,
+   "halves": 3,
+   "usable_for_G1": true
+  },
+  "I-": {
+   "source_n": 10,
+   "survivors": [
+    "inhibited",
+    "quiet",
+    "reserved",
+    "shy",
+    "timid",
+    "withdrawn"
+   ],
+   "n": 6,
+   "halves": 3,
+   "usable_for_G1": true
+  },
+  "II+": {
+   "source_n": 10,
+   "survivors": [
+    "cooperative",
+    "generous",
+    "helpful",
+    "kind",
+    "pleasant",
+    "sympathetic",
+    "warm"
+   ],
+   "n": 7,
+   "halves": 3,
+   "usable_for_G1": true
+  },
+  "II-": {
+   "source_n": 10,
+   "survivors": [
+    "cold",
+    "demanding",
+    "harsh",
+    "rude",
+    "selfish"
+   ],
+   "n": 5,
+   "halves": 2,
+   "usable_for_G1": false
+  },
+  "III+": {
+   "source_n": 10,
+   "survivors": [
+    "careful",
+    "efficient",
+    "neat",
+    "organized",
+    "practical",
+    "prompt",
+    "steady",
+    "systematic",
+    "thorough"
+   ],
+   "n": 9,
+   "halves": 4,
+   "usable_for_G1": true
+  },
+  "III-": {
+   "source_n": 10,
+   "survivors": [
+    "careless",
+    "inconsistent",
+    "inefficient",
+    "negligent",
+    "sloppy"
+   ],
+   "n": 5,
+   "halves": 2,
+   "usable_for_G1": false
+  },
+  "IV+": {
+   "source_n": 6,
+   "survivors": [
+    "relaxed"
+   ],
+   "n": 1,
+   "halves": 0,
+   "usable_for_G1": false
+  },
+  "IV-": {
+   "source_n": 14,
+   "survivors": [
+    "anxious",
+    "emotional",
+    "fearful",
+    "insecure",
+    "jealous",
+    "nervous"
+   ],
+   "n": 6,
+   "halves": 3,
+   "usable_for_G1": true
+  },
+  "V+": {
+   "source_n": 10,
+   "survivors": [
+    "artistic",
+    "bright",
+    "complex",
+    "creative",
+    "deep",
+    "imaginative",
+    "innovative",
+    "intellectual",
+    "philosophical"
+   ],
+   "n": 9,
+   "halves": 4,
+   "usable_for_G1": true
+  },
+  "V-": {
+   "source_n": 10,
+   "survivors": [
+    "shallow",
+    "simple"
+   ],
+   "n": 2,
+   "halves": 1,
+   "usable_for_G1": false
+  }
+ },
+ "usable_pools": [
+  "I+",
+  "I-",
+  "II+",
+  "III+",
+  "IV-",
+  "V+"
+ ],
+ "thin_pools": [
+  "II-",
+  "III-",
+  "IV+",
+  "V-"
+ ],
+ "multi_token_terms": [
+  {
+   "term": "agreeable",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġagree",
+    "able"
+   ]
+  },
+  {
+   "term": "assertive",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġassert",
+    "ive"
+   ]
+  },
+  {
+   "term": "bashful",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġbash",
+    "ful"
+   ]
+  },
+  {
+   "term": "conscientious",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġconscient",
+    "ious"
+   ]
+  },
+  {
+   "term": "considerate",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġconsider",
+    "ate"
+   ]
+  },
+  {
+   "term": "disorganized",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġdis",
+    "organized"
+   ]
+  },
+  {
+   "term": "distrustful",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġdistrust",
+    "ful"
+   ]
+  },
+  {
+   "term": "envious",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġen",
+    "vious"
+   ]
+  },
+  {
+   "term": "extraverted",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġextrav",
+    "ert",
+    "ed"
+   ]
+  },
+  {
+   "term": "fretful",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġfret",
+    "ful"
+   ]
+  },
+  {
+   "term": "haphazard",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġh",
+    "aph",
+    "azard"
+   ]
+  },
+  {
+   "term": "high-strung",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġhigh",
+    "-str",
+    "ung"
+   ]
+  },
+  {
+   "term": "imperceptive",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġimper",
+    "ceptive"
+   ]
+  },
+  {
+   "term": "imperturbable",
+   "n_tokens": 4,
+   "pieces": [
+    "Ġimp",
+    "ert",
+    "urb",
+    "able"
+   ]
+  },
+  {
+   "term": "impractical",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġimpr",
+    "actical"
+   ]
+  },
+  {
+   "term": "introspective",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġintros",
+    "pective"
+   ]
+  },
+  {
+   "term": "introverted",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġintro",
+    "verted"
+   ]
+  },
+  {
+   "term": "irritable",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġir",
+    "ritable"
+   ]
+  },
+  {
+   "term": "moody",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġmo",
+    "ody"
+   ]
+  },
+  {
+   "term": "self-pitying",
+   "n_tokens": 4,
+   "pieces": [
+    "Ġself",
+    "-p",
+    "ity",
+    "ing"
+   ]
+  },
+  {
+   "term": "talkative",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġtalk",
+    "ative"
+   ]
+  },
+  {
+   "term": "temperamental",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġtemper",
+    "amental"
+   ]
+  },
+  {
+   "term": "touchy",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġtouch",
+    "y"
+   ]
+  },
+  {
+   "term": "trustful",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġtrust",
+    "ful"
+   ]
+  },
+  {
+   "term": "unadventurous",
+   "n_tokens": 4,
+   "pieces": [
+    "Ġun",
+    "ad",
+    "vent",
+    "urous"
+   ]
+  },
+  {
+   "term": "uncharitable",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "char",
+    "itable"
+   ]
+  },
+  {
+   "term": "uncooperative",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "co",
+    "operative"
+   ]
+  },
+  {
+   "term": "uncreative",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġun",
+    "creative"
+   ]
+  },
+  {
+   "term": "undemanding",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġund",
+    "emand",
+    "ing"
+   ]
+  },
+  {
+   "term": "undependable",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġund",
+    "epend",
+    "able"
+   ]
+  },
+  {
+   "term": "unemotional",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "em",
+    "otional"
+   ]
+  },
+  {
+   "term": "unenvious",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "en",
+    "vious"
+   ]
+  },
+  {
+   "term": "unexcitable",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "exc",
+    "itable"
+   ]
+  },
+  {
+   "term": "unimaginative",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġunimagin",
+    "ative"
+   ]
+  },
+  {
+   "term": "uninquisitive",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġunin",
+    "quis",
+    "itive"
+   ]
+  },
+  {
+   "term": "unintellectual",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġunint",
+    "el",
+    "lectual"
+   ]
+  },
+  {
+   "term": "unintelligent",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġunint",
+    "elligent"
+   ]
+  },
+  {
+   "term": "unkind",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġun",
+    "kind"
+   ]
+  },
+  {
+   "term": "unreflective",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "reflect",
+    "ive"
+   ]
+  },
+  {
+   "term": "unrestrained",
+   "n_tokens": 2,
+   "pieces": [
+    "Ġunre",
+    "strained"
+   ]
+  },
+  {
+   "term": "unsophisticated",
+   "n_tokens": 4,
+   "pieces": [
+    "Ġuns",
+    "oph",
+    "istic",
+    "ated"
+   ]
+  },
+  {
+   "term": "unsympathetic",
+   "n_tokens": 4,
+   "pieces": [
+    "Ġuns",
+    "ymp",
+    "ath",
+    "etic"
+   ]
+  },
+  {
+   "term": "unsystematic",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġuns",
+    "ystem",
+    "atic"
+   ]
+  },
+  {
+   "term": "untalkative",
+   "n_tokens": 3,
+   "pieces": [
+    "Ġunt",
+    "alk",
+    "ative"
+   ]
+  }
+ ],
+ "terms": {
+  "active": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġactive"
+   ],
+   "ids": [
+    4393
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "I",
+   "key": "I+",
+   "familiarity_prop": 0.96
+  },
+  "agreeable": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġagree",
+    "able"
+   ],
+   "ids": [
+    7268,
+    470
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "II",
+   "key": "II+",
+   "familiarity_prop": 0.58
+  },
+  "anxious": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġanxious"
+   ],
+   "ids": [
+    35772
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.93
+  },
+  "artistic": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġartistic"
+   ],
+   "ids": [
+    30553
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "V",
+   "key": "V+",
+   "familiarity_prop": 0.94
+  },
+  "assertive": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġassert",
+    "ive"
+   ],
+   "ids": [
+    1992,
+    520
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I+",
+   "familiarity_prop": 0.91
+  },
+  "bashful": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġbash",
+    "ful"
+   ],
+   "ids": [
+    26156,
+    1218
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I-",
+   "familiarity_prop": 0.85
+  },
+  "bold": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġbold"
+   ],
+   "ids": [
+    13539
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "I",
+   "key": "I+",
+   "familiarity_prop": 0.9
+  },
+  "bright": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġbright"
+   ],
+   "ids": [
+    9613
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "V",
+   "key": "V+",
+   "familiarity_prop": 0.9
+  },
+  "careful": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġcareful"
+   ],
+   "ids": [
+    16097
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "III",
+   "key": "III+",
+   "familiarity_prop": 0.87
+  },
+  "careless": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġcareless"
+   ],
+   "ids": [
+    80847
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "III",
+   "key": "III-",
+   "familiarity_prop": 0.86
+  },
+  "cold": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġcold"
+   ],
+   "ids": [
+    8981
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "II",
+   "key": "II-",
+   "familiarity_prop": 0.8
+  },
+  "complex": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġcomplex"
+   ],
+   "ids": [
+    6150
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "V",
+   "key": "V+",
+   "familiarity_prop": 0.95
+  },
+  "conscientious": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġconscient",
+    "ious"
+   ],
+   "ids": [
+    70774,
+    1181
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "III",
+   "key": "III+",
+   "familiarity_prop": 0.8
+  },
+  "considerate": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġconsider",
+    "ate"
+   ],
+   "ids": [
+    2814,
+    344
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "II",
+   "key": "II+",
+   "familiarity_prop": 0.9
+  },
+  "cooperative": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġcooperative"
+   ],
+   "ids": [
+    45883
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "II",
+   "key": "II+",
+   "familiarity_prop": 0.89
+  },
+  "creative": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġcreative"
+   ],
+   "ids": [
+    11190
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "V",
+   "key": "V+",
+   "familiarity_prop": 0.94
+  },
+  "daring": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġdaring"
+   ],
+   "ids": [
+    56688
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I+",
+   "familiarity_prop": 0.91
+  },
+  "deep": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġdeep"
+   ],
+   "ids": [
+    5365
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "V",
+   "key": "V+",
+   "familiarity_prop": 0.39
+  },
+  "demanding": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġdemanding"
+   ],
+   "ids": [
+    24339
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "II",
+   "key": "II-",
+   "familiarity_prop": 0.93
+  },
+  "disorganized": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġdis",
+    "organized"
+   ],
+   "ids": [
+    801,
+    60120
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "III",
+   "key": "III-",
+   "familiarity_prop": 0.66
+  },
+  "distrustful": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġdistrust",
+    "ful"
+   ],
+   "ids": [
+    73385,
+    1218
+   ],
+   "single_token": false,
+   "bare_n_tokens": 4,
+   "factor": "II",
+   "key": "II-",
+   "familiarity_prop": 0.87
+  },
+  "efficient": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġefficient"
+   ],
+   "ids": [
+    10727
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "III",
+   "key": "III+",
+   "familiarity_prop": 0.81
+  },
+  "emotional": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġemotional"
+   ],
+   "ids": [
+    13861
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.86
+  },
+  "energetic": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġenergetic"
+   ],
+   "ids": [
+    43361
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I+",
+   "familiarity_prop": 0.9
+  },
+  "envious": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġen",
+    "vious"
+   ],
+   "ids": [
+    644,
+    2389
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.93
+  },
+  "extraverted": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġextrav",
+    "ert",
+    "ed"
+   ],
+   "ids": [
+    55420,
+    517,
+    290
+   ],
+   "single_token": false,
+   "bare_n_tokens": 4,
+   "factor": "I",
+   "key": "I+",
+   "familiarity_prop": 0.83
+  },
+  "fearful": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġfearful"
+   ],
+   "ids": [
+    60544
+   ],
+   "single_token": true,
+   "bare_n_tokens": 3,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.67
+  },
+  "fretful": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġfret",
+    "ful"
+   ],
+   "ids": [
+    51282,
+    1218
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.76
+  },
+  "generous": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġgenerous"
+   ],
+   "ids": [
+    26774
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "II",
+   "key": "II+",
+   "familiarity_prop": 0.58
+  },
+  "haphazard": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġh",
+    "aph",
+    "azard"
+   ],
+   "ids": [
+    304,
+    1294,
+    55723
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "III",
+   "key": "III-",
+   "familiarity_prop": 0.58
+  },
+  "harsh": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġharsh"
+   ],
+   "ids": [
+    24149
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "II",
+   "key": "II-",
+   "familiarity_prop": 0.8
+  },
+  "helpful": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġhelpful"
+   ],
+   "ids": [
+    10631
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "II",
+   "key": "II+",
+   "familiarity_prop": 0.94
+  },
+  "high-strung": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġhigh",
+    "-str",
+    "ung"
+   ],
+   "ids": [
+    1496,
+    40252,
+    2116
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.8
+  },
+  "imaginative": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġimaginative"
+   ],
+   "ids": [
+    73652
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "V",
+   "key": "V+",
+   "familiarity_prop": 0.96
+  },
+  "imperceptive": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġimper",
+    "ceptive"
+   ],
+   "ids": [
+    16280,
+    56313
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "V",
+   "key": "V-",
+   "familiarity_prop": 0.76
+  },
+  "imperturbable": {
+   "n_tokens": 4,
+   "pieces": [
+    "Ġimp",
+    "ert",
+    "urb",
+    "able"
+   ],
+   "ids": [
+    3062,
+    517,
+    8776,
+    470
+   ],
+   "single_token": false,
+   "bare_n_tokens": 4,
+   "factor": "IV",
+   "key": "IV+",
+   "familiarity_prop": 0.47
+  },
+  "impractical": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġimpr",
+    "actical"
+   ],
+   "ids": [
+    21840,
+    34826
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "III",
+   "key": "III-",
+   "familiarity_prop": 0.86
+  },
+  "inconsistent": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġinconsistent"
+   ],
+   "ids": [
+    37844
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "III",
+   "key": "III-",
+   "familiarity_prop": 0.91
+  },
+  "inefficient": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġinefficient"
+   ],
+   "ids": [
+    61240
+   ],
+   "single_token": true,
+   "bare_n_tokens": 3,
+   "factor": "III",
+   "key": "III-",
+   "familiarity_prop": 0.95
+  },
+  "inhibited": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġinhibited"
+   ],
+   "ids": [
+    95164
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I-",
+   "familiarity_prop": 0.58
+  },
+  "innovative": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġinnovative"
+   ],
+   "ids": [
+    17658
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "V",
+   "key": "V+",
+   "familiarity_prop": 0.88
+  },
+  "insecure": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġinsecure"
+   ],
+   "ids": [
+    59760
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.87
+  },
+  "intellectual": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġintellectual"
+   ],
+   "ids": [
+    19034
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "V",
+   "key": "V+",
+   "familiarity_prop": 0.81
+  },
+  "introspective": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġintros",
+    "pective"
+   ],
+   "ids": [
+    24715,
+    8812
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "V",
+   "key": "V+",
+   "familiarity_prop": 0.93
+  },
+  "introverted": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġintro",
+    "verted"
+   ],
+   "ids": [
+    19104,
+    20967
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I-",
+   "familiarity_prop": 0.88
+  },
+  "irritable": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġir",
+    "ritable"
+   ],
+   "ids": [
+    6021,
+    21833
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.96
+  },
+  "jealous": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġjealous"
+   ],
+   "ids": [
+    39251
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.89
+  },
+  "kind": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġkind"
+   ],
+   "ids": [
+    2993
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "II",
+   "key": "II+",
+   "familiarity_prop": 0.87
+  },
+  "moody": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġmo",
+    "ody"
+   ],
+   "ids": [
+    4396,
+    1041
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.87
+  },
+  "neat": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġneat"
+   ],
+   "ids": [
+    27555
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "III",
+   "key": "III+",
+   "familiarity_prop": 0.94
+  },
+  "negligent": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġnegligent"
+   ],
+   "ids": [
+    91489
+   ],
+   "single_token": true,
+   "bare_n_tokens": 3,
+   "factor": "III",
+   "key": "III-",
+   "familiarity_prop": 0.67
+  },
+  "nervous": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġnervous"
+   ],
+   "ids": [
+    21896
+   ],
+   "single_token": true,
+   "bare_n_tokens": 3,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.54
+  },
+  "organized": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġorganized"
+   ],
+   "ids": [
+    16155
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "III",
+   "key": "III+",
+   "familiarity_prop": 0.94
+  },
+  "philosophical": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġphilosophical"
+   ],
+   "ids": [
+    39457
+   ],
+   "single_token": true,
+   "bare_n_tokens": 3,
+   "factor": "V",
+   "key": "V+",
+   "familiarity_prop": 0.93
+  },
+  "pleasant": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġpleasant"
+   ],
+   "ids": [
+    23050
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "II",
+   "key": "II+",
+   "familiarity_prop": 0.63
+  },
+  "practical": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġpractical"
+   ],
+   "ids": [
+    14542
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "III",
+   "key": "III+",
+   "familiarity_prop": 0.65
+  },
+  "prompt": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġprompt"
+   ],
+   "ids": [
+    9640
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "III",
+   "key": "III+",
+   "familiarity_prop": 0.89
+  },
+  "quiet": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġquiet"
+   ],
+   "ids": [
+    11012
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "I",
+   "key": "I-",
+   "familiarity_prop": 0.98
+  },
+  "relaxed": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġrelaxed"
+   ],
+   "ids": [
+    29378
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "IV",
+   "key": "IV+",
+   "familiarity_prop": 0.87
+  },
+  "reserved": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġreserved"
+   ],
+   "ids": [
+    4442
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "I",
+   "key": "I-",
+   "familiarity_prop": 0.65
+  },
+  "rude": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġrude"
+   ],
+   "ids": [
+    44464
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "II",
+   "key": "II-",
+   "familiarity_prop": 0.92
+  },
+  "self-pitying": {
+   "n_tokens": 4,
+   "pieces": [
+    "Ġself",
+    "-p",
+    "ity",
+    "ing"
+   ],
+   "ids": [
+    638,
+    2195,
+    477,
+    286
+   ],
+   "single_token": false,
+   "bare_n_tokens": 4,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.95
+  },
+  "selfish": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġselfish"
+   ],
+   "ids": [
+    43163
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "II",
+   "key": "II-",
+   "familiarity_prop": 0.95
+  },
+  "shallow": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġshallow"
+   ],
+   "ids": [
+    24785
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "V",
+   "key": "V-",
+   "familiarity_prop": 0.86
+  },
+  "shy": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġshy"
+   ],
+   "ids": [
+    31229
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I-",
+   "familiarity_prop": 0.88
+  },
+  "simple": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġsimple"
+   ],
+   "ids": [
+    4145
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "V",
+   "key": "V-",
+   "familiarity_prop": 0.77
+  },
+  "sloppy": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġsloppy"
+   ],
+   "ids": [
+    71465
+   ],
+   "single_token": true,
+   "bare_n_tokens": 3,
+   "factor": "III",
+   "key": "III-",
+   "familiarity_prop": 0.94
+  },
+  "steady": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġsteady"
+   ],
+   "ids": [
+    23271
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "III",
+   "key": "III+",
+   "familiarity_prop": 0.59
+  },
+  "sympathetic": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġsympathetic"
+   ],
+   "ids": [
+    50605
+   ],
+   "single_token": true,
+   "bare_n_tokens": 4,
+   "factor": "II",
+   "key": "II+",
+   "familiarity_prop": 0.93
+  },
+  "systematic": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġsystematic"
+   ],
+   "ids": [
+    35234
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "III",
+   "key": "III+",
+   "familiarity_prop": 0.95
+  },
+  "talkative": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġtalk",
+    "ative"
+   ],
+   "ids": [
+    2963,
+    1340
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I+",
+   "familiarity_prop": 0.91
+  },
+  "temperamental": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġtemper",
+    "amental"
+   ],
+   "ids": [
+    6583,
+    41664
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.83
+  },
+  "thorough": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġthorough"
+   ],
+   "ids": [
+    16908
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "III",
+   "key": "III+",
+   "familiarity_prop": 0.84
+  },
+  "timid": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġtimid"
+   ],
+   "ids": [
+    94667
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I-",
+   "familiarity_prop": 0.91
+  },
+  "touchy": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġtouch",
+    "y"
+   ],
+   "ids": [
+    5615,
+    88
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "IV",
+   "key": "IV-",
+   "familiarity_prop": 0.66
+  },
+  "trustful": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġtrust",
+    "ful"
+   ],
+   "ids": [
+    6734,
+    1218
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "II",
+   "key": "II+",
+   "familiarity_prop": 0.72
+  },
+  "unadventurous": {
+   "n_tokens": 4,
+   "pieces": [
+    "Ġun",
+    "ad",
+    "vent",
+    "urous"
+   ],
+   "ids": [
+    632,
+    327,
+    666,
+    52776
+   ],
+   "single_token": false,
+   "bare_n_tokens": 4,
+   "factor": "I",
+   "key": "I-",
+   "familiarity_prop": 0.93
+  },
+  "uncharitable": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "char",
+    "itable"
+   ],
+   "ids": [
+    632,
+    1700,
+    14921
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "II",
+   "key": "II-",
+   "familiarity_prop": 0.57
+  },
+  "uncooperative": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "co",
+    "operative"
+   ],
+   "ids": [
+    632,
+    981,
+    41204
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "II",
+   "key": "II-",
+   "familiarity_prop": 0.98
+  },
+  "uncreative": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġun",
+    "creative"
+   ],
+   "ids": [
+    632,
+    49975
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "V",
+   "key": "V-",
+   "familiarity_prop": 0.94
+  },
+  "undemanding": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġund",
+    "emand",
+    "ing"
+   ],
+   "ids": [
+    1962,
+    19483,
+    286
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "IV",
+   "key": "IV+",
+   "familiarity_prop": 0.86
+  },
+  "undependable": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġund",
+    "epend",
+    "able"
+   ],
+   "ids": [
+    1962,
+    12403,
+    470
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "III",
+   "key": "III-",
+   "familiarity_prop": 0.94
+  },
+  "unemotional": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "em",
+    "otional"
+   ],
+   "ids": [
+    632,
+    334,
+    39515
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "IV",
+   "key": "IV+",
+   "familiarity_prop": 0.85
+  },
+  "unenvious": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "en",
+    "vious"
+   ],
+   "ids": [
+    632,
+    268,
+    2389
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "IV",
+   "key": "IV+",
+   "familiarity_prop": 0.8
+  },
+  "unexcitable": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "exc",
+    "itable"
+   ],
+   "ids": [
+    632,
+    38135,
+    14921
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "IV",
+   "key": "IV+",
+   "familiarity_prop": 0.88
+  },
+  "unimaginative": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġunimagin",
+    "ative"
+   ],
+   "ids": [
+    83140,
+    1340
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "V",
+   "key": "V-",
+   "familiarity_prop": 0.92
+  },
+  "uninquisitive": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġunin",
+    "quis",
+    "itive"
+   ],
+   "ids": [
+    67642,
+    8929,
+    3295
+   ],
+   "single_token": false,
+   "bare_n_tokens": 4,
+   "factor": "V",
+   "key": "V-",
+   "familiarity_prop": 0.78
+  },
+  "unintellectual": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġunint",
+    "el",
+    "lectual"
+   ],
+   "ids": [
+    33626,
+    300,
+    56448
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "V",
+   "key": "V-",
+   "familiarity_prop": 0.87
+  },
+  "unintelligent": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġunint",
+    "elligent"
+   ],
+   "ids": [
+    33626,
+    19884
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "V",
+   "key": "V-",
+   "familiarity_prop": 0.91
+  },
+  "unkind": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġun",
+    "kind"
+   ],
+   "ids": [
+    632,
+    14868
+   ],
+   "single_token": false,
+   "bare_n_tokens": 2,
+   "factor": "II",
+   "key": "II-",
+   "familiarity_prop": 0.82
+  },
+  "unreflective": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġun",
+    "reflect",
+    "ive"
+   ],
+   "ids": [
+    632,
+    33756,
+    520
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "V",
+   "key": "V-",
+   "familiarity_prop": 0.56
+  },
+  "unrestrained": {
+   "n_tokens": 2,
+   "pieces": [
+    "Ġunre",
+    "strained"
+   ],
+   "ids": [
+    35893,
+    55792
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "I",
+   "key": "I+",
+   "familiarity_prop": 0.96
+  },
+  "unsophisticated": {
+   "n_tokens": 4,
+   "pieces": [
+    "Ġuns",
+    "oph",
+    "istic",
+    "ated"
+   ],
+   "ids": [
+    6758,
+    4964,
+    4384,
+    639
+   ],
+   "single_token": false,
+   "bare_n_tokens": 4,
+   "factor": "V",
+   "key": "V-",
+   "familiarity_prop": 0.79
+  },
+  "unsympathetic": {
+   "n_tokens": 4,
+   "pieces": [
+    "Ġuns",
+    "ymp",
+    "ath",
+    "etic"
+   ],
+   "ids": [
+    6758,
+    172708,
+    572,
+    5130
+   ],
+   "single_token": false,
+   "bare_n_tokens": 4,
+   "factor": "II",
+   "key": "II-",
+   "familiarity_prop": 0.92
+  },
+  "unsystematic": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġuns",
+    "ystem",
+    "atic"
+   ],
+   "ids": [
+    6758,
+    597,
+    749
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "III",
+   "key": "III-",
+   "familiarity_prop": 0.63
+  },
+  "untalkative": {
+   "n_tokens": 3,
+   "pieces": [
+    "Ġunt",
+    "alk",
+    "ative"
+   ],
+   "ids": [
+    12689,
+    1632,
+    1340
+   ],
+   "single_token": false,
+   "bare_n_tokens": 3,
+   "factor": "I",
+   "key": "I-",
+   "familiarity_prop": 0.94
+  },
+  "verbal": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġverbal"
+   ],
+   "ids": [
+    34585
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I+",
+   "familiarity_prop": 0.92
+  },
+  "vigorous": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġvigorous"
+   ],
+   "ids": [
+    68420
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I+",
+   "familiarity_prop": 0.88
+  },
+  "warm": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġwarm"
+   ],
+   "ids": [
+    7948
+   ],
+   "single_token": true,
+   "bare_n_tokens": 1,
+   "factor": "II",
+   "key": "II+",
+   "familiarity_prop": 0.68
+  },
+  "withdrawn": {
+   "n_tokens": 1,
+   "pieces": [
+    "Ġwithdrawn"
+   ],
+   "ids": [
+    47913
+   ],
+   "single_token": true,
+   "bare_n_tokens": 2,
+   "factor": "I",
+   "key": "I-",
+   "familiarity_prop": 0.74
+  }
+ }
+}
