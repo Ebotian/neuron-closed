@@ -84,6 +84,9 @@ def main():
     ap.add_argument('--pool-variant', default='full', choices=['full', 'A', 'B'])
     ap.add_argument('--max-seq', type=int, default=384)
     ap.add_argument('--fp32', action='store_true', help='readout forward in float32')
+    ap.add_argument('--record-top', type=int, default=64,
+                    help='record this many top-|g| coordinate identities per context, so the result '
+                         'can be expressed as neuron + sign + strength (0 disables)')
     ap.add_argument('--out', default='out/support_sweep')
     ap.add_argument('--dry-run', action='store_true')
     a = ap.parse_args()
@@ -191,6 +194,26 @@ def main():
                  'abs_g_total': float(flat.norm()),
                  'abs_g_top1': float(flat.abs()[order[0]]),
                  'curve': {}}
+        # coordinate identities, so "neuron + sign + strength" is expressible and the
+        # cumulative share of the gradient's squared mass is auditable per prefix
+        if a.record_top:
+            npl = per_layer_n[layers[0]]
+            g2 = float((flat ** 2).sum()) or 1.0
+            cum = 0.0
+            top = []
+            for r, i in enumerate(order[:a.record_top].tolist(), 1):
+                l = layers[i // npl]
+                n = i % npl
+                v = float(flat[i])
+                cum += v * v
+                top.append({'rank': r, 'layer': int(l), 'neuron': int(n), 'g': v,
+                            'sign': 1 if v >= 0 else -1,
+                            'cum_share_of_g_squared': cum / g2})
+            entry['top_coordinates'] = top
+            entry['known_evil_ranks'] = {
+                f'L{l}N{n}': next((t['rank'] for t in top
+                                   if t['layer'] == l and t['neuron'] == n), None)
+                for l, n in ((14, 8949), (13, 7956))}
         for b in budgets:
             for K in ks:
                 idx = order[:K]
@@ -271,7 +294,7 @@ def main():
         prev, prev_K = v, K
     lines += ['', 'argmax K per budget: ' + ', '.join(f'b={b} -> {argmax[str(b)]}' for b in budgets),
               '', f'K=1 mean dJ2 (b={budgets[0]}): {mean_curve[str(budgets[0])]["1"]:+.5f}; '
-              f'K={dim} mean: {mean_curve[str(budgets[0])][str(dim)]:+.5f}']
+              f'K={max(ks)} mean: {mean_curve[str(budgets[0])][str(max(ks))]:+.5f}']
     (out / 'support_sweep.md').write_text('\n'.join(lines) + '\n', encoding='utf8')
     print('\n' + '\n'.join(lines))
     print(f'\nwrote {out}/support_sweep.json and .md')

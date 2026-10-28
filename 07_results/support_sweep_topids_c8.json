@@ -1,0 +1,4358 @@
+{
+ "schema": "qwentest-support-sweep-v1",
+ "machine": "autodl-container-ded147b554-4b263ae1",
+ "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+ "model": "/root/autodl-tmp/Qwen3.5-4B",
+ "precision": "torch.bfloat16",
+ "layers": [
+  13,
+  14
+ ],
+ "ks": [
+  1
+ ],
+ "budgets": [
+  0.05
+ ],
+ "pool_variant": "full",
+ "lexicon_sha256": "af6487149e9ffc75c1c7a7cbcf1b63fd2ff5104f57a4af096ee3e183bb8744ea",
+ "p50": {
+  "13": 9.752792358398438,
+  "14": 10.32901382446289
+ },
+ "contexts": [
+  "hostility_04",
+  "hostility_05",
+  "risk_aversion_04",
+  "risk_aversion_05",
+  "greed_04",
+  "greed_05",
+  "avoidance_04",
+  "avoidance_05"
+ ],
+ "coordinate_space": 18432,
+ "per_context": {
+  "hostility_04": {
+   "baseline_J2": -0.22010135650634766,
+   "J2_by_family": {
+    "adj": -0.4680495262145996,
+    "verb": 0.027846813201904297
+   },
+   "abs_g_total": 33.44509907644377,
+   "abs_g_top1": 1.4013111591339111,
+   "curve": {
+    "0.05": {
+     "1": {
+      "dJ2": 0.06760048866271973,
+      "predicted": 0.07006556031833351,
+      "n_nonzero": 1,
+      "budget_actual": 0.05,
+      "dose_abs_max": 0.0500000016853059
+     }
+    }
+   },
+   "top_coordinates": [
+    {
+     "rank": 1,
+     "layer": 14,
+     "neuron": 5331,
+     "g": -1.4013111591339111,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0017555135553920548
+    },
+    {
+     "rank": 2,
+     "layer": 14,
+     "neuron": 5098,
+     "g": -1.315809726715088,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0033033362540930617
+    },
+    {
+     "rank": 3,
+     "layer": 13,
+     "neuron": 1293,
+     "g": 1.251265525817871,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.004703033103091525
+    },
+    {
+     "rank": 4,
+     "layer": 14,
+     "neuron": 178,
+     "g": 1.2264777421951294,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.006047822786191319
+    },
+    {
+     "rank": 5,
+     "layer": 13,
+     "neuron": 4886,
+     "g": 1.1615065336227417,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0072539089646640395
+    },
+    {
+     "rank": 6,
+     "layer": 13,
+     "neuron": 8189,
+     "g": -1.148761510848999,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.008433671983764735
+    },
+    {
+     "rank": 7,
+     "layer": 13,
+     "neuron": 8008,
+     "g": 1.1203994750976562,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.009555899258710593
+    },
+    {
+     "rank": 8,
+     "layer": 13,
+     "neuron": 4650,
+     "g": -1.108392596244812,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.010654202483227305
+    },
+    {
+     "rank": 9,
+     "layer": 14,
+     "neuron": 6527,
+     "g": 1.09773850440979,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.011731492963266438
+    },
+    {
+     "rank": 10,
+     "layer": 13,
+     "neuron": 5769,
+     "g": 1.0925755500793457,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01279867370998551
+    },
+    {
+     "rank": 11,
+     "layer": 13,
+     "neuron": 6589,
+     "g": -1.0637668371200562,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.013810318200138462
+    },
+    {
+     "rank": 12,
+     "layer": 13,
+     "neuron": 5798,
+     "g": 1.059546947479248,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.014813952362303089
+    },
+    {
+     "rank": 13,
+     "layer": 13,
+     "neuron": 4573,
+     "g": -1.0354843139648438,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.015772518482433412
+    },
+    {
+     "rank": 14,
+     "layer": 14,
+     "neuron": 5551,
+     "g": -1.035008430480957,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.016730203737528378
+    },
+    {
+     "rank": 15,
+     "layer": 13,
+     "neuron": 3809,
+     "g": -1.0251390933990479,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.017669712029368328
+    },
+    {
+     "rank": 16,
+     "layer": 13,
+     "neuron": 7967,
+     "g": 1.022562861442566,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.018604504180713872
+    },
+    {
+     "rank": 17,
+     "layer": 13,
+     "neuron": 6675,
+     "g": 1.0191502571105957,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.019533067370032516
+    },
+    {
+     "rank": 18,
+     "layer": 13,
+     "neuron": 107,
+     "g": -1.0179812908172607,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.020459501655294674
+    },
+    {
+     "rank": 19,
+     "layer": 13,
+     "neuron": 7768,
+     "g": 0.9958984851837158,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.021346178097328427
+    },
+    {
+     "rank": 20,
+     "layer": 14,
+     "neuron": 2197,
+     "g": 0.974956750869751,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.022195956575831254
+    },
+    {
+     "rank": 21,
+     "layer": 13,
+     "neuron": 6744,
+     "g": 0.9642472267150879,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.023027168611944825
+    },
+    {
+     "rank": 22,
+     "layer": 14,
+     "neuron": 3885,
+     "g": 0.9616824388504028,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.023853964670077298
+    },
+    {
+     "rank": 23,
+     "layer": 13,
+     "neuron": 8818,
+     "g": -0.9567604064941406,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.024672319058501296
+    },
+    {
+     "rank": 24,
+     "layer": 13,
+     "neuron": 992,
+     "g": 0.9475078582763672,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.025474921852783418
+    },
+    {
+     "rank": 25,
+     "layer": 13,
+     "neuron": 7380,
+     "g": 0.9439801573753357,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.02627155937334529
+    },
+    {
+     "rank": 26,
+     "layer": 13,
+     "neuron": 6076,
+     "g": -0.9376864433288574,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02705760960633364
+    },
+    {
+     "rank": 27,
+     "layer": 13,
+     "neuron": 2903,
+     "g": 0.9362895488739014,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.027841319587227954
+    },
+    {
+     "rank": 28,
+     "layer": 14,
+     "neuron": 9081,
+     "g": 0.9333183169364929,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.028620063392114044
+    },
+    {
+     "rank": 29,
+     "layer": 13,
+     "neuron": 8269,
+     "g": 0.9309834241867065,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.02939491568684471
+    },
+    {
+     "rank": 30,
+     "layer": 14,
+     "neuron": 1200,
+     "g": 0.9278969764709473,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.030164638831585232
+    },
+    {
+     "rank": 31,
+     "layer": 14,
+     "neuron": 7760,
+     "g": -0.921586275100708,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.030923927682587178
+    },
+    {
+     "rank": 32,
+     "layer": 14,
+     "neuron": 2938,
+     "g": 0.9211055040359497,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03168242453201202
+    },
+    {
+     "rank": 33,
+     "layer": 14,
+     "neuron": 6189,
+     "g": -0.9200530052185059,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.032439188982843835
+    },
+    {
+     "rank": 34,
+     "layer": 14,
+     "neuron": 2170,
+     "g": 0.919070303440094,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03319433770803542
+    },
+    {
+     "rank": 35,
+     "layer": 14,
+     "neuron": 5384,
+     "g": 0.9102674722671509,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03393509011952036
+    },
+    {
+     "rank": 36,
+     "layer": 13,
+     "neuron": 5336,
+     "g": -0.9073614478111267,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03467112038386637
+    },
+    {
+     "rank": 37,
+     "layer": 14,
+     "neuron": 7153,
+     "g": 0.8971755504608154,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.035390718281724784
+    },
+    {
+     "rank": 38,
+     "layer": 14,
+     "neuron": 3759,
+     "g": 0.8971053957939148,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.036110203646028224
+    },
+    {
+     "rank": 39,
+     "layer": 13,
+     "neuron": 4483,
+     "g": 0.890892744064331,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03681975832782075
+    },
+    {
+     "rank": 40,
+     "layer": 13,
+     "neuron": 5967,
+     "g": 0.8880891799926758,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03752485421931578
+    },
+    {
+     "rank": 41,
+     "layer": 13,
+     "neuron": 5671,
+     "g": -0.8813453912734985,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03821928234458063
+    },
+    {
+     "rank": 42,
+     "layer": 14,
+     "neuron": 1128,
+     "g": 0.8738980293273926,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03890202422876122
+    },
+    {
+     "rank": 43,
+     "layer": 13,
+     "neuron": 1655,
+     "g": -0.872050404548645,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03958188221280836
+    },
+    {
+     "rank": 44,
+     "layer": 13,
+     "neuron": 8129,
+     "g": -0.8619255423545837,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.040246044983777714
+    },
+    {
+     "rank": 45,
+     "layer": 13,
+     "neuron": 9087,
+     "g": 0.86012864112854,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04090744141164477
+    },
+    {
+     "rank": 46,
+     "layer": 14,
+     "neuron": 7950,
+     "g": 0.8472857475280762,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04154923419367411
+    },
+    {
+     "rank": 47,
+     "layer": 14,
+     "neuron": 5582,
+     "g": -0.8431187868118286,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04218472981057898
+    },
+    {
+     "rank": 48,
+     "layer": 13,
+     "neuron": 3547,
+     "g": 0.8405146598815918,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.042816305800670904
+    },
+    {
+     "rank": 49,
+     "layer": 14,
+     "neuron": 8396,
+     "g": -0.8391165137290955,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04344578236015413
+    },
+    {
+     "rank": 50,
+     "layer": 14,
+     "neuron": 7110,
+     "g": -0.8389954566955566,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04407507730703183
+    },
+    {
+     "rank": 51,
+     "layer": 13,
+     "neuron": 8649,
+     "g": -0.8387354612350464,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04470398229118173
+    },
+    {
+     "rank": 52,
+     "layer": 13,
+     "neuron": 7392,
+     "g": -0.8380388021469116,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.045331842964138815
+    },
+    {
+     "rank": 53,
+     "layer": 13,
+     "neuron": 942,
+     "g": -0.8373960256576538,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.045958740867097087
+    },
+    {
+     "rank": 54,
+     "layer": 13,
+     "neuron": 8059,
+     "g": -0.8332252502441406,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04657940960499345
+    },
+    {
+     "rank": 55,
+     "layer": 13,
+     "neuron": 2077,
+     "g": -0.8305022716522217,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04719602828291764
+    },
+    {
+     "rank": 56,
+     "layer": 13,
+     "neuron": 6657,
+     "g": 0.825371503829956,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04780505166635878
+    },
+    {
+     "rank": 57,
+     "layer": 13,
+     "neuron": 3477,
+     "g": -0.8202077150344849,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04840647839675985
+    },
+    {
+     "rank": 58,
+     "layer": 13,
+     "neuron": 7080,
+     "g": 0.8161325454711914,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04900194364393627
+    },
+    {
+     "rank": 59,
+     "layer": 13,
+     "neuron": 1589,
+     "g": 0.8150768876075745,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.049595869432783476
+    },
+    {
+     "rank": 60,
+     "layer": 14,
+     "neuron": 6322,
+     "g": 0.8106597661972046,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.05018337537636884
+    },
+    {
+     "rank": 61,
+     "layer": 13,
+     "neuron": 6162,
+     "g": -0.8097378611564636,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.050769545823268605
+    },
+    {
+     "rank": 62,
+     "layer": 13,
+     "neuron": 8177,
+     "g": 0.8085493445396423,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.05135399679509272
+    },
+    {
+     "rank": 63,
+     "layer": 14,
+     "neuron": 4372,
+     "g": -0.806676983833313,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05193574407047331
+    },
+    {
+     "rank": 64,
+     "layer": 13,
+     "neuron": 3937,
+     "g": -0.8039523363113403,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0525135681412853
+    }
+   ],
+   "known_evil_ranks": {
+    "L14N8949": null,
+    "L13N7956": null
+   }
+  },
+  "hostility_05": {
+   "baseline_J2": -0.3138422966003418,
+   "J2_by_family": {
+    "adj": -0.7036938667297363,
+    "verb": 0.07600927352905273
+   },
+   "abs_g_total": 18.531449338424494,
+   "abs_g_top1": 0.890288770198822,
+   "curve": {
+    "0.05": {
+     "1": {
+      "dJ2": 0.04157614707946777,
+      "predicted": 0.04451443981062312,
+      "n_nonzero": 1,
+      "budget_actual": 0.05,
+      "dose_abs_max": 0.05000000146096644
+     }
+    }
+   },
+   "top_coordinates": [
+    {
+     "rank": 1,
+     "layer": 14,
+     "neuron": 6837,
+     "g": 0.890288770198822,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.002308038332339248
+    },
+    {
+     "rank": 2,
+     "layer": 13,
+     "neuron": 7458,
+     "g": -0.7123948931694031,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.003785862694679508
+    },
+    {
+     "rank": 3,
+     "layer": 13,
+     "neuron": 6076,
+     "g": -0.7073379158973694,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0052427806766767605
+    },
+    {
+     "rank": 4,
+     "layer": 13,
+     "neuron": 2047,
+     "g": -0.6195811033248901,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.006360615292026143
+    },
+    {
+     "rank": 5,
+     "layer": 14,
+     "neuron": 2965,
+     "g": 0.5924142599105835,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.007382571377884566
+    },
+    {
+     "rank": 6,
+     "layer": 14,
+     "neuron": 3447,
+     "g": -0.5829324722290039,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.008372075763398401
+    },
+    {
+     "rank": 7,
+     "layer": 14,
+     "neuron": 6843,
+     "g": 0.5801228284835815,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.009352064621871551
+    },
+    {
+     "rank": 8,
+     "layer": 14,
+     "neuron": 6297,
+     "g": 0.5776299238204956,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.010323649157661966
+    },
+    {
+     "rank": 9,
+     "layer": 13,
+     "neuron": 8177,
+     "g": 0.560630202293396,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.011238887503314674
+    },
+    {
+     "rank": 10,
+     "layer": 13,
+     "neuron": 1242,
+     "g": -0.544154167175293,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.012101121505831253
+    },
+    {
+     "rank": 11,
+     "layer": 13,
+     "neuron": 6951,
+     "g": 0.543262243270874,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.012960531246801152
+    },
+    {
+     "rank": 12,
+     "layer": 14,
+     "neuron": 7908,
+     "g": 0.5350159406661987,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.013794048647086676
+    },
+    {
+     "rank": 13,
+     "layer": 14,
+     "neuron": 5830,
+     "g": -0.5343028903007507,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.014625345762763382
+    },
+    {
+     "rank": 14,
+     "layer": 14,
+     "neuron": 6550,
+     "g": -0.5318963527679443,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.015449171302138614
+    },
+    {
+     "rank": 15,
+     "layer": 14,
+     "neuron": 6095,
+     "g": -0.5158379673957825,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.01622400381452436
+    },
+    {
+     "rank": 16,
+     "layer": 13,
+     "neuron": 840,
+     "g": 0.5157228112220764,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01699849041678524
+    },
+    {
+     "rank": 17,
+     "layer": 13,
+     "neuron": 5458,
+     "g": 0.5145592093467712,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.017769486084064555
+    },
+    {
+     "rank": 18,
+     "layer": 14,
+     "neuron": 1756,
+     "g": 0.5138840675354004,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01853845986576486
+    },
+    {
+     "rank": 19,
+     "layer": 13,
+     "neuron": 7237,
+     "g": -0.5125889182090759,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.01930356242085009
+    },
+    {
+     "rank": 20,
+     "layer": 13,
+     "neuron": 7788,
+     "g": 0.5098839998245239,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.02006061142877613
+    },
+    {
+     "rank": 21,
+     "layer": 13,
+     "neuron": 8729,
+     "g": -0.5092852711677551,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02081588355877465
+    },
+    {
+     "rank": 22,
+     "layer": 14,
+     "neuron": 6189,
+     "g": -0.5019657611846924,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.021549601969995988
+    },
+    {
+     "rank": 23,
+     "layer": 13,
+     "neuron": 6118,
+     "g": -0.4983118176460266,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.022272677392710608
+    },
+    {
+     "rank": 24,
+     "layer": 14,
+     "neuron": 4680,
+     "g": 0.49486973881721497,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.022985798057929475
+    },
+    {
+     "rank": 25,
+     "layer": 14,
+     "neuron": 9122,
+     "g": 0.49254080653190613,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.023692222408547074
+    },
+    {
+     "rank": 26,
+     "layer": 13,
+     "neuron": 7104,
+     "g": -0.4912872910499573,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.024395055637239375
+    },
+    {
+     "rank": 27,
+     "layer": 13,
+     "neuron": 2889,
+     "g": -0.48909103870391846,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.025091619015682746
+    },
+    {
+     "rank": 28,
+     "layer": 13,
+     "neuron": 9039,
+     "g": 0.48655691742897034,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.025780982903663253
+    },
+    {
+     "rank": 29,
+     "layer": 13,
+     "neuron": 2781,
+     "g": -0.48569536209106445,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.026467907614318033
+    },
+    {
+     "rank": 30,
+     "layer": 13,
+     "neuron": 1750,
+     "g": 0.4811819791793823,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.027142124980892288
+    },
+    {
+     "rank": 31,
+     "layer": 13,
+     "neuron": 2987,
+     "g": 0.47701317071914673,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.02780471054183617
+    },
+    {
+     "rank": 32,
+     "layer": 14,
+     "neuron": 7431,
+     "g": 0.4745465815067291,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.028460461486779026
+    },
+    {
+     "rank": 33,
+     "layer": 14,
+     "neuron": 6772,
+     "g": -0.47436952590942383,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.029115723195384653
+    },
+    {
+     "rank": 34,
+     "layer": 14,
+     "neuron": 4043,
+     "g": 0.474269300699234,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.029770708044701957
+    },
+    {
+     "rank": 35,
+     "layer": 14,
+     "neuron": 5900,
+     "g": 0.4714016914367676,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.030417796273487868
+    },
+    {
+     "rank": 36,
+     "layer": 13,
+     "neuron": 4886,
+     "g": 0.4711783230304718,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03106427141655553
+    },
+    {
+     "rank": 37,
+     "layer": 13,
+     "neuron": 2629,
+     "g": 0.47104114294052124,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03171037018149132
+    },
+    {
+     "rank": 38,
+     "layer": 13,
+     "neuron": 5668,
+     "g": 0.4692210257053375,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03235148550278181
+    },
+    {
+     "rank": 39,
+     "layer": 14,
+     "neuron": 6137,
+     "g": -0.46849897503852844,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03299062920922812
+    },
+    {
+     "rank": 40,
+     "layer": 14,
+     "neuron": 2418,
+     "g": -0.467873215675354,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03362806668757327
+    },
+    {
+     "rank": 41,
+     "layer": 13,
+     "neuron": 3937,
+     "g": -0.4671408236026764,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03426351008400945
+    },
+    {
+     "rank": 42,
+     "layer": 13,
+     "neuron": 7816,
+     "g": 0.4665755033493042,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03489741642078622
+    },
+    {
+     "rank": 43,
+     "layer": 13,
+     "neuron": 666,
+     "g": 0.4644704759120941,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0355256157280761
+    },
+    {
+     "rank": 44,
+     "layer": 14,
+     "neuron": 7528,
+     "g": -0.46318626403808594,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03615034602807899
+    },
+    {
+     "rank": 45,
+     "layer": 14,
+     "neuron": 8348,
+     "g": -0.46220478415489197,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03677243155800128
+    },
+    {
+     "rank": 46,
+     "layer": 14,
+     "neuron": 8532,
+     "g": -0.4599186182022095,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03738837836511702
+    },
+    {
+     "rank": 47,
+     "layer": 14,
+     "neuron": 5413,
+     "g": 0.45670992136001587,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03799576064709182
+    },
+    {
+     "rank": 48,
+     "layer": 14,
+     "neuron": 9010,
+     "g": 0.4562385082244873,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03860188970377133
+    },
+    {
+     "rank": 49,
+     "layer": 13,
+     "neuron": 8708,
+     "g": 0.454132080078125,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.039202434751648106
+    },
+    {
+     "rank": 50,
+     "layer": 13,
+     "neuron": 1710,
+     "g": 0.45412832498550415,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03980296986808398
+    },
+    {
+     "rank": 51,
+     "layer": 14,
+     "neuron": 5465,
+     "g": -0.4524286389350891,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.040399018098522435
+    },
+    {
+     "rank": 52,
+     "layer": 14,
+     "neuron": 6668,
+     "g": -0.45074236392974854,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.040990631472018264
+    },
+    {
+     "rank": 53,
+     "layer": 14,
+     "neuron": 3092,
+     "g": -0.44991007447242737,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04158006205102207
+    },
+    {
+     "rank": 54,
+     "layer": 14,
+     "neuron": 7000,
+     "g": -0.44960811734199524,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04216870170290618
+    },
+    {
+     "rank": 55,
+     "layer": 13,
+     "neuron": 1080,
+     "g": -0.44796323776245117,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04275304218774701
+    },
+    {
+     "rank": 56,
+     "layer": 14,
+     "neuron": 8658,
+     "g": 0.44760072231292725,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0433364372970628
+    },
+    {
+     "rank": 57,
+     "layer": 13,
+     "neuron": 482,
+     "g": 0.4444562792778015,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0439116643718615
+    },
+    {
+     "rank": 58,
+     "layer": 14,
+     "neuron": 4512,
+     "g": 0.44184964895248413,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04448016409199348
+    },
+    {
+     "rank": 59,
+     "layer": 14,
+     "neuron": 8949,
+     "g": 0.43913012742996216,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.045041687278917365
+    },
+    {
+     "rank": 60,
+     "layer": 14,
+     "neuron": 7556,
+     "g": -0.43765997886657715,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04559945695140003
+    },
+    {
+     "rank": 61,
+     "layer": 14,
+     "neuron": 4693,
+     "g": 0.43704473972320557,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04615565956016753
+    },
+    {
+     "rank": 62,
+     "layer": 13,
+     "neuron": 5311,
+     "g": -0.43585893511772156,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04670884804794596
+    },
+    {
+     "rank": 63,
+     "layer": 13,
+     "neuron": 7536,
+     "g": -0.4351651072502136,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.047260276736553926
+    },
+    {
+     "rank": 64,
+     "layer": 14,
+     "neuron": 6528,
+     "g": -0.43515580892562866,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04781168186027552
+    }
+   ],
+   "known_evil_ranks": {
+    "L14N8949": 59,
+    "L13N7956": null
+   }
+  },
+  "risk_aversion_04": {
+   "baseline_J2": -0.33628082275390625,
+   "J2_by_family": {
+    "adj": -0.659027099609375,
+    "verb": -0.0135345458984375
+   },
+   "abs_g_total": 23.14166006400459,
+   "abs_g_top1": 1.4962432384490967,
+   "curve": {
+    "0.05": {
+     "1": {
+      "dJ2": 0.07687020301818848,
+      "predicted": 0.07481216410841597,
+      "n_nonzero": 1,
+      "budget_actual": 0.05,
+      "dose_abs_max": 0.050000001460966434
+     }
+    }
+   },
+   "top_coordinates": [
+    {
+     "rank": 1,
+     "layer": 14,
+     "neuron": 6837,
+     "g": 1.4962432384490967,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.004180376349820774
+    },
+    {
+     "rank": 2,
+     "layer": 13,
+     "neuron": 5458,
+     "g": 0.8975657224655151,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.005684707671157562
+    },
+    {
+     "rank": 3,
+     "layer": 14,
+     "neuron": 8812,
+     "g": -0.8714195489883423,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.007102672887127318
+    },
+    {
+     "rank": 4,
+     "layer": 13,
+     "neuron": 7458,
+     "g": -0.8692400455474854,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.008513554040539495
+    },
+    {
+     "rank": 5,
+     "layer": 13,
+     "neuron": 3448,
+     "g": -0.8420970439910889,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.009837698190383232
+    },
+    {
+     "rank": 6,
+     "layer": 14,
+     "neuron": 5003,
+     "g": 0.837456464767456,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.011147288519658337
+    },
+    {
+     "rank": 7,
+     "layer": 13,
+     "neuron": 8177,
+     "g": 0.8339570164680481,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.012445957042813061
+    },
+    {
+     "rank": 8,
+     "layer": 13,
+     "neuron": 4703,
+     "g": -0.8040283918380737,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.013653086227762247
+    },
+    {
+     "rank": 9,
+     "layer": 14,
+     "neuron": 5465,
+     "g": -0.7627856135368347,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.01473955179585822
+    },
+    {
+     "rank": 10,
+     "layer": 14,
+     "neuron": 4073,
+     "g": -0.7491694092750549,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.015787575369624655
+    },
+    {
+     "rank": 11,
+     "layer": 14,
+     "neuron": 5039,
+     "g": 0.720639169216156,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0167572961628605
+    },
+    {
+     "rank": 12,
+     "layer": 13,
+     "neuron": 4933,
+     "g": -0.6991413831710815,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.017670023375815247
+    },
+    {
+     "rank": 13,
+     "layer": 14,
+     "neuron": 4675,
+     "g": 0.6926344633102417,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01856584011661304
+    },
+    {
+     "rank": 14,
+     "layer": 14,
+     "neuron": 7947,
+     "g": 0.6820889711380005,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01943458655109582
+    },
+    {
+     "rank": 15,
+     "layer": 13,
+     "neuron": 914,
+     "g": -0.6789975166320801,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.020295475934749216
+    },
+    {
+     "rank": 16,
+     "layer": 14,
+     "neuron": 2786,
+     "g": -0.6605599522590637,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0211102467433504
+    },
+    {
+     "rank": 17,
+     "layer": 14,
+     "neuron": 5830,
+     "g": -0.6596130728721619,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.021922683360375804
+    },
+    {
+     "rank": 18,
+     "layer": 14,
+     "neuron": 6564,
+     "g": 0.659213662147522,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.022734136377571407
+    },
+    {
+     "rank": 19,
+     "layer": 13,
+     "neuron": 7375,
+     "g": -0.6576592922210693,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02354176723141717
+    },
+    {
+     "rank": 20,
+     "layer": 14,
+     "neuron": 7876,
+     "g": -0.6557803153991699,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02434478976650244
+    },
+    {
+     "rank": 21,
+     "layer": 13,
+     "neuron": 9112,
+     "g": -0.6483501195907593,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02512971839809302
+    },
+    {
+     "rank": 22,
+     "layer": 13,
+     "neuron": 4904,
+     "g": -0.6482238173484802,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02591434124246506
+    },
+    {
+     "rank": 23,
+     "layer": 13,
+     "neuron": 3937,
+     "g": -0.6405658721923828,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.026680534937674073
+    },
+    {
+     "rank": 24,
+     "layer": 13,
+     "neuron": 6033,
+     "g": 0.6384868621826172,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.027441763212631077
+    },
+    {
+     "rank": 25,
+     "layer": 13,
+     "neuron": 8129,
+     "g": -0.6360368728637695,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.028197160755336195
+    },
+    {
+     "rank": 26,
+     "layer": 13,
+     "neuron": 6688,
+     "g": 0.6245412230491638,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.02892549914103763
+    },
+    {
+     "rank": 27,
+     "layer": 14,
+     "neuron": 4680,
+     "g": 0.6237816214561462,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.029652066913262085
+    },
+    {
+     "rank": 28,
+     "layer": 14,
+     "neuron": 3624,
+     "g": 0.6231746673583984,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0303772214385325
+    },
+    {
+     "rank": 29,
+     "layer": 14,
+     "neuron": 5559,
+     "g": -0.616955041885376,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.031087973316494672
+    },
+    {
+     "rank": 30,
+     "layer": 14,
+     "neuron": 8599,
+     "g": 0.6168569326400757,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03179849916247328
+    },
+    {
+     "rank": 31,
+     "layer": 14,
+     "neuron": 2130,
+     "g": 0.6167438626289368,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0325087645532378
+    },
+    {
+     "rank": 32,
+     "layer": 14,
+     "neuron": 6587,
+     "g": 0.6155038475990295,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03321617671947047
+    },
+    {
+     "rank": 33,
+     "layer": 13,
+     "neuron": 8923,
+     "g": -0.6147150993347168,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03392177699578525
+    },
+    {
+     "rank": 34,
+     "layer": 14,
+     "neuron": 8434,
+     "g": 0.6090602874755859,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.034614455238834135
+    },
+    {
+     "rank": 35,
+     "layer": 14,
+     "neuron": 6668,
+     "g": -0.6085333228111267,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.035305935377007755
+    },
+    {
+     "rank": 36,
+     "layer": 13,
+     "neuron": 3186,
+     "g": 0.6026909351348877,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0359842017704676
+    },
+    {
+     "rank": 37,
+     "layer": 14,
+     "neuron": 3467,
+     "g": -0.5988196134567261,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03665378260386424
+    },
+    {
+     "rank": 38,
+     "layer": 13,
+     "neuron": 840,
+     "g": 0.598763108253479,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03732323707862075
+    },
+    {
+     "rank": 39,
+     "layer": 14,
+     "neuron": 3508,
+     "g": -0.5985981822013855,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03799232280895707
+    },
+    {
+     "rank": 40,
+     "layer": 13,
+     "neuron": 605,
+     "g": -0.5973215699195862,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.038658557704585234
+    },
+    {
+     "rank": 41,
+     "layer": 14,
+     "neuron": 3679,
+     "g": 0.5969653725624084,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.039323998253034786
+    },
+    {
+     "rank": 42,
+     "layer": 14,
+     "neuron": 3289,
+     "g": 0.5947065353393555,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03998441245274345
+    },
+    {
+     "rank": 43,
+     "layer": 14,
+     "neuron": 3447,
+     "g": -0.5947057604789734,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.040644824931507624
+    },
+    {
+     "rank": 44,
+     "layer": 13,
+     "neuron": 4814,
+     "g": -0.5899345278739929,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04129468314347151
+    },
+    {
+     "rank": 45,
+     "layer": 14,
+     "neuron": 2884,
+     "g": 0.5889744162559509,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.041942427803285866
+    },
+    {
+     "rank": 46,
+     "layer": 14,
+     "neuron": 8949,
+     "g": 0.5888949632644653,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04258999771262491
+    },
+    {
+     "rank": 47,
+     "layer": 14,
+     "neuron": 3510,
+     "g": -0.5883309841156006,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.043236327872714427
+    },
+    {
+     "rank": 48,
+     "layer": 13,
+     "neuron": 2047,
+     "g": -0.5870055556297302,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.043879749127934936
+    },
+    {
+     "rank": 49,
+     "layer": 13,
+     "neuron": 5260,
+     "g": -0.5847341418266296,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.044518200589186686
+    },
+    {
+     "rank": 50,
+     "layer": 14,
+     "neuron": 5987,
+     "g": 0.5847039818763733,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04515658619087477
+    },
+    {
+     "rank": 51,
+     "layer": 14,
+     "neuron": 3367,
+     "g": -0.5841058492660522,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.045793666366385606
+    },
+    {
+     "rank": 52,
+     "layer": 14,
+     "neuron": 6186,
+     "g": 0.5821153521537781,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04642641189760072
+    },
+    {
+     "rank": 53,
+     "layer": 14,
+     "neuron": 6632,
+     "g": 0.5811079740524292,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.047056969331724714
+    },
+    {
+     "rank": 54,
+     "layer": 13,
+     "neuron": 3992,
+     "g": -0.5801379680633545,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04768542342524581
+    },
+    {
+     "rank": 55,
+     "layer": 13,
+     "neuron": 4619,
+     "g": 0.5768896341323853,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04830685948636966
+    },
+    {
+     "rank": 56,
+     "layer": 13,
+     "neuron": 7900,
+     "g": 0.5702043771743774,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04891397603945713
+    },
+    {
+     "rank": 57,
+     "layer": 13,
+     "neuron": 3183,
+     "g": -0.5684683322906494,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04951740136479826
+    },
+    {
+     "rank": 58,
+     "layer": 14,
+     "neuron": 7839,
+     "g": 0.566322922706604,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0501162806090595
+    },
+    {
+     "rank": 59,
+     "layer": 13,
+     "neuron": 1011,
+     "g": -0.5650052428245544,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05071237623622438
+    },
+    {
+     "rank": 60,
+     "layer": 14,
+     "neuron": 8984,
+     "g": -0.5635123252868652,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05130532588942182
+    },
+    {
+     "rank": 61,
+     "layer": 13,
+     "neuron": 1355,
+     "g": 0.5618505477905273,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.051894783524913043
+    },
+    {
+     "rank": 62,
+     "layer": 14,
+     "neuron": 9205,
+     "g": 0.561796247959137,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.052484127230094255
+    },
+    {
+     "rank": 63,
+     "layer": 13,
+     "neuron": 7831,
+     "g": 0.5616387724876404,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.053073140587143276
+    },
+    {
+     "rank": 64,
+     "layer": 13,
+     "neuron": 2149,
+     "g": -0.5615904927253723,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05366205268265563
+    }
+   ],
+   "known_evil_ranks": {
+    "L14N8949": 46,
+    "L13N7956": null
+   }
+  },
+  "risk_aversion_05": {
+   "baseline_J2": -0.0828094482421875,
+   "J2_by_family": {
+    "adj": -0.31466197967529297,
+    "verb": 0.14904308319091797
+   },
+   "abs_g_total": 23.34448059625553,
+   "abs_g_top1": 1.1527231931686401,
+   "curve": {
+    "0.05": {
+     "1": {
+      "dJ2": 0.055724143981933594,
+      "predicted": 0.057636158199769895,
+      "n_nonzero": 1,
+      "budget_actual": 0.05,
+      "dose_abs_max": 0.04999999873459464
+     }
+    }
+   },
+   "top_coordinates": [
+    {
+     "rank": 1,
+     "layer": 13,
+     "neuron": 6540,
+     "g": -1.1527231931686401,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0024382690821693515
+    },
+    {
+     "rank": 2,
+     "layer": 13,
+     "neuron": 5290,
+     "g": -1.0909172296524048,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0046220806935925035
+    },
+    {
+     "rank": 3,
+     "layer": 13,
+     "neuron": 3937,
+     "g": -1.08124577999115,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.006767343088269587
+    },
+    {
+     "rank": 4,
+     "layer": 14,
+     "neuron": 5465,
+     "g": -1.0665854215621948,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.008854825646993799
+    },
+    {
+     "rank": 5,
+     "layer": 13,
+     "neuron": 8177,
+     "g": 0.9092344045639038,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.010371817646139059
+    },
+    {
+     "rank": 6,
+     "layer": 14,
+     "neuron": 7760,
+     "g": -0.8552274703979492,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.011713948478449749
+    },
+    {
+     "rank": 7,
+     "layer": 14,
+     "neuron": 9181,
+     "g": 0.8384783864021301,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.013004024530346919
+    },
+    {
+     "rank": 8,
+     "layer": 14,
+     "neuron": 3885,
+     "g": 0.7170817255973816,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01394758313344703
+    },
+    {
+     "rank": 9,
+     "layer": 13,
+     "neuron": 663,
+     "g": 0.7131581902503967,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01488084456298833
+    },
+    {
+     "rank": 10,
+     "layer": 13,
+     "neuron": 8008,
+     "g": 0.7128725051879883,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01581335842922384
+    },
+    {
+     "rank": 11,
+     "layer": 14,
+     "neuron": 6679,
+     "g": -0.7077202200889587,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.016732441521443698
+    },
+    {
+     "rank": 12,
+     "layer": 13,
+     "neuron": 4536,
+     "g": 0.6838710308074951,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.017590624671667957
+    },
+    {
+     "rank": 13,
+     "layer": 13,
+     "neuron": 3268,
+     "g": -0.6833622455596924,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.018447531357514858
+    },
+    {
+     "rank": 14,
+     "layer": 14,
+     "neuron": 6837,
+     "g": 0.6707683205604553,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01927314461011093
+    },
+    {
+     "rank": 15,
+     "layer": 13,
+     "neuron": 4286,
+     "g": -0.6641631722450256,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.020082578063724398
+    },
+    {
+     "rank": 16,
+     "layer": 13,
+     "neuron": 942,
+     "g": -0.6621237993240356,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.020887048272257097
+    },
+    {
+     "rank": 17,
+     "layer": 14,
+     "neuron": 9180,
+     "g": 0.6512120366096497,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.021665221718720762
+    },
+    {
+     "rank": 18,
+     "layer": 13,
+     "neuron": 8631,
+     "g": 0.6509444713592529,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.022442755836096503
+    },
+    {
+     "rank": 19,
+     "layer": 13,
+     "neuron": 3840,
+     "g": 0.6451725959777832,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.023206562412638156
+    },
+    {
+     "rank": 20,
+     "layer": 14,
+     "neuron": 5830,
+     "g": -0.6422682404518127,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.023963507654128594
+    },
+    {
+     "rank": 21,
+     "layer": 13,
+     "neuron": 8786,
+     "g": 0.6340433955192566,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.024701190246386718
+    },
+    {
+     "rank": 22,
+     "layer": 13,
+     "neuron": 5145,
+     "g": -0.6282994747161865,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02542556776313396
+    },
+    {
+     "rank": 23,
+     "layer": 13,
+     "neuron": 1323,
+     "g": -0.62698894739151,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02614692657141585
+    },
+    {
+     "rank": 24,
+     "layer": 13,
+     "neuron": 5332,
+     "g": -0.6268728971481323,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02686801836983017
+    },
+    {
+     "rank": 25,
+     "layer": 13,
+     "neuron": 8907,
+     "g": 0.6264828443527222,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.027588213092077988
+    },
+    {
+     "rank": 26,
+     "layer": 13,
+     "neuron": 7294,
+     "g": -0.6177449226379395,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.028288457965572535
+    },
+    {
+     "rank": 27,
+     "layer": 14,
+     "neuron": 7287,
+     "g": -0.6141700744628906,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02898062174963376
+    },
+    {
+     "rank": 28,
+     "layer": 13,
+     "neuron": 5660,
+     "g": 0.6137938499450684,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.029671937790579937
+    },
+    {
+     "rank": 29,
+     "layer": 13,
+     "neuron": 4810,
+     "g": -0.6111437678337097,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.030357297143274984
+    },
+    {
+     "rank": 30,
+     "layer": 14,
+     "neuron": 8748,
+     "g": -0.6109895706176758,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.031042310694613145
+    },
+    {
+     "rank": 31,
+     "layer": 14,
+     "neuron": 7305,
+     "g": 0.6079819202423096,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03172059676513992
+    },
+    {
+     "rank": 32,
+     "layer": 14,
+     "neuron": 6662,
+     "g": -0.6064866781234741,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.032395550648549494
+    },
+    {
+     "rank": 33,
+     "layer": 14,
+     "neuron": 8346,
+     "g": 0.6055061221122742,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03306832379132806
+    },
+    {
+     "rank": 34,
+     "layer": 13,
+     "neuron": 6657,
+     "g": 0.603725790977478,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.033737146526070086
+    },
+    {
+     "rank": 35,
+     "layer": 13,
+     "neuron": 2091,
+     "g": 0.6009284853935242,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.034399785767322465
+    },
+    {
+     "rank": 36,
+     "layer": 14,
+     "neuron": 8434,
+     "g": 0.5980138182640076,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03505601263499145
+    },
+    {
+     "rank": 37,
+     "layer": 13,
+     "neuron": 4945,
+     "g": 0.5972025394439697,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.035710460206525935
+    },
+    {
+     "rank": 38,
+     "layer": 13,
+     "neuron": 3183,
+     "g": -0.5949954986572266,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03636007952159319
+    },
+    {
+     "rank": 39,
+     "layer": 14,
+     "neuron": 3510,
+     "g": -0.594791054725647,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0370092524873693
+    },
+    {
+     "rank": 40,
+     "layer": 13,
+     "neuron": 6797,
+     "g": -0.593752920627594,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03765616132877257
+    },
+    {
+     "rank": 41,
+     "layer": 13,
+     "neuron": 5260,
+     "g": -0.5929489135742188,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.038301319384272
+    },
+    {
+     "rank": 42,
+     "layer": 13,
+     "neuron": 8094,
+     "g": -0.5922901034355164,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0389450445994889
+    },
+    {
+     "rank": 43,
+     "layer": 14,
+     "neuron": 7355,
+     "g": 0.5920464396476746,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03958824027602408
+    },
+    {
+     "rank": 44,
+     "layer": 13,
+     "neuron": 4292,
+     "g": -0.5821607708930969,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04021013581706452
+    },
+    {
+     "rank": 45,
+     "layer": 14,
+     "neuron": 2884,
+     "g": 0.5820575952529907,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04083181094206926
+    },
+    {
+     "rank": 46,
+     "layer": 14,
+     "neuron": 4320,
+     "g": -0.5774655342102051,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04144371552548667
+    },
+    {
+     "rank": 47,
+     "layer": 13,
+     "neuron": 7684,
+     "g": 0.5755042433738708,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.042051470649772126
+    },
+    {
+     "rank": 48,
+     "layer": 13,
+     "neuron": 2914,
+     "g": 0.5739744305610657,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0426559989834716
+    },
+    {
+     "rank": 49,
+     "layer": 13,
+     "neuron": 8849,
+     "g": -0.5737369060516357,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04326002708378895
+    },
+    {
+     "rank": 50,
+     "layer": 14,
+     "neuron": 9135,
+     "g": 0.5736754536628723,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04386392579733906
+    },
+    {
+     "rank": 51,
+     "layer": 13,
+     "neuron": 4656,
+     "g": -0.5733770132064819,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.044467196347606236
+    },
+    {
+     "rank": 52,
+     "layer": 13,
+     "neuron": 4619,
+     "g": 0.5723541378974915,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04506831641006126
+    },
+    {
+     "rank": 53,
+     "layer": 13,
+     "neuron": 5982,
+     "g": -0.5719873905181885,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.045668666359884494
+    },
+    {
+     "rank": 54,
+     "layer": 13,
+     "neuron": 3802,
+     "g": -0.5702508687973022,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.046265376585378305
+    },
+    {
+     "rank": 55,
+     "layer": 14,
+     "neuron": 3099,
+     "g": 0.5694603323936462,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04686043352384024
+    },
+    {
+     "rank": 56,
+     "layer": 13,
+     "neuron": 8552,
+     "g": -0.567423403263092,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04745124110214463
+    },
+    {
+     "rank": 57,
+     "layer": 14,
+     "neuron": 7671,
+     "g": 0.5669312477111816,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04804102424920938
+    },
+    {
+     "rank": 58,
+     "layer": 13,
+     "neuron": 2693,
+     "g": -0.5652624368667603,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04862734035181935
+    },
+    {
+     "rank": 59,
+     "layer": 13,
+     "neuron": 3210,
+     "g": 0.5651420950889587,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.049213406832990615
+    },
+    {
+     "rank": 60,
+     "layer": 14,
+     "neuron": 3605,
+     "g": 0.5641827583312988,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04979748529054219
+    },
+    {
+     "rank": 61,
+     "layer": 14,
+     "neuron": 3624,
+     "g": 0.5628269910812378,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0503787599652058
+    },
+    {
+     "rank": 62,
+     "layer": 13,
+     "neuron": 8390,
+     "g": -0.5626434683799744,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.050959655625686016
+    },
+    {
+     "rank": 63,
+     "layer": 13,
+     "neuron": 6146,
+     "g": -0.5602749586105347,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.051535670891340736
+    },
+    {
+     "rank": 64,
+     "layer": 13,
+     "neuron": 8103,
+     "g": -0.5584167838096619,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.052107871736497655
+    }
+   ],
+   "known_evil_ranks": {
+    "L14N8949": null,
+    "L13N7956": null
+   }
+  },
+  "greed_04": {
+   "baseline_J2": -0.40947413444519043,
+   "J2_by_family": {
+    "adj": -0.8165459632873535,
+    "verb": -0.0024023056030273438
+   },
+   "abs_g_total": 24.77573218279165,
+   "abs_g_top1": 1.2094597816467285,
+   "curve": {
+    "0.05": {
+     "1": {
+      "dJ2": 0.07065343856811523,
+      "predicted": 0.06047299084931657,
+      "n_nonzero": 1,
+      "budget_actual": 0.049999999999999996,
+      "dose_abs_max": 0.050000001460966434
+     }
+    }
+   },
+   "top_coordinates": [
+    {
+     "rank": 1,
+     "layer": 14,
+     "neuron": 6837,
+     "g": 1.2094597816467285,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0023830319601915086
+    },
+    {
+     "rank": 2,
+     "layer": 14,
+     "neuron": 5465,
+     "g": -1.1087895631790161,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.00438586737952384
+    },
+    {
+     "rank": 3,
+     "layer": 13,
+     "neuron": 5220,
+     "g": -1.0901474952697754,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.006321921649621048
+    },
+    {
+     "rank": 4,
+     "layer": 13,
+     "neuron": 4619,
+     "g": 0.9567097425460815,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.007813023803529811
+    },
+    {
+     "rank": 5,
+     "layer": 13,
+     "neuron": 8008,
+     "g": 0.9110009074211121,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.009165048496571994
+    },
+    {
+     "rank": 6,
+     "layer": 14,
+     "neuron": 7403,
+     "g": 0.8799654245376587,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.010426522255856236
+    },
+    {
+     "rank": 7,
+     "layer": 14,
+     "neuron": 8949,
+     "g": 0.8663200736045837,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01164917678115522
+    },
+    {
+     "rank": 8,
+     "layer": 13,
+     "neuron": 1928,
+     "g": -0.8458295464515686,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.012814677935610964
+    },
+    {
+     "rank": 9,
+     "layer": 13,
+     "neuron": 9204,
+     "g": -0.8403184413909912,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.01396504064102583
+    },
+    {
+     "rank": 10,
+     "layer": 13,
+     "neuron": 8177,
+     "g": 0.8398644328117371,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01511416064266523
+    },
+    {
+     "rank": 11,
+     "layer": 14,
+     "neuron": 9181,
+     "g": 0.8342124819755554,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01624786645148189
+    },
+    {
+     "rank": 12,
+     "layer": 13,
+     "neuron": 6296,
+     "g": 0.8325105905532837,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01737695119291658
+    },
+    {
+     "rank": 13,
+     "layer": 13,
+     "neuron": 7208,
+     "g": 0.8198712468147278,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.018472012202879376
+    },
+    {
+     "rank": 14,
+     "layer": 13,
+     "neuron": 3937,
+     "g": -0.8111191987991333,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.019543818653573707
+    },
+    {
+     "rank": 15,
+     "layer": 14,
+     "neuron": 8348,
+     "g": -0.7964932918548584,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.020577320482157792
+    },
+    {
+     "rank": 16,
+     "layer": 13,
+     "neuron": 6540,
+     "g": -0.7936511635780334,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.021603459777660552
+    },
+    {
+     "rank": 17,
+     "layer": 14,
+     "neuron": 6605,
+     "g": -0.790884256362915,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.022622456683305436
+    },
+    {
+     "rank": 18,
+     "layer": 13,
+     "neuron": 6358,
+     "g": 0.7903746366500854,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.02364014079609582
+    },
+    {
+     "rank": 19,
+     "layer": 13,
+     "neuron": 4814,
+     "g": -0.7777610421180725,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.024625601646557374
+    },
+    {
+     "rank": 20,
+     "layer": 14,
+     "neuron": 8225,
+     "g": -0.7758691310882568,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02560627404256779
+    },
+    {
+     "rank": 21,
+     "layer": 13,
+     "neuron": 8445,
+     "g": 0.762043297290802,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.026552307071915974
+    },
+    {
+     "rank": 22,
+     "layer": 14,
+     "neuron": 7179,
+     "g": -0.7461057305335999,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.027459182752451464
+    },
+    {
+     "rank": 23,
+     "layer": 13,
+     "neuron": 3992,
+     "g": -0.7265883684158325,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02831923312193981
+    },
+    {
+     "rank": 24,
+     "layer": 13,
+     "neuron": 5544,
+     "g": -0.7183887958526611,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02915998162963018
+    },
+    {
+     "rank": 25,
+     "layer": 13,
+     "neuron": 9105,
+     "g": 0.717685341835022,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0299990844035544
+    },
+    {
+     "rank": 26,
+     "layer": 14,
+     "neuron": 5830,
+     "g": -0.6977614164352417,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03079224459015528
+    },
+    {
+     "rank": 27,
+     "layer": 14,
+     "neuron": 6712,
+     "g": 0.6947785019874573,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03157863778798987
+    },
+    {
+     "rank": 28,
+     "layer": 13,
+     "neuron": 3163,
+     "g": 0.6908074617385864,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03235606733834142
+    },
+    {
+     "rank": 29,
+     "layer": 14,
+     "neuron": 6233,
+     "g": -0.686843991279602,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.033124601560323805
+    },
+    {
+     "rank": 30,
+     "layer": 13,
+     "neuron": 791,
+     "g": -0.6840888261795044,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.033886982443819554
+    },
+    {
+     "rank": 31,
+     "layer": 13,
+     "neuron": 8571,
+     "g": -0.675947368144989,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03463132485894067
+    },
+    {
+     "rank": 32,
+     "layer": 14,
+     "neuron": 8817,
+     "g": -0.6747394800186157,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03537300943678849
+    },
+    {
+     "rank": 33,
+     "layer": 13,
+     "neuron": 7494,
+     "g": -0.6698043942451477,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03610388423879921
+    },
+    {
+     "rank": 34,
+     "layer": 14,
+     "neuron": 7630,
+     "g": -0.66783207654953,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.036830461084692706
+    },
+    {
+     "rank": 35,
+     "layer": 13,
+     "neuron": 8584,
+     "g": -0.6650719046592712,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03755104441004318
+    },
+    {
+     "rank": 36,
+     "layer": 13,
+     "neuron": 4329,
+     "g": -0.6556026935577393,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03825125465834151
+    },
+    {
+     "rank": 37,
+     "layer": 14,
+     "neuron": 4053,
+     "g": 0.6548587083816528,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03894987659572432
+    },
+    {
+     "rank": 38,
+     "layer": 14,
+     "neuron": 2138,
+     "g": -0.6529785394668579,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03964449265643497
+    },
+    {
+     "rank": 39,
+     "layer": 14,
+     "neuron": 3487,
+     "g": 0.6500763893127441,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04033294802359596
+    },
+    {
+     "rank": 40,
+     "layer": 13,
+     "neuron": 7636,
+     "g": -0.6497434973716736,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04102069848109534
+    },
+    {
+     "rank": 41,
+     "layer": 13,
+     "neuron": 2698,
+     "g": -0.6434244513511658,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04169513662760284
+    },
+    {
+     "rank": 42,
+     "layer": 13,
+     "neuron": 7132,
+     "g": -0.6430864930152893,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04236886646365497
+    },
+    {
+     "rank": 43,
+     "layer": 13,
+     "neuron": 8511,
+     "g": 0.6410945653915405,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04303842907596656
+    },
+    {
+     "rank": 44,
+     "layer": 14,
+     "neuron": 8588,
+     "g": 0.638096809387207,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04370174458323773
+    },
+    {
+     "rank": 45,
+     "layer": 14,
+     "neuron": 8178,
+     "g": 0.636465847492218,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.044361673583264774
+    },
+    {
+     "rank": 46,
+     "layer": 14,
+     "neuron": 5761,
+     "g": -0.6354271173477173,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04501945029568582
+    },
+    {
+     "rank": 47,
+     "layer": 14,
+     "neuron": 7671,
+     "g": 0.6347900629043579,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04567590874670572
+    },
+    {
+     "rank": 48,
+     "layer": 14,
+     "neuron": 4073,
+     "g": -0.6318073272705078,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04632621259030881
+    },
+    {
+     "rank": 49,
+     "layer": 13,
+     "neuron": 7400,
+     "g": 0.6310263872146606,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04697490982241107
+    },
+    {
+     "rank": 50,
+     "layer": 14,
+     "neuron": 453,
+     "g": -0.6285264492034912,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.047618477346628066
+    },
+    {
+     "rank": 51,
+     "layer": 14,
+     "neuron": 5165,
+     "g": 0.6270014643669128,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04825892570187054
+    },
+    {
+     "rank": 52,
+     "layer": 13,
+     "neuron": 7504,
+     "g": 0.6265416145324707,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.048898434977737985
+    },
+    {
+     "rank": 53,
+     "layer": 13,
+     "neuron": 5046,
+     "g": -0.6261094808578491,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.049537062402553
+    },
+    {
+     "rank": 54,
+     "layer": 14,
+     "neuron": 7760,
+     "g": -0.6225619912147522,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05016847349827907
+    },
+    {
+     "rank": 55,
+     "layer": 14,
+     "neuron": 6313,
+     "g": -0.619665265083313,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05079402246332506
+    },
+    {
+     "rank": 56,
+     "layer": 14,
+     "neuron": 8532,
+     "g": -0.6195333003997803,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.051419305021374095
+    },
+    {
+     "rank": 57,
+     "layer": 14,
+     "neuron": 458,
+     "g": -0.6147757768630981,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05203502110592352
+    },
+    {
+     "rank": 58,
+     "layer": 13,
+     "neuron": 8615,
+     "g": 0.6122193932533264,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.05264562724951694
+    },
+    {
+     "rank": 59,
+     "layer": 14,
+     "neuron": 6431,
+     "g": -0.6104551553726196,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.053252719285802365
+    },
+    {
+     "rank": 60,
+     "layer": 13,
+     "neuron": 7247,
+     "g": 0.6100417971611023,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.05385898943856597
+    },
+    {
+     "rank": 61,
+     "layer": 14,
+     "neuron": 2960,
+     "g": -0.6096624135971069,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05446450574983425
+    },
+    {
+     "rank": 62,
+     "layer": 13,
+     "neuron": 8801,
+     "g": 0.608938455581665,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.05506858484568031
+    },
+    {
+     "rank": 63,
+     "layer": 13,
+     "neuron": 7672,
+     "g": -0.6051447987556458,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05566516062071557
+    },
+    {
+     "rank": 64,
+     "layer": 13,
+     "neuron": 5660,
+     "g": 0.6033374071121216,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.056258178120544906
+    }
+   ],
+   "known_evil_ranks": {
+    "L14N8949": 7,
+    "L13N7956": null
+   }
+  },
+  "greed_05": {
+   "baseline_J2": -0.23952460289001465,
+   "J2_by_family": {
+    "adj": -0.554502010345459,
+    "verb": 0.07545280456542969
+   },
+   "abs_g_total": 22.338342111018502,
+   "abs_g_top1": 1.41323721408844,
+   "curve": {
+    "0.05": {
+     "1": {
+      "dJ2": 0.06863713264465332,
+      "predicted": 0.07066185742137374,
+      "n_nonzero": 1,
+      "budget_actual": 0.05,
+      "dose_abs_max": 0.0499999976769305
+     }
+    }
+   },
+   "top_coordinates": [
+    {
+     "rank": 1,
+     "layer": 14,
+     "neuron": 5465,
+     "g": -1.41323721408844,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.004002471555975255
+    },
+    {
+     "rank": 2,
+     "layer": 13,
+     "neuron": 3937,
+     "g": -1.3869332075119019,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.007857336948416855
+    },
+    {
+     "rank": 3,
+     "layer": 14,
+     "neuron": 6837,
+     "g": 1.3465487957000732,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.011490980447448847
+    },
+    {
+     "rank": 4,
+     "layer": 14,
+     "neuron": 9181,
+     "g": 1.1151435375213623,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.013983047182373837
+    },
+    {
+     "rank": 5,
+     "layer": 14,
+     "neuron": 7760,
+     "g": -1.0864405632019043,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.016348477006737833
+    },
+    {
+     "rank": 6,
+     "layer": 13,
+     "neuron": 8177,
+     "g": 1.0769089460372925,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.018672583872859895
+    },
+    {
+     "rank": 7,
+     "layer": 14,
+     "neuron": 3885,
+     "g": 1.0384695529937744,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.020833737599655604
+    },
+    {
+     "rank": 8,
+     "layer": 13,
+     "neuron": 8008,
+     "g": 0.9330964088439941,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.022578559727191007
+    },
+    {
+     "rank": 9,
+     "layer": 14,
+     "neuron": 7671,
+     "g": 0.8499963283538818,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.024026438575821995
+    },
+    {
+     "rank": 10,
+     "layer": 14,
+     "neuron": 7355,
+     "g": 0.8487987518310547,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.025470240408672733
+    },
+    {
+     "rank": 11,
+     "layer": 14,
+     "neuron": 3447,
+     "g": -0.8362489938735962,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.026871663731323877
+    },
+    {
+     "rank": 12,
+     "layer": 14,
+     "neuron": 8348,
+     "g": -0.8358109593391418,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.028271619282912826
+    },
+    {
+     "rank": 13,
+     "layer": 14,
+     "neuron": 4073,
+     "g": -0.8312466740608215,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02965632653127386
+    },
+    {
+     "rank": 14,
+     "layer": 13,
+     "neuron": 6296,
+     "g": 0.8264248371124268,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.031025015749051685
+    },
+    {
+     "rank": 15,
+     "layer": 13,
+     "neuron": 4735,
+     "g": 0.8130415678024292,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.032349734319088636
+    },
+    {
+     "rank": 16,
+     "layer": 14,
+     "neuron": 3679,
+     "g": 0.8112006187438965,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03366846062867195
+    },
+    {
+     "rank": 17,
+     "layer": 13,
+     "neuron": 5458,
+     "g": 0.7811459302902222,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03489128045955664
+    },
+    {
+     "rank": 18,
+     "layer": 14,
+     "neuron": 7630,
+     "g": -0.7684364318847656,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.036074632646665744
+    },
+    {
+     "rank": 19,
+     "layer": 13,
+     "neuron": 8445,
+     "g": 0.7641938328742981,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.037244954140928606
+    },
+    {
+     "rank": 20,
+     "layer": 13,
+     "neuron": 4619,
+     "g": 0.7382602095603943,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.038337191551324784
+    },
+    {
+     "rank": 21,
+     "layer": 13,
+     "neuron": 3374,
+     "g": -0.7189779877662659,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.039373118933522834
+    },
+    {
+     "rank": 22,
+     "layer": 13,
+     "neuron": 840,
+     "g": 0.717936098575592,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04040604611397866
+    },
+    {
+     "rank": 23,
+     "layer": 13,
+     "neuron": 4814,
+     "g": -0.708141028881073,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04141098034438951
+    },
+    {
+     "rank": 24,
+     "layer": 13,
+     "neuron": 3991,
+     "g": -0.6993416547775269,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04239109507831356
+    },
+    {
+     "rank": 25,
+     "layer": 13,
+     "neuron": 7458,
+     "g": -0.6927357316017151,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04335278109859999
+    },
+    {
+     "rank": 26,
+     "layer": 14,
+     "neuron": 8201,
+     "g": 0.683617889881134,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0442893181488707
+    },
+    {
+     "rank": 27,
+     "layer": 14,
+     "neuron": 7825,
+     "g": -0.6807283163070679,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04521795466473433
+    },
+    {
+     "rank": 28,
+     "layer": 14,
+     "neuron": 6522,
+     "g": 0.6795222163200378,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.046143303418824055
+    },
+    {
+     "rank": 29,
+     "layer": 14,
+     "neuron": 3670,
+     "g": -0.6781466603279114,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04706490960009026
+    },
+    {
+     "rank": 30,
+     "layer": 13,
+     "neuron": 3448,
+     "g": -0.6776059865951538,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04798504680821152
+    },
+    {
+     "rank": 31,
+     "layer": 14,
+     "neuron": 4243,
+     "g": -0.6759225130081177,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04890061763857782
+    },
+    {
+     "rank": 32,
+     "layer": 13,
+     "neuron": 6540,
+     "g": -0.6716936230659485,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04980476782191019
+    },
+    {
+     "rank": 33,
+     "layer": 14,
+     "neuron": 6829,
+     "g": -0.6557829976081848,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05066659151500364
+    },
+    {
+     "rank": 34,
+     "layer": 14,
+     "neuron": 3943,
+     "g": -0.6481359601020813,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05150843307054909
+    },
+    {
+     "rank": 35,
+     "layer": 14,
+     "neuron": 6322,
+     "g": 0.6440858244895935,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.052339786334631454
+    },
+    {
+     "rank": 36,
+     "layer": 13,
+     "neuron": 4733,
+     "g": 0.6434285044670105,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.053169443593992706
+    },
+    {
+     "rank": 37,
+     "layer": 13,
+     "neuron": 5982,
+     "g": -0.6430644392967224,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05399816224445978
+    },
+    {
+     "rank": 38,
+     "layer": 13,
+     "neuron": 8527,
+     "g": -0.6397013664245605,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.054818235560918506
+    },
+    {
+     "rank": 39,
+     "layer": 14,
+     "neuron": 1733,
+     "g": 0.6384127140045166,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.055635008196498456
+    },
+    {
+     "rank": 40,
+     "layer": 13,
+     "neuron": 6744,
+     "g": 0.6342615485191345,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.056441193526883066
+    },
+    {
+     "rank": 41,
+     "layer": 14,
+     "neuron": 9205,
+     "g": 0.628466784954071,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.057232715150395345
+    },
+    {
+     "rank": 42,
+     "layer": 14,
+     "neuron": 9169,
+     "g": -0.6259498596191406,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05801790959281814
+    },
+    {
+     "rank": 43,
+     "layer": 14,
+     "neuron": 5987,
+     "g": 0.6187994480133057,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.05878526747685097
+    },
+    {
+     "rank": 44,
+     "layer": 14,
+     "neuron": 8370,
+     "g": 0.6181465983390808,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.059551007049560796
+    },
+    {
+     "rank": 45,
+     "layer": 14,
+     "neuron": 453,
+     "g": -0.6159714460372925,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.060311367090239494
+    },
+    {
+     "rank": 46,
+     "layer": 14,
+     "neuron": 8949,
+     "g": 0.6076598763465881,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06105134583660231
+    },
+    {
+     "rank": 47,
+     "layer": 14,
+     "neuron": 8910,
+     "g": 0.6069648861885071,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06178963290025896
+    },
+    {
+     "rank": 48,
+     "layer": 13,
+     "neuron": 4904,
+     "g": -0.6044566631317139,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.06252183077322307
+    },
+    {
+     "rank": 49,
+     "layer": 14,
+     "neuron": 8763,
+     "g": 0.6017315983772278,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06324744161001092
+    },
+    {
+     "rank": 50,
+     "layer": 13,
+     "neuron": 9105,
+     "g": 0.6007475256919861,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06397068105754737
+    },
+    {
+     "rank": 51,
+     "layer": 13,
+     "neuron": 4689,
+     "g": 0.5995079278945923,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06469093888291978
+    },
+    {
+     "rank": 52,
+     "layer": 13,
+     "neuron": 6928,
+     "g": 0.5983921885490417,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06540851827102047
+    },
+    {
+     "rank": 53,
+     "layer": 14,
+     "neuron": 9035,
+     "g": -0.5980745553970337,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.06612533606325097
+    },
+    {
+     "rank": 54,
+     "layer": 13,
+     "neuron": 5543,
+     "g": 0.5959751605987549,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06683713026012027
+    },
+    {
+     "rank": 55,
+     "layer": 13,
+     "neuron": 1038,
+     "g": -0.5954232811927795,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.06754760680919272
+    },
+    {
+     "rank": 56,
+     "layer": 14,
+     "neuron": 7670,
+     "g": 0.5939953327178955,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06825467970436934
+    },
+    {
+     "rank": 57,
+     "layer": 14,
+     "neuron": 5539,
+     "g": -0.5931379795074463,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0689597129413509
+    },
+    {
+     "rank": 58,
+     "layer": 13,
+     "neuron": 5220,
+     "g": -0.589641809463501,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.06965645923123409
+    },
+    {
+     "rank": 59,
+     "layer": 14,
+     "neuron": 8984,
+     "g": -0.5864500403404236,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.07034568287150708
+    },
+    {
+     "rank": 60,
+     "layer": 14,
+     "neuron": 8273,
+     "g": 0.5857362151145935,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.07103322969102681
+    },
+    {
+     "rank": 61,
+     "layer": 13,
+     "neuron": 7750,
+     "g": -0.5848373174667358,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.07171866784807665
+    },
+    {
+     "rank": 62,
+     "layer": 13,
+     "neuron": 8369,
+     "g": -0.5845234394073486,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0724033704629201
+    },
+    {
+     "rank": 63,
+     "layer": 13,
+     "neuron": 5620,
+     "g": -0.5834423303604126,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0730855426278778
+    },
+    {
+     "rank": 64,
+     "layer": 13,
+     "neuron": 8993,
+     "g": 0.5832064747810364,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.07376716337041635
+    }
+   ],
+   "known_evil_ranks": {
+    "L14N8949": 46,
+    "L13N7956": null
+   }
+  },
+  "avoidance_04": {
+   "baseline_J2": -0.44768810272216797,
+   "J2_by_family": {
+    "adj": -0.8342485427856445,
+    "verb": -0.061127662658691406
+   },
+   "abs_g_total": 21.72348605463984,
+   "abs_g_top1": 1.0051020383834839,
+   "curve": {
+    "0.05": {
+     "1": {
+      "dJ2": 0.05295133590698242,
+      "predicted": 0.05025510060992304,
+      "n_nonzero": 1,
+      "budget_actual": 0.05,
+      "dose_abs_max": 0.049999998697394785
+     }
+    }
+   },
+   "top_coordinates": [
+    {
+     "rank": 1,
+     "layer": 14,
+     "neuron": 3885,
+     "g": 1.0051020383834839,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.00214072691074738
+    },
+    {
+     "rank": 2,
+     "layer": 14,
+     "neuron": 3447,
+     "g": -0.8598051071166992,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.003707265155110274
+    },
+    {
+     "rank": 3,
+     "layer": 13,
+     "neuron": 4735,
+     "g": 0.8368260860443115,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.005191188204558439
+    },
+    {
+     "rank": 4,
+     "layer": 14,
+     "neuron": 7760,
+     "g": -0.8181769847869873,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0066097082536522335
+    },
+    {
+     "rank": 5,
+     "layer": 13,
+     "neuron": 5220,
+     "g": -0.8097283840179443,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.007999083917103893
+    },
+    {
+     "rank": 6,
+     "layer": 13,
+     "neuron": 8008,
+     "g": 0.804866373538971,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0093718246730812
+    },
+    {
+     "rank": 7,
+     "layer": 13,
+     "neuron": 3937,
+     "g": -0.7694624662399292,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.010626455174036412
+    },
+    {
+     "rank": 8,
+     "layer": 13,
+     "neuron": 9105,
+     "g": 0.7660461068153381,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.011869969464500378
+    },
+    {
+     "rank": 9,
+     "layer": 14,
+     "neuron": 8348,
+     "g": -0.7540576457977295,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.013074866835395382
+    },
+    {
+     "rank": 10,
+     "layer": 14,
+     "neuron": 5761,
+     "g": -0.7527145147323608,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.01427547569120043
+    },
+    {
+     "rank": 11,
+     "layer": 14,
+     "neuron": 7396,
+     "g": 0.7473389506340027,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.015458997313890646
+    },
+    {
+     "rank": 12,
+     "layer": 13,
+     "neuron": 4814,
+     "g": -0.7433170080184937,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.01662981453388333
+    },
+    {
+     "rank": 13,
+     "layer": 14,
+     "neuron": 4675,
+     "g": 0.7379274368286133,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.017783714810000836
+    },
+    {
+     "rank": 14,
+     "layer": 14,
+     "neuron": 6322,
+     "g": 0.7227957844734192,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.01889077741968247
+    },
+    {
+     "rank": 15,
+     "layer": 13,
+     "neuron": 4904,
+     "g": -0.7214085459709167,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.019993594608616688
+    },
+    {
+     "rank": 16,
+     "layer": 13,
+     "neuron": 4619,
+     "g": 0.6942800879478455,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.021015028774978396
+    },
+    {
+     "rank": 17,
+     "layer": 13,
+     "neuron": 1293,
+     "g": 0.6847286224365234,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.022008551775174624
+    },
+    {
+     "rank": 18,
+     "layer": 13,
+     "neuron": 8564,
+     "g": -0.6802003383636475,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02298897738797495
+    },
+    {
+     "rank": 19,
+     "layer": 13,
+     "neuron": 2282,
+     "g": -0.653007984161377,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.023892580969595647
+    },
+    {
+     "rank": 20,
+     "layer": 13,
+     "neuron": 4041,
+     "g": -0.6448366045951843,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.02477371165552594
+    },
+    {
+     "rank": 21,
+     "layer": 14,
+     "neuron": 3670,
+     "g": -0.6429600119590759,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.025649721300507328
+    },
+    {
+     "rank": 22,
+     "layer": 13,
+     "neuron": 8177,
+     "g": 0.6405460238456726,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.02651916535178947
+    },
+    {
+     "rank": 23,
+     "layer": 14,
+     "neuron": 378,
+     "g": 0.6319932341575623,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.027365546182993934
+    },
+    {
+     "rank": 24,
+     "layer": 13,
+     "neuron": 5048,
+     "g": -0.6307702660560608,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.028208654525835646
+    },
+    {
+     "rank": 25,
+     "layer": 13,
+     "neuron": 7208,
+     "g": 0.6305758953094482,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.02905124334403296
+    },
+    {
+     "rank": 26,
+     "layer": 13,
+     "neuron": 7080,
+     "g": 0.6266540288925171,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.029883383794059835
+    },
+    {
+     "rank": 27,
+     "layer": 14,
+     "neuron": 5649,
+     "g": -0.62508624792099,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.030711365707022067
+    },
+    {
+     "rank": 28,
+     "layer": 13,
+     "neuron": 6924,
+     "g": -0.6161803603172302,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03151592242344646
+    },
+    {
+     "rank": 29,
+     "layer": 13,
+     "neuron": 4656,
+     "g": -0.6127170324325562,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.032311460310023396
+    },
+    {
+     "rank": 30,
+     "layer": 13,
+     "neuron": 5260,
+     "g": -0.6098228096961975,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.033099500360658916
+    },
+    {
+     "rank": 31,
+     "layer": 14,
+     "neuron": 8949,
+     "g": 0.6082421541213989,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03388346051936095
+    },
+    {
+     "rank": 32,
+     "layer": 14,
+     "neuron": 6837,
+     "g": 0.595538854598999,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0346350162032869
+    },
+    {
+     "rank": 33,
+     "layer": 13,
+     "neuron": 3991,
+     "g": -0.5929283499717712,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.035379997540098185
+    },
+    {
+     "rank": 34,
+     "layer": 14,
+     "neuron": 8005,
+     "g": 0.5904000401496887,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03611863906261118
+    },
+    {
+     "rank": 35,
+     "layer": 14,
+     "neuron": 9181,
+     "g": 0.5853575468063354,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03684471727488331
+    },
+    {
+     "rank": 36,
+     "layer": 14,
+     "neuron": 453,
+     "g": -0.5821476578712463,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03756285422026513
+    },
+    {
+     "rank": 37,
+     "layer": 14,
+     "neuron": 5608,
+     "g": 0.5819183588027954,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03828042555072009
+    },
+    {
+     "rank": 38,
+     "layer": 13,
+     "neuron": 8415,
+     "g": 0.5796413421630859,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.038992392228533276
+    },
+    {
+     "rank": 39,
+     "layer": 14,
+     "neuron": 8145,
+     "g": 0.5717917084693909,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03968520624882114
+    },
+    {
+     "rank": 40,
+     "layer": 13,
+     "neuron": 7487,
+     "g": -0.5658177137374878,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.040363619059328025
+    },
+    {
+     "rank": 41,
+     "layer": 14,
+     "neuron": 5039,
+     "g": 0.5641195774078369,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04103796586532346
+    },
+    {
+     "rank": 42,
+     "layer": 14,
+     "neuron": 9205,
+     "g": 0.563744068145752,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.041711415204888524
+    },
+    {
+     "rank": 43,
+     "layer": 14,
+     "neuron": 8532,
+     "g": -0.5630773901939392,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.042383272657724194
+    },
+    {
+     "rank": 44,
+     "layer": 13,
+     "neuron": 8457,
+     "g": 0.5616912841796875,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04305182641042265
+    },
+    {
+     "rank": 45,
+     "layer": 13,
+     "neuron": 4650,
+     "g": -0.5615848302841187,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0437201267733707
+    },
+    {
+     "rank": 46,
+     "layer": 13,
+     "neuron": 5562,
+     "g": -0.5602226853370667,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04438518909318247
+    },
+    {
+     "rank": 47,
+     "layer": 13,
+     "neuron": 8134,
+     "g": -0.5596715211868286,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.045048943439567855
+    },
+    {
+     "rank": 48,
+     "layer": 13,
+     "neuron": 7605,
+     "g": 0.5551509261131287,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04570201849858062
+    },
+    {
+     "rank": 49,
+     "layer": 14,
+     "neuron": 5987,
+     "g": 0.5546504855155945,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04635391665974763
+    },
+    {
+     "rank": 50,
+     "layer": 14,
+     "neuron": 9010,
+     "g": 0.5535054206848145,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.047003125937932044
+    },
+    {
+     "rank": 51,
+     "layer": 13,
+     "neuron": 4247,
+     "g": -0.5528901219367981,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.047650892644410386
+    },
+    {
+     "rank": 52,
+     "layer": 14,
+     "neuron": 7163,
+     "g": -0.5510892868041992,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04829444650192989
+    },
+    {
+     "rank": 53,
+     "layer": 14,
+     "neuron": 8403,
+     "g": 0.5509096384048462,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04893758084639086
+    },
+    {
+     "rank": 54,
+     "layer": 14,
+     "neuron": 8243,
+     "g": -0.5489117503166199,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.049576058962403496
+    },
+    {
+     "rank": 55,
+     "layer": 14,
+     "neuron": 8474,
+     "g": 0.5488961935043335,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.05021450088846959
+    },
+    {
+     "rank": 56,
+     "layer": 14,
+     "neuron": 4887,
+     "g": 0.5483688712120056,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.050851716706766005
+    },
+    {
+     "rank": 57,
+     "layer": 14,
+     "neuron": 8003,
+     "g": -0.5474939942359924,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05148690089720547
+    },
+    {
+     "rank": 58,
+     "layer": 14,
+     "neuron": 8341,
+     "g": -0.546858549118042,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05212061149902129
+    },
+    {
+     "rank": 59,
+     "layer": 14,
+     "neuron": 2995,
+     "g": -0.5459812879562378,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.052752290556141605
+    },
+    {
+     "rank": 60,
+     "layer": 13,
+     "neuron": 2772,
+     "g": -0.5395102500915527,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05336908487013018
+    },
+    {
+     "rank": 61,
+     "layer": 14,
+     "neuron": 6220,
+     "g": -0.538554310798645,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.053983695368116646
+    },
+    {
+     "rank": 62,
+     "layer": 14,
+     "neuron": 6957,
+     "g": -0.538357675075531,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.054597857137667585
+    },
+    {
+     "rank": 63,
+     "layer": 14,
+     "neuron": 7713,
+     "g": -0.5350875854492188,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05520458049024569
+    },
+    {
+     "rank": 64,
+     "layer": 14,
+     "neuron": 9179,
+     "g": 0.5322588086128235,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.05580490583104424
+    }
+   ],
+   "known_evil_ranks": {
+    "L14N8949": 31,
+    "L13N7956": null
+   }
+  },
+  "avoidance_05": {
+   "baseline_J2": -0.24039983749389648,
+   "J2_by_family": {
+    "adj": -0.5544672012329102,
+    "verb": 0.07366752624511719
+   },
+   "abs_g_total": 24.84931818391159,
+   "abs_g_top1": 1.3834728002548218,
+   "curve": {
+    "0.05": {
+     "1": {
+      "dJ2": 0.06877565383911133,
+      "predicted": 0.06917364203394842,
+      "n_nonzero": 1,
+      "budget_actual": 0.05,
+      "dose_abs_max": 0.05000000146096644
+     }
+    }
+   },
+   "top_coordinates": [
+    {
+     "rank": 1,
+     "layer": 14,
+     "neuron": 6837,
+     "g": 1.3834728002548218,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.003099647418613998
+    },
+    {
+     "rank": 2,
+     "layer": 14,
+     "neuron": 8348,
+     "g": -1.2332336902618408,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.005562632645886944
+    },
+    {
+     "rank": 3,
+     "layer": 14,
+     "neuron": 5465,
+     "g": -1.1336994171142578,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.007644087006012094
+    },
+    {
+     "rank": 4,
+     "layer": 13,
+     "neuron": 8008,
+     "g": 1.1331405639648438,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.009723489780677205
+    },
+    {
+     "rank": 5,
+     "layer": 13,
+     "neuron": 3937,
+     "g": -1.110115647315979,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.01171924601336799
+    },
+    {
+     "rank": 6,
+     "layer": 14,
+     "neuron": 453,
+     "g": -1.0756096839904785,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.013592861438298706
+    },
+    {
+     "rank": 7,
+     "layer": 14,
+     "neuron": 6322,
+     "g": 1.0639033317565918,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.015425915964785077
+    },
+    {
+     "rank": 8,
+     "layer": 14,
+     "neuron": 7671,
+     "g": 1.035237193107605,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.017161520510907177
+    },
+    {
+     "rank": 9,
+     "layer": 14,
+     "neuron": 9181,
+     "g": 1.024073839187622,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.018859895515696886
+    },
+    {
+     "rank": 10,
+     "layer": 14,
+     "neuron": 7630,
+     "g": -1.0168360471725464,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.020534348328337355
+    },
+    {
+     "rank": 11,
+     "layer": 13,
+     "neuron": 4814,
+     "g": -1.000744104385376,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.022156222383053377
+    },
+    {
+     "rank": 12,
+     "layer": 13,
+     "neuron": 8445,
+     "g": 0.9588751196861267,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.023645223919278348
+    },
+    {
+     "rank": 13,
+     "layer": 14,
+     "neuron": 8949,
+     "g": 0.9436589479446411,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.025087343157674465
+    },
+    {
+     "rank": 14,
+     "layer": 14,
+     "neuron": 3885,
+     "g": 0.9396950006484985,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.026517372269029435
+    },
+    {
+     "rank": 15,
+     "layer": 13,
+     "neuron": 8177,
+     "g": 0.9385548830032349,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.027943933420351938
+    },
+    {
+     "rank": 16,
+     "layer": 14,
+     "neuron": 7163,
+     "g": -0.8795380592346191,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.029196729309775467
+    },
+    {
+     "rank": 17,
+     "layer": 14,
+     "neuron": 2138,
+     "g": -0.8452302813529968,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.030353696761613484
+    },
+    {
+     "rank": 18,
+     "layer": 14,
+     "neuron": 8005,
+     "g": 0.8142611384391785,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.031427435104830696
+    },
+    {
+     "rank": 19,
+     "layer": 13,
+     "neuron": 5136,
+     "g": 0.7931519746780396,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03244622320952366
+    },
+    {
+     "rank": 20,
+     "layer": 13,
+     "neuron": 9072,
+     "g": 0.7929590344429016,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0334645157186315
+    },
+    {
+     "rank": 21,
+     "layer": 14,
+     "neuron": 3679,
+     "g": 0.7917933464050293,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03447981655007786
+    },
+    {
+     "rank": 22,
+     "layer": 13,
+     "neuron": 6820,
+     "g": -0.7910322546958923,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.03549316645414791
+    },
+    {
+     "rank": 23,
+     "layer": 14,
+     "neuron": 8399,
+     "g": 0.7872591018676758,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03649687223789126
+    },
+    {
+     "rank": 24,
+     "layer": 13,
+     "neuron": 6928,
+     "g": 0.7753076553344727,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03747033465742732
+    },
+    {
+     "rank": 25,
+     "layer": 14,
+     "neuron": 2816,
+     "g": -0.7677876949310303,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.038425004801825376
+    },
+    {
+     "rank": 26,
+     "layer": 14,
+     "neuron": 8273,
+     "g": 0.7653505802154541,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.03937362392962909
+    },
+    {
+     "rank": 27,
+     "layer": 13,
+     "neuron": 8673,
+     "g": 0.7647260427474976,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04032069551443703
+    },
+    {
+     "rank": 28,
+     "layer": 14,
+     "neuron": 4073,
+     "g": -0.7558323740959167,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04124586654526927
+    },
+    {
+     "rank": 29,
+     "layer": 13,
+     "neuron": 8994,
+     "g": 0.7508317828178406,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04215883619866924
+    },
+    {
+     "rank": 30,
+     "layer": 13,
+     "neuron": 6744,
+     "g": 0.7393481135368347,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04304409241297857
+    },
+    {
+     "rank": 31,
+     "layer": 14,
+     "neuron": 8910,
+     "g": 0.7310788035392761,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.04390965690224823
+    },
+    {
+     "rank": 32,
+     "layer": 14,
+     "neuron": 5830,
+     "g": -0.7206557393074036,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04475071644998598
+    },
+    {
+     "rank": 33,
+     "layer": 13,
+     "neuron": 3879,
+     "g": -0.7152822613716125,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04557928025126573
+    },
+    {
+     "rank": 34,
+     "layer": 13,
+     "neuron": 7458,
+     "g": -0.7103046178817749,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04639635224025054
+    },
+    {
+     "rank": 35,
+     "layer": 13,
+     "neuron": 2320,
+     "g": -0.7061120867729187,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04720380725661308
+    },
+    {
+     "rank": 36,
+     "layer": 14,
+     "neuron": 8094,
+     "g": -0.7029012441635132,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04800393562769648
+    },
+    {
+     "rank": 37,
+     "layer": 13,
+     "neuron": 4904,
+     "g": -0.6808508038520813,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04875465038816641
+    },
+    {
+     "rank": 38,
+     "layer": 14,
+     "neuron": 9113,
+     "g": -0.6780684590339661,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.04949924198801064
+    },
+    {
+     "rank": 39,
+     "layer": 13,
+     "neuron": 6540,
+     "g": -0.6763299703598022,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.050240020389885474
+    },
+    {
+     "rank": 40,
+     "layer": 13,
+     "neuron": 9208,
+     "g": -0.6761915683746338,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05098049564177238
+    },
+    {
+     "rank": 41,
+     "layer": 13,
+     "neuron": 2820,
+     "g": -0.6742660999298096,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.051716759862772924
+    },
+    {
+     "rank": 42,
+     "layer": 14,
+     "neuron": 3447,
+     "g": -0.6735339164733887,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05245142593790993
+    },
+    {
+     "rank": 43,
+     "layer": 14,
+     "neuron": 7981,
+     "g": -0.6731647253036499,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0531852868334284
+    },
+    {
+     "rank": 44,
+     "layer": 14,
+     "neuron": 6889,
+     "g": 0.6705018877983093,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.053913353345423465
+    },
+    {
+     "rank": 45,
+     "layer": 14,
+     "neuron": 8173,
+     "g": 0.6601742506027222,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.05461916399704137
+    },
+    {
+     "rank": 46,
+     "layer": 14,
+     "neuron": 8370,
+     "g": 0.6583672165870667,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.05532111603616432
+    },
+    {
+     "rank": 47,
+     "layer": 13,
+     "neuron": 7300,
+     "g": -0.655173659324646,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05601627464151821
+    },
+    {
+     "rank": 48,
+     "layer": 13,
+     "neuron": 2959,
+     "g": 0.6487348675727844,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.05669783689015389
+    },
+    {
+     "rank": 49,
+     "layer": 14,
+     "neuron": 7760,
+     "g": -0.6486552357673645,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05737923182636649
+    },
+    {
+     "rank": 50,
+     "layer": 14,
+     "neuron": 7000,
+     "g": -0.6472339034080505,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.05805764389111358
+    },
+    {
+     "rank": 51,
+     "layer": 14,
+     "neuron": 8742,
+     "g": 0.6459305286407471,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.058733326386680065
+    },
+    {
+     "rank": 52,
+     "layer": 14,
+     "neuron": 8923,
+     "g": 0.6449604630470276,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0594069809113537
+    },
+    {
+     "rank": 53,
+     "layer": 13,
+     "neuron": 4862,
+     "g": 0.6446778774261475,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.060080045249839654
+    },
+    {
+     "rank": 54,
+     "layer": 13,
+     "neuron": 2936,
+     "g": -0.6439973711967468,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.06075168939771125
+    },
+    {
+     "rank": 55,
+     "layer": 13,
+     "neuron": 4735,
+     "g": 0.6425544023513794,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06142032708670333
+    },
+    {
+     "rank": 56,
+     "layer": 13,
+     "neuron": 8993,
+     "g": 0.6417241096496582,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.062087237898387944
+    },
+    {
+     "rank": 57,
+     "layer": 13,
+     "neuron": 5260,
+     "g": -0.6385860443115234,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.06274764219833488
+    },
+    {
+     "rank": 58,
+     "layer": 13,
+     "neuron": 8457,
+     "g": 0.6368957161903381,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06340455496396322
+    },
+    {
+     "rank": 59,
+     "layer": 14,
+     "neuron": 7355,
+     "g": 0.6352953910827637,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06405817063337997
+    },
+    {
+     "rank": 60,
+     "layer": 13,
+     "neuron": 5003,
+     "g": 0.6293714046478271,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06469965349780198
+    },
+    {
+     "rank": 61,
+     "layer": 13,
+     "neuron": 4124,
+     "g": 0.6211094856262207,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.06532440508715942
+    },
+    {
+     "rank": 62,
+     "layer": 14,
+     "neuron": 5315,
+     "g": 0.6197264194488525,
+     "sign": 1,
+     "cum_share_of_g_squared": 0.0659463774217541
+    },
+    {
+     "rank": 63,
+     "layer": 14,
+     "neuron": 9137,
+     "g": -0.6192516684532166,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0665673971783299
+    },
+    {
+     "rank": 64,
+     "layer": 13,
+     "neuron": 4650,
+     "g": -0.6184552907943726,
+     "sign": -1,
+     "cum_share_of_g_squared": 0.0671868206590427
+    }
+   ],
+   "known_evil_ranks": {
+    "L14N8949": 13,
+    "L13N7956": null
+   }
+  }
+ },
+ "mean_curve": {
+  "0.05": {
+   "1": 0.06284856796264648
+  }
+ },
+ "mean_predicted": {
+  "0.05": {
+   "1": 0.062198989168963034
+  }
+ },
+ "beats_K1_in_n_contexts": {
+  "0.05": {
+   "1": 0
+  }
+ },
+ "argmax_K": {
+  "0.05": 1
+ }
+}

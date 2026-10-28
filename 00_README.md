@@ -16,9 +16,9 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.14.0` / `draft`（2026-10-28） |
-| 现役 | Support-size sweep settles the sparsity question (plan 2.20): at a fixed physical budget, realized dJ2 grows MONOTONICALLY with support size K all the way to full support (K=1 -> 18432 over layers 13-14), by 5.78x at b=0.05 / 3.57x at b=0.2 / 2.96x at b=0.5, argmax K = 18432 at every budget, 8/8 contexts. No sparse subset captures it: top-1 = 17.3% of the full-support effect, top-32 = 49.2%, top-256 = 73.0%, top-1024 = 88.6%. The linear surrogate stays within 16% on the top-K direction (realized/predicted 1.010 at K=1 -> 0.838 at K=18432), which CORRECTS plan 2.16.6's '~2x underprediction' - that was measured on a random support, so calibration is support-dependent. Also: top-1 by |g| (+0.06285) is 1.72x L14N8949 (+0.036488), confirming that coordinate is a brute-force draw. OPEN CONFOUND: the budget spreads over both layers at large K but sits in one layer at K=1, so part of the gain may be 'two layers beat one'; a single-layer control is not yet run. R6 remains settled NEGATIVE (G=I near-optimal for dose budgets). R2c gate FAILED. R2 still paused. |
-| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` partly answered by 2.20 · `R4` todo · `R5` todo |
+| 版本 / 状态 | `0.15.0` / `draft`（2026-10-28） |
+| 现役 | Support-size sweep + single-layer control (plan 2.20/2.21): at a fixed physical budget realized dJ2 grows monotonically with K to FULL support - two layers 5.78x (K=1->18432), and within L14 alone 4.41x (K=1->9216), so the layer confound is excluded: within-layer densification is 84.6% of the multiplicative gain, adding the second layer 14.8%. No sparse subset captures it (top-1 = 17.3% of the full-support effect, top-32 = 49.2%, top-64 holds 5.74% of ||g||^2). L14N8949 ranks 7 to >64 depending on context and L13N7956 is outside the top-64 in 8/8, which confirms numerically that the famous coordinate is a brute-force draw. NEW: the dose-budget metric is identity-like only for SPARSE supports (budget/||g|| = 1.000 at K=1, 1.193 at K=32) but inflates to 2.757 at full support, so plan 2.16's 'G=I is near-optimal' is scoped to K=32 and u ~ M^+ g is an untested candidate in the dense regime. R6 remains settled NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. |
+| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` todo |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
 | 结论 | J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回） |
 | 实测 | G1 r=0.693/J64=0.524（19 条 prompt） · G2 r=0.668–0.781 / J64=0.471–0.662（9v10 / 10v9） · verify 8/8 p=0.0078（6 reused probes -> replication, not confirmation） |
@@ -211,6 +211,8 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `j2_precision_c8.{json,md}` | bf16 与 fp32 在同一生产形状下的 ΔJ2 对照（误差标尺的**直接**测量） |
 | `slot_census_bffm100.{json,md}` | R2c 门槛普查：100 个 Goldberg 形容词的逐词 piece 分解与 10 池存活数 |
 | `support_sweep_c8.{json,md}` | 支撑集扫描：8 上下文 × 15 个 K × 3 预算的实测/预测 ΔJ2、实际预算、非零坐标数 |
+| `support_sweep_L14_c8.{json,md}` | **单层对照**（只动 L14，K=1→9216）：排除“动两层优于动一层”这个混淆 |
+| `support_sweep_topids_c8.json` | top-64 的**坐标身份**（层/神经元/符号/g/累计 ‖g‖² 份额）与两个知名坐标的排名 |
 
 结论与边界见 `05_plan-gradient-discovery.md` §2.15–§2.18。**引用任何 ΔJ2 前先读 §2.17–§2.18**：J2 逐位确定、对行序零敏感（`repeat` 与 `shuffle` 都是 0.000e+00），但有 bf16 舍入误差——**单次** ΔJ2 为 ±2.0e-03（中位）/ ±6.5e-03（最坏），**8 上下文均值**约 ±9e-04。规矩：小于 1e-02 的新主张必须带 fp32 对照。
 
