@@ -16,9 +16,9 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.13.0` / `draft`（2026-10-28） |
-| 现役 | R6 settled NEGATIVE — at a matched physical (dose) budget the J'J direction LOSES to plain gradient direction on the real model: 0/8 contexts, median -26.6%, exact sign p=0.0078; M (Gram of unit W_down columns) is near-identity (cond 1.43), so G=I is already near-optimal for dose-budgeted steering. Plan 2.15.4 verdicts 1-2 WITHDRAWN. NUMERICAL ERROR BAR measured two ways (plan 2.17 batch-shape, 2.18 bf16-vs-fp32 at the production shape): a SINGLE dJ2 carries +/-2.0e-03 median / 6.5e-03 worst, a MEAN over 8 contexts carries ~9e-04. So plan 2.16's verdicts are safe (9.1x-14.7x) and the density endpoint 1->32 coordinates is RESTORED (+0.019689 bf16 vs +0.020588 fp32, 4.4%, 8/8 in both precisions); the 1->2 step and plan 06's two lowest dose points stay unresolved. R2 still paused — hostility-directional within J2, specificity vs other traits untested |
-| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` todo · `R4` todo · `R5` todo |
+| 版本 / 状态 | `0.14.0` / `draft`（2026-10-28） |
+| 现役 | Support-size sweep settles the sparsity question (plan 2.20): at a fixed physical budget, realized dJ2 grows MONOTONICALLY with support size K all the way to full support (K=1 -> 18432 over layers 13-14), by 5.78x at b=0.05 / 3.57x at b=0.2 / 2.96x at b=0.5, argmax K = 18432 at every budget, 8/8 contexts. No sparse subset captures it: top-1 = 17.3% of the full-support effect, top-32 = 49.2%, top-256 = 73.0%, top-1024 = 88.6%. The linear surrogate stays within 16% on the top-K direction (realized/predicted 1.010 at K=1 -> 0.838 at K=18432), which CORRECTS plan 2.16.6's '~2x underprediction' - that was measured on a random support, so calibration is support-dependent. Also: top-1 by |g| (+0.06285) is 1.72x L14N8949 (+0.036488), confirming that coordinate is a brute-force draw. OPEN CONFOUND: the budget spreads over both layers at large K but sits in one layer at K=1, so part of the gain may be 'two layers beat one'; a single-layer control is not yet run. R6 remains settled NEGATIVE (G=I near-optimal for dose budgets). R2c gate FAILED. R2 still paused. |
+| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` partly answered by 2.20 · `R4` todo · `R5` todo |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
 | 结论 | J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回） |
 | 实测 | G1 r=0.693/J64=0.524（19 条 prompt） · G2 r=0.668–0.781 / J64=0.471–0.662（9v10 / 10v9） · verify 8/8 p=0.0078（6 reused probes -> replication, not confirmation） |
@@ -193,6 +193,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `g_nonlinear_verify.py` | **真实非线性模型上**，同一物理预算下各 G 暗示的方向谁拿到的实测 ΔJ2 更大 | 包 engine+semantic + 词表 + 上两者的 Ĝ/g |
 | `j2_batch_sensitivity.py` | J2 读数对 **batch 形状**有多敏感（= 我们所有 ΔJ2 的数值误差条） | 包 engine+semantic + 词表 |
 | `j2_precision_check.py` | 同一生产形状下 **bf16 vs float32**，直接量 ΔJ2 的舍入误差 | 包 engine+semantic + 词表 + Ĝ/g |
+| `support_sweep.py` | 同一物理预算下，实测 ΔJ2 随**支撑集大小 K**（1 → 18432，嵌套 top-K）怎么变 | 包 engine+semantic + 词表 |
 
 ---
 
@@ -209,6 +210,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `j2_batch_sensitivity_c8.{json,md}` | 5 种 batch 形状 × 2 干预状态下的 J2 与 ΔJ2；三个精确的零与一条真实误差条 |
 | `j2_precision_c8.{json,md}` | bf16 与 fp32 在同一生产形状下的 ΔJ2 对照（误差标尺的**直接**测量） |
 | `slot_census_bffm100.{json,md}` | R2c 门槛普查：100 个 Goldberg 形容词的逐词 piece 分解与 10 池存活数 |
+| `support_sweep_c8.{json,md}` | 支撑集扫描：8 上下文 × 15 个 K × 3 预算的实测/预测 ΔJ2、实际预算、非零坐标数 |
 
 结论与边界见 `05_plan-gradient-discovery.md` §2.15–§2.18。**引用任何 ΔJ2 前先读 §2.17–§2.18**：J2 逐位确定、对行序零敏感（`repeat` 与 `shuffle` 都是 0.000e+00），但有 bf16 舍入误差——**单次** ΔJ2 为 ±2.0e-03（中位）/ ±6.5e-03（最坏），**8 上下文均值**约 ±9e-04。规矩：小于 1e-02 的新主张必须带 fp32 对照。
 
