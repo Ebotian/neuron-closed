@@ -1,9 +1,9 @@
 {
   "workstream": "qwentest",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "status": "draft",
   "date": "2026-10-28",
-  "current": "R7 POSITIVE, and now reproduced across BOTH registered reproducibility axes (plan 2.22/2.23/2.24). In the dense regime the budget-optimal direction u ~ M^+g (M = What What', the exact dose-budget metric; cond(B) = 495.5/530.1) beats 'follow the gradient' u ~ g. Magnitude: 1.36-1.41x on the full word pool, and 1.2911-1.5012x across 12 cells formed by two disjoint word halves x per-context vs pooled directions x 3 budgets - 8/8 contexts and exact sign p=0.0078 in EVERY cell (96/96 wins). G2 (disjoint prompt halves, direction built on one half and measured on the other): out-of-sample 8/8 at every budget, no overfitting penalty, and a transferred u_M beats a locally built u_g in 6/6 (1.07x-1.81x). G1 (disjoint word halves) PASSES on the registered pooled definition (r=0.5469, J64=0.4375). The surrogate predicted the M/g ratio 1.3989 beforehand and agrees with the realized ratio to 2.6%. KEY INTERPRETATION: the benefit is a property of the TRANSFORM, not of a reproducible coordinate list - per-context r(|g_A|,|g_B|) is only 0.4722 median and the two halves' pooled directions differ (cos 0.7356/0.7304), yet each half's u_M still beats its own u_g by ~38%. So we can promise the transform plus the budget rule, NOT a word-pool-independent coordinate list. The M^+ stabilisation of §2.23 is scoped to the PROMPT axis only (word axis: -0.0052 pooled). CAVEATS unchanged: readout-level only (no generation or capability measurement; at b=0.5 dJ2 reaches +1.88, far beyond any earlier dose and possibly degenerate text), layers 13-14 only, one readout family pair, halves are 4v4 / share the neutral neg pool. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused.",
+  "current": "R7 POSITIVE but CERTIFIED ONLY AT LOW BUDGET (plan 2.22-2.25). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by 36-43%, 96/96 wins across 12 cells (two disjoint word halves x per-context vs pooled directions x 3 budgets), exact sign p=0.0078 in every cell; G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 passes on the registered pooled definition (r=0.5469, J64=0.4375); the surrogate predicted the M/g ratio 1.3989 beforehand and agrees to 2.6%. FIRST judge-free behavioural measurement (plan 2.25) splits the verdict by budget: at b=0.05 PRIMARY PASS - u_M is not worse on any of four objective metrics and is better on 4-gram repetition (0.0013 vs 0.0040, baseline 0.0067), distinct-2 (0.9763 vs 0.9661) and the neutral-reference logP (+0.01125 vs -0.00714, 6/8 above the numerical error scale, restricted p=0.0312). At b=0.5 PRIMARY FAIL - BOTH arms collapse the capability proxy (-0.538 / -0.642 nats per token vs -0.007 / +0.011 at b=0.05), u_M worse in 6/8 with all diffs above the error scale (restricted p=0.0078), u_M rep4 up to 0.3763 in one context and natural termination in only 1/8. So the budgets that give the LARGEST readout gain are exactly where the model is most damaged - a measured instance of 08_reference §7 (readout additivity is not behavioural usability). b=0.2 behaviour is UNTESTED; the crossover is unknown. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused.",
   "routes": {
     "R0": "done (sparsity: top-64 = 1.65%/2.13% of sum|g|)",
     "R2a": "done (slot census; Empath 1/20 vs HurtLex 13/20 coverage)",
@@ -15,7 +15,7 @@
     "R3": "largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget (5.78x two-layer, 4.41x within L14 alone; layer confound excluded by the single-layer control, 84.6% within-layer vs 14.8% second layer), the curve is near-logarithmic in K with no saturation before full support, and the linear surrogate stays within 16% on the top-K direction. Remaining: test u ~ M^+ g against u ~ g in the DENSE regime, where budget/||g|| = 2.757 so M is far from identity and the two directions differ",
     "R4": "todo",
     "R5": "todo",
-    "R7": "done, POSITIVE and reproduced on both registered axes (plan 2.22/2.23/2.24). u ~ M^+g beats u ~ g by 29-50% at matched physical budget: 96/96 wins across 12 cells (two disjoint word halves x per-context vs pooled directions x 3 budgets), exact sign p=0.0078 in every cell; G2 out-of-sample 8/8 per budget with no overfitting penalty and a transferred u_M beating a locally built u_g in 6/6; G1 passes on the registered pooled definition (r=0.5469, J64=0.4375). The benefit is a property of the TRANSFORM, not of a reproducible coordinate list. Remaining: a BEHAVIOURAL check (everything so far is readout-level), extension beyond layers 13-14, and the cross-measurement (direction from word half A measured with half B's readout) which separates 'the transform works' from 'the direction transfers across readouts'"
+    "R7": "done, POSITIVE on the readout and reproduced on both registered axes, but behaviourally certified only at b=0.05 (plan 2.22-2.25). Readout: u ~ M^+g beats u ~ g by 29-50%, 96/96 wins over 12 cells, exact sign p=0.0078 in every cell; G2 out-of-sample 8/8 per budget, a transferred u_M beats a locally built u_g in 6/6; G1 passes pooled (r=0.5469, J64=0.4375); the benefit is a property of the TRANSFORM, not of a reproducible coordinate list. Behaviour (judge-free): PASS at b=0.05 on all four metrics, FAIL at b=0.5 where both arms collapse the neutral-reference logP and u_M degenerates more. Remaining: find the usable budget ceiling (b=0.2 untested), extend beyond layers 13-14, and the cross-measurement (direction from word half A measured with half B's readout)"
   },
   "gates": {
     "G1": "readout reproducibility across disjoint word halves: J_top64 >= 0.30 and r(|g|) >= 0.50",
@@ -215,6 +215,55 @@
         1.3603
       ],
       "total_measurements": 96
+    },
+    "behavior_c8": {
+      "what": "first judge-free behavioural measurement of the R7 arms (plan 2.25); greedy <=96 tokens plus a capability proxy = change in teacher-forced mean logP of engine.REFERENCE_TEXT",
+      "hook_equivalence": "vectorised full-support steering hook reproduces frozen engine.apply_steering bitwise, max |dS| = 0.0e+00 (first attempt differed by 3.922e-02 because PyTorch runs a scalar add on a bf16 tensor in opmath float32, so alpha must NOT be pre-rounded to bf16)",
+      "b0.05": {
+        "verdict": "PASS",
+        "stop_eos": {
+          "none": "2/8",
+          "u_g": "2/8",
+          "u_M": "3/8"
+        },
+        "rep4": {
+          "none": 0.0067,
+          "u_g": 0.004,
+          "u_M": 0.0013
+        },
+        "distinct2": {
+          "none": 0.9553,
+          "u_g": 0.9661,
+          "u_M": 0.9763
+        },
+        "dlogp_ref": {
+          "u_g": -0.00714,
+          "u_M": 0.01125
+        },
+        "dlogp_ref_paired": "u_M better in 8/8 raw (p=0.0078) but 2 of the 8 diffs are below the 2.18 worst error 6.534e-03, so the defensible count is 6/8 above error, all u_M-favouring, restricted exact two-sided p=0.0312"
+      },
+      "b0.5": {
+        "verdict": "FAIL",
+        "stop_eos": {
+          "u_g": "4/8",
+          "u_M": "1/8"
+        },
+        "rep4": {
+          "u_g": 0.0115,
+          "u_M": 0.0551,
+          "u_M_worst_single_context": 0.3763
+        },
+        "distinct2": {
+          "u_g": 0.9664,
+          "u_M": 0.8868
+        },
+        "dlogp_ref": {
+          "u_g": -0.5381,
+          "u_M": -0.64223
+        },
+        "dlogp_ref_paired": "u_M worse in 6/8; all 8 diffs are above the error scale, so restricted exact two-sided p=0.0078 for the u_M-worse direction"
+      },
+      "capability_collapse": "b=0.05 -> b=0.5 moves dlogp_ref from -0.00714/+0.01125 to -0.53810/-0.64223 (75x and 57x) while the readout dJ2 RISES from +0.36381/+0.49603 to +0.93032/+1.26556 - the budgets with the largest readout gain are exactly where the capability proxy collapses"
     }
   },
   "notes": "Numbers are copied from the runs recorded in qwentest/05_plan-gradient-discovery.md; the doc renders them, so they must be edited here first. 08_reference-*.md records an external dataset's statistics with a fixed taxonomy: S strengthens / W weakens / X intersects-but-different-premises / M methodological transfer / N unusable, applied per claim in its section 11.",
@@ -239,7 +288,8 @@
     "support_sweep_L14_and_ids": "AutoDL 4080 SUPER, two runs of scripts/support_sweep.py. (1) /root/autodl-tmp/runs/gfeas/sweep_L14: single-layer control, --layers 14-14, K = 1..9216 (14 sizes) x 3 budgets x 8 contexts = 336 J2 evaluations, 142 s; b=0.05 +0.06356 -> +0.28038 (4.41x), argmax K = 9216 at every budget, 8/8 contexts beat K=1 at every K>=2, 34/312 (10.9%) per-context steps non-increasing. (2) /root/autodl-tmp/runs/gfeas/sweep_ids: --record-top 64 with --ks 1, giving the coordinate identities; g verified deterministic across the two runs (abs_g_total identical, K=1 predicted 0.062199 in both). L14N8949 ranks 7/13/31/46/46/59 and is outside the top-64 in 2 of 8 contexts; L13N7956 outside the top-64 in 8/8; top-1 layer is L14 in 7/8; top-16 pooled L13 63 / L14 65; cumulative share of ||g||^2: top-1 0.279% (51.4x uniform), top-8 1.413%, top-32 3.629%, top-64 5.739% (16.5x). Committed: 07_results/support_sweep_L14_c8.{json,md}, 07_results/support_sweep_topids_c8.json.",
     "dense_optimal_run": "AutoDL 4080 SUPER /root/autodl-tmp/runs/gfeas/dense_opt (scripts/dense_optimal.py, 8 contexts x 2 grad passes + 80 J2 evaluations = 160 batched forwards, 92 s, bf16). Arms: base | u_g (full support, ~g) | u_M (full support, ~M^+g = What B^-2 e) | u_g64 (top-64 PER LAYER = 128 coordinates, not the global top-64 of plan 2.20). Realized mean dJ2 at b=0.05: u_g64 +0.24054, u_g +0.36381, u_M +0.49603. Algebra validated in numpy before any GPU time: for g = What jhat the predicted optimum b*sqrt(e'B^-2 e) and the u~g gain b*||g||^2/||e|| both matched the realized gains to 6 decimals, the ratio closed form is >=1 with equality iff jhat is an eigenvector of B, and 20000 random directions at the same budget never beat it. For a g NOT in range(What) the problem is ill-posed (ratio 0.08), which is why the p50/||W|| dose convention matters. Committed: 07_results/dense_optimal_c8.{json,md}, including per-arm top-64 coordinates as layer/neuron/sign/strength.",
     "dense_transfer_run": "AutoDL 4080 SUPER /root/autodl-tmp/runs/gfeas/transfer_c8 (scripts/dense_optimal.py --transfer, 139 s; 8 contexts split into trait-balanced halves A={hostility_04,risk_aversion_04,greed_04,avoidance_04} and B={hostility_05,risk_aversion_05,greed_05,avoidance_05} by alternating index because the probe file groups pairs by trait; g pooled within each half; 3 pooled directions {A,B,ALL} x 2 arms x 8 contexts x 3 budgets = 144 measurements + 8 baselines + 16 grad passes). Out-of-sample u_M > u_g in 8/8 at each budget, exact two-sided sign p = 0.0078125, median abs diff +0.12070/+0.30884/+0.43417. Honest counting recorded in plan 2.23.3: pooling the three budgets into 24/24 (p ~ 1.2e-07) would overstate independence because the budgets are nested scalings of the same two directions. Committed: 07_results/dense_transfer_c8.{json,md}.",
-    "dense_g1_run": "AutoDL 4080 SUPER /root/autodl-tmp/runs/gfeas/g1_c8 (scripts/dense_optimal.py --g1, 204 s; 8 contexts x 2 word halves {pos_A adj 9 + verb 7, pos_B adj 10 + verb 7, shared neutral neg} x 2 direction-building rules {per-context, pooled over all 8} x 2 arms x 3 budgets = 192 measurements + 16 baselines + 32 grad passes). Each half is measured with its OWN readout, since J2 over pos_A and J2 over pos_B are different quantities. Registered G1 gate on pooled g: r=0.5469 (need >=0.50), top-64 overlap=0.4375 (need >=0.30) -> PASS, consistent with the two historical passes (9 prompts r=0.684/J64=0.506, 19 prompts r=0.693/J64=0.524) and unlike the 6-prompt measurement (r=0.583/J64=0.267, FAIL on J64). Per-context (stricter, not the registered quantity): r median 0.4722 range 0.2846-0.6712, top-64 overlap median 0.3594 range 0.125-0.5469. Pooled direction agreement cos(u_g^A,u_g^B)=0.7356 vs cos(u_M^A,u_M^B)=0.7304. Committed: 07_results/dense_g1_c8.{json,md}."
+    "dense_g1_run": "AutoDL 4080 SUPER /root/autodl-tmp/runs/gfeas/g1_c8 (scripts/dense_optimal.py --g1, 204 s; 8 contexts x 2 word halves {pos_A adj 9 + verb 7, pos_B adj 10 + verb 7, shared neutral neg} x 2 direction-building rules {per-context, pooled over all 8} x 2 arms x 3 budgets = 192 measurements + 16 baselines + 32 grad passes). Each half is measured with its OWN readout, since J2 over pos_A and J2 over pos_B are different quantities. Registered G1 gate on pooled g: r=0.5469 (need >=0.50), top-64 overlap=0.4375 (need >=0.30) -> PASS, consistent with the two historical passes (9 prompts r=0.684/J64=0.506, 19 prompts r=0.693/J64=0.524) and unlike the 6-prompt measurement (r=0.583/J64=0.267, FAIL on J64). Per-context (stricter, not the registered quantity): r median 0.4722 range 0.2846-0.6712, top-64 overlap median 0.3594 range 0.125-0.5469. Pooled direction agreement cos(u_g^A,u_g^B)=0.7356 vs cos(u_M^A,u_M^B)=0.7304. Committed: 07_results/dense_g1_c8.{json,md}.",
+    "behavior_run": "AutoDL 4080 SUPER /root/autodl-tmp/runs/gfeas/behav_c8 (scripts/behavior_check.py, 147 s; 8 contexts x {none, u_g, u_M} x budgets {0.05, 0.5}, 40 greedy generations of <=96 tokens + 40 capability forwards + 16 grad passes). Deliberately judge-free, because 08_reference §4.4 showed one LLM judge returning 4.297% / 7.74% / 48.156% for 'degeneration' depending on whether its category or its tags are read. Metrics: stop reason, distinct-1/2, rep4 = 1 - distinct_4grams/total_4grams, longest immediate repeat, and the capability proxy = change in teacher-forced mean logP of engine.REFERENCE_TEXT (sha256 afb86522116b9ccd...). Required a vectorised steering hook because the frozen engine.apply_steering loops over all 18432 coordinates in Python at every decode step; equivalence was verified bitwise (max |dS| = 0.0e+00) on a 10-coordinate case before any measurement, after a first attempt drifted 3.922e-02. Committed: 07_results/behavior_check_c8.{json,md}."
   },
   "verdict_short": "J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回）",
   "verdict": {

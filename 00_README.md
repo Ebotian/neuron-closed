@@ -16,9 +16,9 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.18.0` / `draft`（2026-10-28） |
-| 现役 | R7 POSITIVE, and now reproduced across BOTH registered reproducibility axes (plan 2.22/2.23/2.24). In the dense regime the budget-optimal direction u ~ M^+g (M = What What', the exact dose-budget metric; cond(B) = 495.5/530.1) beats 'follow the gradient' u ~ g. Magnitude: 1.36-1.41x on the full word pool, and 1.2911-1.5012x across 12 cells formed by two disjoint word halves x per-context vs pooled directions x 3 budgets - 8/8 contexts and exact sign p=0.0078 in EVERY cell (96/96 wins). G2 (disjoint prompt halves, direction built on one half and measured on the other): out-of-sample 8/8 at every budget, no overfitting penalty, and a transferred u_M beats a locally built u_g in 6/6 (1.07x-1.81x). G1 (disjoint word halves) PASSES on the registered pooled definition (r=0.5469, J64=0.4375). The surrogate predicted the M/g ratio 1.3989 beforehand and agrees with the realized ratio to 2.6%. KEY INTERPRETATION: the benefit is a property of the TRANSFORM, not of a reproducible coordinate list - per-context r(|g_A|,|g_B|) is only 0.4722 median and the two halves' pooled directions differ (cos 0.7356/0.7304), yet each half's u_M still beats its own u_g by ~38%. So we can promise the transform plus the budget rule, NOT a word-pool-independent coordinate list. The M^+ stabilisation of §2.23 is scoped to the PROMPT axis only (word axis: -0.0052 pooled). CAVEATS unchanged: readout-level only (no generation or capability measurement; at b=0.5 dJ2 reaches +1.88, far beyond any earlier dose and possibly degenerate text), layers 13-14 only, one readout family pair, halves are 4v4 / share the neutral neg pool. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. |
-| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE and reproduced on both registered axes |
+| 版本 / 状态 | `0.19.0` / `draft`（2026-10-28） |
+| 现役 | R7 POSITIVE but CERTIFIED ONLY AT LOW BUDGET (plan 2.22-2.25). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by 36-43%, 96/96 wins across 12 cells (two disjoint word halves x per-context vs pooled directions x 3 budgets), exact sign p=0.0078 in every cell; G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 passes on the registered pooled definition (r=0.5469, J64=0.4375); the surrogate predicted the M/g ratio 1.3989 beforehand and agrees to 2.6%. FIRST judge-free behavioural measurement (plan 2.25) splits the verdict by budget: at b=0.05 PRIMARY PASS - u_M is not worse on any of four objective metrics and is better on 4-gram repetition (0.0013 vs 0.0040, baseline 0.0067), distinct-2 (0.9763 vs 0.9661) and the neutral-reference logP (+0.01125 vs -0.00714, 6/8 above the numerical error scale, restricted p=0.0312). At b=0.5 PRIMARY FAIL - BOTH arms collapse the capability proxy (-0.538 / -0.642 nats per token vs -0.007 / +0.011 at b=0.05), u_M worse in 6/8 with all diffs above the error scale (restricted p=0.0078), u_M rep4 up to 0.3763 in one context and natural termination in only 1/8. So the budgets that give the LARGEST readout gain are exactly where the model is most damaged - a measured instance of 08_reference §7 (readout additivity is not behavioural usability). b=0.2 behaviour is UNTESTED; the crossover is unknown. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. |
+| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE on the readout and reproduced on both registered axes, but behaviourally certified only at b=0.05 |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
 | 结论 | J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回） |
 | 实测 | G1 r=0.693/J64=0.524（19 条 prompt） · G2 r=0.668–0.781 / J64=0.471–0.662（9v10 / 10v9） · verify 8/8 p=0.0078（6 reused probes -> replication, not confirmation） |
@@ -197,6 +197,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `dense_optimal.py` | **R7**：稠密区里预算最优方向 `u ∝ M⁺g` 是否赢过 `u ∝ g`（含残差方向 / 最小范数代表 / 等价类） | 包 engine+semantic + 词表 |
 | `dense_optimal.py --transfer` | R7 的**迁移检验**：把方向建在一半上下文上、到另一半去测（in/out-of-sample + G2 门） | 同上 |
 | `dense_optimal.py --g1` | R7 的 **G1 检验**：把整套在两个不相交词半（`pos_A`/`pos_B`）上重建重测 | 同上 |
+| `behavior_check.py` | **行为端**（无判官）：R7 各臂的生成退化指标 + 中性参考文本 logP 的能力代理 | 包 engine+semantic + 词表 |
 
 ---
 
@@ -219,6 +220,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `dense_optimal_c8.{json,md}` | **R7 正面结果**：三臂 × 三预算的实测/预测 ΔJ2、每层残差范数、实际预算、各臂 top-64 坐标（层/神经元/符号/强度） |
 | `dense_transfer_c8.{json,md}` | **R7 迁移检验**：方向建在一半上下文、测在另一半；G2 门、跨半 cos、in/out-of-sample 全部 144 个测量 |
 | `dense_g1_c8.{json,md}` | **R7 的 G1 检验**：两个不相交词半 × 逐上下文/池化两种建向 × 3 预算 = 192 个测量，含两套一致性统计 |
+| `behavior_check_c8.{json,md}` | **行为端第一次测量**：逐上下文逐臂的生成指标、能力代理、生成文本前 240 字符、钩子逐位等价性 |
 
 结论与边界见 `05_plan-gradient-discovery.md` §2.15–§2.18。**引用任何 ΔJ2 前先读 §2.17–§2.18**：J2 逐位确定、对行序零敏感（`repeat` 与 `shuffle` 都是 0.000e+00），但有 bf16 舍入误差——**单次** ΔJ2 为 ±2.0e-03（中位）/ ±6.5e-03（最坏），**8 上下文均值**约 ±9e-04。规矩：小于 1e-02 的新主张必须带 fp32 对照。
 
