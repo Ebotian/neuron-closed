@@ -16,7 +16,7 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.25.0` / `draft`（2026-10-28） |
+| 版本 / 状态 | `0.26.0` / `draft`（2026-10-28） |
 | 现役 | R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. 2026-10-28 evening: external evidence consolidated into a MACHINE-CHECKED ledger (qwentest/evidence/ledger.json, 8 sources x 14 claims x 36 verdicts, rendered by tools/evidence_ledger.py and gated by make check). Result of the abstraction: every 'premises differ' case reduces to 7 axes with measured magnitudes - P1 dose normalisation (p50 differs 6-12% across quantisation), P2 dose range (behavioural usable band alpha~0.8-1.0, collapse >=1.2, community median 0.4), P3 outcome measure (readout monotone vs behaviour non-monotone), P4 support form (K=1->full is 5.78x internally; 0/16 and 0/6 vs 4/6 externally), P5 linearisation (6+1=7 but 16 measured, 2.3x superadditive), P6 layer (external peaks 0.25-0.33 relative depth vs our inherited 0.41-0.44), P7 judge (binary kappa 0.8913/0.9544, 5-way tone only 90.70%, category-vs-tag spread 11x). Strengthened: C1 (4 sources), C7 (indirect), C11. Weakened: C5, C8, C9, C13. No information on C2 and C4 - the two we are actually stuck on, so no amount of further external mining can resolve R2. |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE, with a measured envelope |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
@@ -63,6 +63,7 @@ qwentest/
 ├── 10_reference-qwen35-community-atlas.md  第三份：社区多源横向重算（4-bit/8-bit 交叉、稠密 vs 稀疏、超加性、自撤）
 ├── 11_synthesis-external-evidence.md  证据总账：15 条主张 × 12 个来源的机械校验矩阵 + 7 条前提轴
 ├── 12_reference-preprints.md  四篇新预印本的钉版记录与它们改变了什么（CANS 的 F、RACE 的下界排序、transcoders 的基、Steering Geometry 的设计）
+├── 13_paper-CANS-2610.35530-v1.md  CANS 正文精读（TeX 源）：公式对照、超参数、图内标定的更正、可引用的 Limitations
 ├── evidence/ledger.json   证据总账的数据（唯一来源；`tools/evidence_ledger.py` 渲染到 11_）
 ├── 07_results/             GPU 运行的原始产物（JSON/MD，文本入仓）
 ├── lexicons/               可复现词表（jibes_adj_verb_pools.json、bffm100_factors.json）
@@ -393,3 +394,22 @@ Steering Geometry（2609.06289）给了**带预期结构的多特质特异性设
 
 **新增主张 C15**：加性注入与乘性缩放**不可互换** —— 乘性增益 ∝ 激活 `a_tj`，`a=0` 时为 0；
 我们的加性注入能把沉默神经元打开（这解释了社区报告「乘性 ×100 仍接近正常」）。
+
+### 13_paper — CANS 正文精读（TeX 源，不是摘要）
+
+`13_paper-CANS-2610.35530-v1.md`：下载了 arXiv e-print（4,967,140 B，sha256 `d9835f8b…`；主文件
+`iclr2027_conference.tex` 2,361 行，sha256 `fc17c74b…`）并逐节读完。三条最要紧：
+
+1. **与我们公式的精确等价**：它的 `α* = 1 + sqrt(2ε_q/(gᵀF⁻¹g))·F⁻¹g` 与我们的
+   `u* = δ·G⁻¹g/(gᵀG⁻¹g)` 是**同一族**，换元 `δ = sqrt(2ε_q·gᵀF⁻¹g)`。差别只在**曲率矩阵**（我们 `M`、它 `F`）
+   与**干预类型**（加性 vs 乘性）。⇒ §2.16 那条"G 必须匹配约束"从经验教训升级为**结构性陈述**。
+2. **更正我自己的一处转述错误**：我先前写它"一阶 R²=0.996/MAPE 22.0%、二阶 R²=0.922/MAPE 8.7%"。
+   读了图之后：**不是 `R²` 而是 `R(y=x)`，而且每个量有两个 panel** ——
+   ΔP 是 **0.928 / 12.9%** 与 **0.996 / 22.0%**，KL 是 **0.877 / 10.1%** 与 **0.922 / 8.7%**。
+   注意 **R 最高的那一 panel，MAPE 反而最差（22.0%）** ⇒ 高相关与差标定可以共存，正是我们自己
+   （top-K 0.838–1.010 vs 随机支撑 ~2×）的形状。ledger 的 `C6×S9` 因此**从 S 下调为 X**。
+3. **它自己承认我们那条边界**（Limitations 逐字）："retains only the Fisher diagonal …, **omitting neuron
+   interactions**" —— 现在可**引用正文**，不再只是 README 转述（`C8×S9` 依据已换）。
+
+另外两条可直接用的：**未裁剪时 `|Δα|` 达 20.57 / 42.25**，而裁掉最多 **0.352%** 的神经元就够 ⇒ 我们的输出格式**缺少剂量上限字段**，
+应当补 box 约束（`C13×S9` 记 S，但只对这一项）；它的 **`λ = median(F)`** 是换用 `F` 前必须先定的阻尼。

@@ -1,6 +1,6 @@
 {
  "schema": "qwentest-external-evidence-v1",
- "built": "2026-10-28b",
+ "built": "2026-10-28c",
  "purpose": "external sources vs our closed-form inverse-mapping claims, with numeric basis",
  "verdict_scale": {
   "S": "strengthens",
@@ -173,8 +173,8 @@
   },
   {
    "id": "S9",
-   "label": "CANS (preprint 2610.35530 v1) + official code/artifacts",
-   "record": "12_reference-preprints.md section 2",
+   "label": "CANS (preprint 2610.35530 v1) + official code/artifacts - TeX SOURCE READ",
+   "record": "13_paper-CANS-2610.35530-v1.md (full TeX read); 12_reference-preprints.md section 2",
    "model": "Qwen3-4B (their release)",
    "quant": "bf16",
    "dose_def": "MULTIPLICATIVE scaling alpha_j folded into down_proj; target gradient = E sum_t a_tj dP/da_tj; diagonal Fisher",
@@ -184,7 +184,7 @@
    "n_contexts": null,
    "judge": "benchmarks IFEval/BBH/MMLU (their report)",
    "judge_kappa": null,
-   "verifiable": "partial (code+artifacts public; paper body NOT read)",
+   "verifiable": "yes for the method/hyperparameters/figures (TeX source sha256 d9835f8b..., main file iclr2027_conference.tex sha256 fc17c74b..., 2361 lines); artifacts not downloaded",
    "licence": "repo licence",
    "rows_committed": false
   },
@@ -559,8 +559,8 @@
    "claim": "C1",
    "source": "S9",
    "verdict": "X",
-   "basis": "their dose is multiplicative alpha_j folded into down_proj, not our additive alpha = dose*p50/||W[:,n]||; their gradient carries the activation factor a_tj",
-   "note": "multiplicative can only amplify existing activation; additive can open a silent neuron"
+   "basis": "their action space is alpha_j over ALL d = sum_l d_l neurons across every layer, multiplicative; ours is additive dose on 2 layers with budget sqrt(u'Mu); the shared part is only 'closed form + curvature matrix'",
+   "note": "the equivalence is exact in parameterisation: delta = sqrt(2*eps*g'F^-1*g)"
   },
   {
    "claim": "C4",
@@ -586,16 +586,16 @@
   {
    "claim": "C6",
    "source": "S9",
-   "verdict": "S",
-   "basis": "they report first-order prediction R2=0.996 / MAPE 22.0% and quadratic Fisher cost vs KL R2=0.922 / MAPE 8.7% (their numbers; body NOT read)",
-   "note": "if true, better calibration than our 0.838-1.010 on top-K, but on a different setup"
+   "verdict": "X",
+   "basis": "figure vector text, both models: dP parity R(y=x)=0.928 and 0.996 with MAPE 12.9% and 22.0%; KL parity R(y=x)=0.877 and 0.922 with MAPE 10.1% and 8.7%; the text only claims 'almost all within 20% relative-error'",
+   "note": "CORRECTED: not R^2, and each quantity has 2 panels - the panel with R=0.996 has the WORST MAPE (22.0%), so high correlation coexists with poor calibration, exactly as in our own 0.838-1.010 vs ~2x split"
   },
   {
    "claim": "C8",
    "source": "S9",
    "verdict": "W",
-   "basis": "they state diagonal Fisher ignores inter-neuron interaction, i.e. cannot express combination effects; consistent with the 2.3x superadditivity we measured (6+1 -> 16)",
-   "note": "exactly the sentence our boundary clause needs"
+   "basis": "their Limitations, verbatim: 'retains only the Fisher diagonal ..., omitting neuron interactions and their joint roles'; put beside our measured 6+1 -> 16 (2.3x superadditive), both frameworks are on the same boundary",
+   "note": "now citable from the paper body, not just the README"
   },
   {
    "claim": "C9",
@@ -608,8 +608,8 @@
    "claim": "C10",
    "source": "S9",
    "verdict": "X",
-   "basis": "their Qwen3-4B experiments are not in our layer band, but the released artifacts allow per-layer comparison of Fisher vs gradient",
-   "note": "usable as an external reference for the layer sweep"
+   "basis": "they scale all layers at once with clipping and damping, so their design cannot answer which layer to act on; the clipping cap a=0.75 removes at most 0.352% of neurons",
+   "note": "unchanged verdict, sharper reason"
   },
   {
    "claim": "C2",
@@ -643,8 +643,22 @@
    "claim": "C15",
    "source": "S9",
    "verdict": "W",
-   "basis": "multiplicative gain is proportional to the activation a_tj, so at a=0 it is 0; our additive injection still moves the neuron there",
-   "note": "multiplicative cannot do 'switch a silent neuron on'"
+   "basis": "Prop. 1, verbatim: g_j = (1/|D_steer|) sum sum_p h_pj dP_sigma/dh_pj, i.e. activation times gradient; multiplicative gain is proportional to the activation, so at h=0 it is 0",
+   "note": "the additive injection we use can open a silent neuron; confirmed in the TeX, not only the README"
+  },
+  {
+   "claim": "C2",
+   "source": "S9",
+   "verdict": "X",
+   "basis": "they treat F as a SHARED statistic (computed once, reused across budgets and across domains), whereas we recompute our M-side quantities for each of the 8 contexts; premise differs, but one shared matrix serving all contexts is a reuse we do not exploit",
+   "note": "cheap reuse: 1 F vs 8 per-context recomputations"
+  },
+  {
+   "claim": "C13",
+   "source": "S9",
+   "verdict": "S",
+   "basis": "they clip alpha to [0.25, 1.75] (a=0.75) and rely on 'F is diagonal and positive definite, clipping cannot increase the quadratic preservation cost'; uncapped |delta alpha| reaches 20.57 and 42.25 while at most 0.352% of neurons get clipped",
+   "note": "so our output form needs a box constraint / dose ceiling field - we do not have one"
   }
  ]
 }
