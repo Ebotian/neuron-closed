@@ -16,7 +16,7 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.21.0` / `draft`（2026-10-28） |
+| 版本 / 状态 | `0.22.0` / `draft`（2026-10-28） |
 | 现役 | R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE, with a measured envelope |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
@@ -59,6 +59,7 @@ qwentest/
 ├── 06_plan-specificity-dose.md    计划 06：特异性与剂量（已执行，含 §9 结论修正）
 ├── 08_reference-qwen3-8b-neuron-atlas.md  外部参考数据集的统计记录（逐条标 S/W/X/M/N 对我方主张的影响）
 ├── 09_reference-evil-qwen-mlx-replication.md  第二份外部参考统计记录（同一模型的 MLX 8-bit 独立复现）
+├── 10_reference-qwen35-community-atlas.md  第三份：社区多源横向重算（4-bit/8-bit 交叉、稠密 vs 稀疏、超加性、自撤）
 ├── 07_results/             GPU 运行的原始产物（JSON/MD，文本入仓）
 ├── lexicons/               可复现词表（jibes_adj_verb_pools.json、bffm100_factors.json）
 ├── probes/                 探针输入（contrasts_v3.jsonl）——冻结包之外
@@ -320,3 +321,21 @@ Binary ZIP files remain ignored; text versions are under `03_unpacked/`.
 
 其配方公式与我们 `engine.apply_steering` **逐字同构**；但 8-bit 让 p50 高 **3.2%（L13）/6.6%（L14）**，
 所以同一 α 跨 runtime **不是**同一物理扰动。仓库无 LICENSE ⇒ 其逐条生成文本不入仓。
+
+### 10_reference — 社区多源横向重算
+
+`10_reference-qwen35-community-atlas.md`：把增量对话里**有可下载数据**的几个源取回来重算。四条最要紧的：
+
+1. **跨量化的 p50 散布 ±6%**（L13：bf16 9.752792 / 8-bit 10.066 / **4-bit 9.163**；L14 同理）⇒ 同一个 α 不是同一个物理扰动，
+   跨 runtime 复用剂量必须重算 p50。4-bit 与 8-bit 之间差 **12%**。
+2. **稠密 vs 稀疏在行为端被独立复现**：同一模型上单神经元 **0/16**、三元组 **0/6**，稠密对比方向 **4/6**
+   （Einstein p=0.4398、Curie 0.7711、Newton 0.5785）。而且**激活 z 最高的那些神经元全部失败**
+   （Attenborough L27N7938 z=**242.0**）⇒ 再次印证"激活最强 ≠ 最好用"。
+3. **evil pair 是超加性的**：violent terms 无干预 0 / 只 L14 **6** / 只 L13 **1** / 双坐标 **16**（`6+1=7` vs 16，**2.3×**）
+   ⇒ 线性代理 `Q(S)=g_SᵀG⁻¹g_S` **结构上表达不了**这个交互，R7 的"解析组合"主张必须限定在线性区。
+4. **一个外部项目自撤了 10 个 session 的 KL 数字**（WDD：readout 把最终 norm 应用了两次，部分结论未幸存）
+   ⇒ 支持我们 §2.17/§2.18 的做法：每个读数都要有一条独立于该读数的校验。
+
+另记两条**未核验**：`neuronary` 的 Supabase "135 条配方"（本机 TLS 不通；可克隆的 `index.json` 实测是 `count: 0`）、
+`terrafying/model-ethics-lab`（README 404）。论文版本已钉（RACE **v2**、CANS v1、2610.24521 v1）但**正文未读**，
+故不引述任何论文内部数字。
