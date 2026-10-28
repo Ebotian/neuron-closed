@@ -1,6 +1,6 @@
 {
  "schema": "qwentest-external-evidence-v1",
- "built": "2026-10-28",
+ "built": "2026-10-28b",
  "purpose": "external sources vs our closed-form inverse-mapping claims, with numeric basis",
  "verdict_scale": {
   "S": "strengthens",
@@ -170,6 +170,74 @@
    "verifiable": "是（07_results 逐点 + fp32 对照）",
    "licence": "Apache-2.0/CC BY 4.0",
    "rows_committed": true
+  },
+  {
+   "id": "S9",
+   "label": "CANS (preprint 2610.35530 v1) + official code/artifacts",
+   "record": "12_reference-preprints.md section 2",
+   "model": "Qwen3-4B (their release)",
+   "quant": "bf16",
+   "dose_def": "MULTIPLICATIVE scaling alpha_j folded into down_proj; target gradient = E sum_t a_tj dP/da_tj; diagonal Fisher",
+   "dose_range": null,
+   "outcome": "target-token log-prob (behaviour) + output-distribution KL on general inputs (capability)",
+   "unit": "all neurons (not sparse)",
+   "n_contexts": null,
+   "judge": "benchmarks IFEval/BBH/MMLU (their report)",
+   "judge_kappa": null,
+   "verifiable": "partial (code+artifacts public; paper body NOT read)",
+   "licence": "repo licence",
+   "rows_committed": false
+  },
+  {
+   "id": "S10",
+   "label": "RACE (2608.24758 v2) + code",
+   "record": "12_reference-preprints.md section 3",
+   "model": "several including small LLMs",
+   "quant": "-",
+   "dose_def": "no dose: forward-pass statistics (RDA + Normal-Inverse-Gamma posterior + CAM)",
+   "dose_range": null,
+   "outcome": "domain-wide functional-consistency score; domain-specific effect under perturbation",
+   "unit": "neuron x token (streaming)",
+   "n_contexts": "domain-wide",
+   "judge": "none",
+   "judge_kappa": null,
+   "verifiable": "partial (code+docs public; paper body NOT read)",
+   "licence": "repo licence",
+   "rows_committed": false
+  },
+  {
+   "id": "S11",
+   "label": "Sparsified MLPs vs Transcoders (2610.24521 v1)",
+   "record": "12_reference-preprints.md section 4",
+   "model": "13 open-source transcoders",
+   "quant": "-",
+   "dose_def": "no dose: feature-neuron weight alignment analysis",
+   "dose_range": null,
+   "outcome": "alignment of transcoder features with MLP neurons, cross-run stability, agreement with the MLP Jacobian",
+   "unit": "feature x transcoder",
+   "n_contexts": null,
+   "judge": "none",
+   "judge_kappa": null,
+   "verifiable": "abstract only (body NOT read)",
+   "licence": "-",
+   "rows_committed": false
+  },
+  {
+   "id": "S12",
+   "label": "Steering Geometry (2609.06289 v1, EMNLP 2026) + code/dataset",
+   "record": "12_reference-preprints.md section 5",
+   "model": "several + Schwartz 20 values / MFT 6 foundations",
+   "quant": "-",
+   "dose_def": "contrastive vectors (CAA/SAS/Spherical/ODE/OPT/COLD/BiPO)",
+   "dose_range": null,
+   "outcome": "geometric alignment + behavioural effects (compatible strengthened, opposing suppressed, cross-value transfer)",
+   "unit": "value x method",
+   "n_contexts": null,
+   "judge": "behavioural eval (their report)",
+   "judge_kappa": null,
+   "verifiable": "partial (code+dataset public; paper body NOT read)",
+   "licence": "repo licence",
+   "rows_committed": false
   }
  ],
  "claims": [
@@ -228,6 +296,10 @@
   {
    "id": "C14",
    "claim": "语义编译 tau -> J_tau 是整个映射的主要难点"
+  },
+  {
+   "id": "C15",
+   "claim": "Additive injection and multiplicative scaling are interchangeable at the same coordinate and dose axis"
   }
  ],
  "verdicts": [
@@ -482,6 +554,97 @@
    "verdict": "X",
    "basis": "其读数是 logit 期望，且与 J2 不可混用",
    "note": ""
+  },
+  {
+   "claim": "C1",
+   "source": "S9",
+   "verdict": "X",
+   "basis": "their dose is multiplicative alpha_j folded into down_proj, not our additive alpha = dose*p50/||W[:,n]||; their gradient carries the activation factor a_tj",
+   "note": "multiplicative can only amplify existing activation; additive can open a silent neuron"
+  },
+  {
+   "claim": "C4",
+   "source": "S12",
+   "verdict": "X",
+   "basis": "they test specificity with Schwartz 20-value and MFT 6-foundation compatible/opposing structure, but not a same-register semantic trait on our J2 readout",
+   "note": "its design (many traits + predicted relations) is what our R2c lacks"
+  },
+  {
+   "claim": "C5",
+   "source": "S9",
+   "verdict": "W",
+   "basis": "their object is a continuous scaling coefficient over ALL neurons, not a top-K set; put beside our measured capture rates (top-1 = 17.3% of the full-support effect, top-64 = 5.74% of ||g||^2), it shows dense scaling is the publishable mainstream object",
+   "note": "dense scaling is publishable mainstream practice"
+  },
+  {
+   "claim": "C5",
+   "source": "S12",
+   "verdict": "X",
+   "basis": "all 7 methods it evaluates (CAA, SAS, SphericalSteer, ODESteer, OPT, COLD-Steer, BiPO) are vector-level, none reports a top-K sparse set",
+   "note": "same direction as the C5 weakening, but not a direct test"
+  },
+  {
+   "claim": "C6",
+   "source": "S9",
+   "verdict": "S",
+   "basis": "they report first-order prediction R2=0.996 / MAPE 22.0% and quadratic Fisher cost vs KL R2=0.922 / MAPE 8.7% (their numbers; body NOT read)",
+   "note": "if true, better calibration than our 0.838-1.010 on top-K, but on a different setup"
+  },
+  {
+   "claim": "C8",
+   "source": "S9",
+   "verdict": "W",
+   "basis": "they state diagonal Fisher ignores inter-neuron interaction, i.e. cannot express combination effects; consistent with the 2.3x superadditivity we measured (6+1 -> 16)",
+   "note": "exactly the sentence our boundary clause needs"
+  },
+  {
+   "claim": "C9",
+   "source": "S12",
+   "verdict": "W",
+   "basis": "its central finding is that steering success on isolated behaviours can be a behaviour-specific shortcut; consistent with our b=0.5 result (+1.27 readout while the capability proxy collapses by 0.64 nat)",
+   "note": "independent support for our readout != behaviour"
+  },
+  {
+   "claim": "C10",
+   "source": "S9",
+   "verdict": "X",
+   "basis": "their Qwen3-4B experiments are not in our layer band, but the released artifacts allow per-layer comparison of Fisher vs gradient",
+   "note": "usable as an external reference for the layer sweep"
+  },
+  {
+   "claim": "C2",
+   "source": "S10",
+   "verdict": "S",
+   "basis": "they rank by a posterior with an uncertainty penalty (CAM) instead of a point estimate, and report forward-only scoring at about 1/100 of gradient cost",
+   "note": "borrow: rank by a lower confidence bound, not by the mean"
+  },
+  {
+   "claim": "C13",
+   "source": "S11",
+   "verdict": "X",
+   "basis": "across 13 open-source transcoders it finds neuron coordinates have a stable correspondence with the MLP while most transcoder features do not, which supports residual direction + sparsest representative + equivalence class over a unique feature list",
+   "note": "premise differs: feature basis vs coordinate basis"
+  },
+  {
+   "claim": "C14",
+   "source": "S9",
+   "verdict": "S",
+   "basis": "it separates 2 explicit proxies (target-token log-prob for behaviour, output-distribution KL for capability), so the compiler's definition directly determines the optimised object",
+   "note": "the compiler's definition directly determines the optimised object"
+  },
+  {
+   "claim": "C14",
+   "source": "S12",
+   "verdict": "S",
+   "basis": "it validates directions against a theory-specified structure (Schwartz 20 values, MFT 6 foundations) rather than isolated behaviours, which is exactly the compiler-level test we lack",
+   "note": "supports C14 and gives the design"
+  },
+  {
+   "claim": "C15",
+   "source": "S9",
+   "verdict": "W",
+   "basis": "multiplicative gain is proportional to the activation a_tj, so at a=0 it is 0; our additive injection still moves the neuron there",
+   "note": "multiplicative cannot do 'switch a silent neuron on'"
   }
  ]
 }

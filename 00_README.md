@@ -16,7 +16,7 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.24.0` / `draft`（2026-10-28） |
+| 版本 / 状态 | `0.25.0` / `draft`（2026-10-28） |
 | 现役 | R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. 2026-10-28 evening: external evidence consolidated into a MACHINE-CHECKED ledger (qwentest/evidence/ledger.json, 8 sources x 14 claims x 36 verdicts, rendered by tools/evidence_ledger.py and gated by make check). Result of the abstraction: every 'premises differ' case reduces to 7 axes with measured magnitudes - P1 dose normalisation (p50 differs 6-12% across quantisation), P2 dose range (behavioural usable band alpha~0.8-1.0, collapse >=1.2, community median 0.4), P3 outcome measure (readout monotone vs behaviour non-monotone), P4 support form (K=1->full is 5.78x internally; 0/16 and 0/6 vs 4/6 externally), P5 linearisation (6+1=7 but 16 measured, 2.3x superadditive), P6 layer (external peaks 0.25-0.33 relative depth vs our inherited 0.41-0.44), P7 judge (binary kappa 0.8913/0.9544, 5-way tone only 90.70%, category-vs-tag spread 11x). Strengthened: C1 (4 sources), C7 (indirect), C11. Weakened: C5, C8, C9, C13. No information on C2 and C4 - the two we are actually stuck on, so no amount of further external mining can resolve R2. |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE, with a measured envelope |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
@@ -61,7 +61,8 @@ qwentest/
 ├── 08_reference-qwen3-8b-neuron-atlas.md  外部参考数据集的统计记录（逐条标 S/W/X/M/N 对我方主张的影响）
 ├── 09_reference-evil-qwen-mlx-replication.md  第二份外部参考统计记录（同一模型的 MLX 8-bit 独立复现）
 ├── 10_reference-qwen35-community-atlas.md  第三份：社区多源横向重算（4-bit/8-bit 交叉、稠密 vs 稀疏、超加性、自撤）
-├── 11_synthesis-external-evidence.md  证据总账：14 条主张 × 8 个来源的机械校验矩阵 + 7 条前提轴
+├── 11_synthesis-external-evidence.md  证据总账：15 条主张 × 12 个来源的机械校验矩阵 + 7 条前提轴
+├── 12_reference-preprints.md  四篇新预印本的钉版记录与它们改变了什么（CANS 的 F、RACE 的下界排序、transcoders 的基、Steering Geometry 的设计）
 ├── evidence/ledger.json   证据总账的数据（唯一来源；`tools/evidence_ledger.py` 渲染到 11_）
 ├── 07_results/             GPU 运行的原始产物（JSON/MD，文本入仓）
 ├── lexicons/               可复现词表（jibes_adj_verb_pools.json、bffm100_factors.json）
@@ -368,3 +369,27 @@ P7 判官（二元 κ **0.8913/0.9544**；五分类仅 **0.90**；同一判官�
 
 **净结果**：增强的是 C1（4 个来源）、C7（间接）、C11；弱化的是 **C5 稀疏、C8 可加、C9 读数=行为、C13 短列表输出**；
 而 **C2 可复现与 C4 特异性是 N** —— 恰恰是我们卡住的两条，**继续挖外部数据在结构上解不开 R2**。
+
+### 12_reference — 四篇新预印本改变了什么
+
+版本已从 `arxiv.org/abs` 逐个钉定（`check_citations.py` 撞 429）：**CANS 2610.35530 v1**、
+**RACE 2608.24758 v2（v1 08-25 / v2 09-01，必须引 v2）**、**2610.24521 v1**、
+**Steering Geometry 2609.06289 v1**（EMNLP 2026 main）。**论文正文未读**，凡引其数字均标"其自述/摘要"。
+
+三条实质帮助：
+
+1. **CANS 给了「G 该是谁」的第三种答案**：能力保持的约束 ⇒ 成本是输出分布 KL 的 Fisher。按我们 §2.16 的规则
+   （**G 必须匹配你施加的约束**），它**应该**用 `F`，而它确实用了 ⇒ 我们那条原则被第三次独立验证（我们用 `M` 对应剂量预算）。
+   它还**发布了 Qwen3-4B 的 Fisher 对角与目标梯度**，于是「`M⁺g` vs `F⁻¹g`」变成一个**有外部数据可做的对照**
+   （前提：Qwen3-4B、毒性目标、乘性）。
+2. **CANS 自己承认对角 Fisher 忽略神经元交互** —— 与我们测到的超加性（`6+1=7` 而实测 **16**，2.3×）同一边界。
+   这段现在可以**引用**。
+3. **RACE 的 CAM 给了一个廉价的排序改进**：把「最大 |g|」改成「**置信下界**」。我们每个上下文都有 g，
+   **不需要 GPU** 就能先试。可检验预测：按 5% 下界重排后，达到 73% 捕获率所需的 K 会**小于 256**。
+
+另外两条：Transcoders（2610.24521）从**特征基**一侧支持我们「输出 = 残差方向 + 最简代表 + 等价类」而不是唯一名单；
+Steering Geometry（2609.06289）给了**带预期结构的多特质特异性设计**（Schwartz 20 值 / MFT 6 基础），
+但那是社会/道德维度、非同一语域，故对 C4 只能记 **X**。
+
+**新增主张 C15**：加性注入与乘性缩放**不可互换** —— 乘性增益 ∝ 激活 `a_tj`，`a=0` 时为 0；
+我们的加性注入能把沉默神经元打开（这解释了社区报告「乘性 ×100 仍接近正常」）。

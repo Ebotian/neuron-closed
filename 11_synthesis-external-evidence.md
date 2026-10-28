@@ -78,22 +78,23 @@
 
 格内符号：**S** 增强 · **W** 弱化 · **X** 前提不同 · **N** 无信息 · `·` 未评。
 
-| 主张 | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | 净结论 |
-|---|---|---|---|---|---|---|---|---|---|
-| `C1` 跨神经元的剂量归一化 dose*p50/||W_down[:,n]|| 是正确且可复用的约定 | S | S | S | · | S | · | · | · | S×4 为主 |
-| `C2` 坐标级效应可复现（换词半/换 prompt 半仍选到同一批坐标） | N | N | W | X | · | · | · | · | W×1 为主，X×1 |
-| `C3` 找到的坐标是真实、有方向、剂量单调的杠杆 | · | S | S | · | · | · | · | · | S×2 为主 |
-| `C4` 效应具有敌意特异性（vs 其他同语域特质） | N | N | N | · | · | · | · | · | 无增强 |
-| `C5` 少数稀疏坐标（top-K）能抓住该效应 | W | · | W | W | W | · | · | · | W×4 为主 |
-| `C6` 线性代理能预测效应幅度（calibration） | · | · | X | X | · | · | · | · | 无增强，X×2 |
-| `C7` 闭式最优控制 u ~ M^+g 在稠密区优于 u ~ g | · | · | · | X | · | · | · | · | 无增强，X×1 |
-| `C8` 解析组合 Q(S)=g_S' G_SS^-1 g_S 能表达多坐标的交互 | · | · | W | · | X | · | · | · | W×1 为主，X×1 |
-| `C9` 读数改善等价于行为改善 | · | W | W | · | · | · | X | · | W×2 为主，X×1 |
-| `C10` 层 13-14 是对的作用层 | X | · | · | X | X | · | · | · | 无增强，X×3 |
-| `C11` 读数数值误差可控（可跨 run 比较 1e-03 级差异） | · | · | · | · | · | W | · | S | S/W 相抵 |
-| `C12` 读数/标签可由 LLM 判官可靠给出 | W | S | · | · | · | · | · | · | S/W 相抵 |
-| `C13` 输出形式应为『神经元+符号+强度』的短列表 | · | · | · | W | W | · | · | · | W×2 为主 |
-| `C14` 语义编译 tau -> J_tau 是整个映射的主要难点 | X | · | · | · | · | · | S | · | S×1 为主，X×1 |
+| 主张 | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 | S12 | 净结论 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `C1` 跨神经元的剂量归一化 dose*p50/||W_down[:,n]|| 是正确且可复用的约定 | S | S | S | · | S | · | · | · | X | · | · | · | S×4 为主，X×1 |
+| `C2` 坐标级效应可复现（换词半/换 prompt 半仍选到同一批坐标） | N | N | W | X | · | · | · | · | · | S | · | · | S/W 相抵，X×1 |
+| `C3` 找到的坐标是真实、有方向、剂量单调的杠杆 | · | S | S | · | · | · | · | · | · | · | · | · | S×2 为主 |
+| `C4` 效应具有敌意特异性（vs 其他同语域特质） | N | N | N | · | · | · | · | · | · | · | · | X | 无增强，X×1 |
+| `C5` 少数稀疏坐标（top-K）能抓住该效应 | W | · | W | W | W | · | · | · | W | · | · | X | W×5 为主，X×1 |
+| `C6` 线性代理能预测效应幅度（calibration） | · | · | X | X | · | · | · | · | S | · | · | · | S×1 为主，X×2 |
+| `C7` 闭式最优控制 u ~ M^+g 在稠密区优于 u ~ g | · | · | · | X | · | · | · | · | · | · | · | · | 无增强，X×1 |
+| `C8` 解析组合 Q(S)=g_S' G_SS^-1 g_S 能表达多坐标的交互 | · | · | W | · | X | · | · | · | W | · | · | · | W×2 为主，X×1 |
+| `C9` 读数改善等价于行为改善 | · | W | W | · | · | · | X | · | · | · | · | W | W×3 为主，X×1 |
+| `C10` 层 13-14 是对的作用层 | X | · | · | X | X | · | · | · | X | · | · | · | 无增强，X×4 |
+| `C11` 读数数值误差可控（可跨 run 比较 1e-03 级差异） | · | · | · | · | · | W | · | S | · | · | · | · | S/W 相抵 |
+| `C12` 读数/标签可由 LLM 判官可靠给出 | W | S | · | · | · | · | · | · | · | · | · | · | S/W 相抵 |
+| `C13` 输出形式应为『神经元+符号+强度』的短列表 | · | · | · | W | W | · | · | · | · | · | X | · | W×2 为主，X×1 |
+| `C14` 语义编译 tau -> J_tau 是整个映射的主要难点 | X | · | · | · | · | · | S | · | S | · | · | S | S×3 为主，X×1 |
+| `C15` Additive injection and multiplicative scaling are in | · | · | · | · | · | · | · | · | W | · | · | · | W×1 为主 |
 
 ### 每条判定的数值依据（程序校验：S/W/X 必须含数字）
 
@@ -103,35 +104,48 @@
 | C1 | S2 | **S** | 公式逐字同构；L13 10.066 / L14 11.014 vs 我们 bf16 9.752792 / 10.329014（+3.2%/+6.6%） |
 | C1 | S3 | **S** | 公式同构；L13 9.163 / L14 9.694（4-bit，比我们 bf16 低 6.0%/6.2%） |
 | C1 | S5 | **S** | 141 条配方的剂量轴与该约定相容：中位 0.4、众数 0.6/0.8 — 但作者未记 p50，无法逐条核 |
+| C1 | S9 | **X** | their dose is multiplicative alpha_j folded into down_proj, not our additive alpha = dose*p50///W[:,n]//; their gradient carries the activation factor a_tj — multiplicative can only amplify existing activation; additive can open a silent neuron |
 | C10 | S1 | **X** | 其严格化后 persona 峰在相对深度 0.25-0.33（L9-L12/36），我们 L13-14/32 是 0.41-0.44 — 前提不同，只能记张力 |
 | C10 | S4 | **X** | 最佳稠密层随人不同（L14/L12/L8），说明层不是常数 |
 | C10 | S5 | **X** | 社区层峰在 L7/L4/L22，L13/L14 只 6/2 行；但这是模仿偏差 |
+| C10 | S9 | **X** | their Qwen3-4B experiments are not in our layer band, but the released artifacts allow per-layer comparison of Fisher vs gradient — usable as an external reference for the layer sweep |
 | C11 | S6 | **W** | 外部项目因 readout 把 final norm 应用两次而作废 10 个 session 的 KL 数字 — 同类风险 |
 | C11 | S8 | **S** | 内部已量：单次 dJ2 ±2.0e-03(中位)/6.5e-03(最坏)，8 上下文均值 ~9e-04 |
 | C12 | S1 | **W** | 同一判官对『退化』给出 4.297%/7.74%/48.156% 三个口径（差 11 倍） |
 | C12 | S2 | **S** | 129 条盲复评：hostile kappa 0.8913、broken 0.9544；五分类 tone 仅 0.9070 |
+| C13 | S11 | **X** | across 13 open-source transcoders it finds neuron coordinates have a stable correspondence with the MLP while most transcoder features do not, which supports residual direction + sparsest representative + equivalence class over a unique feature list — premise differs: feature basis vs coordinate basis |
 | C13 | S4 | **W** | 稀疏 0/16、三元组 0/6、稠密 4/6（p(target)=0.44–0.77） |
 | C13 | S5 | **W** | 社区 63.1% 单神经元、≥3 个仅 7.8%，而单神经元有效率为 0/16 |
 | C14 | S1 | **X** | 其对 persona 的定义是 LLM 给的标签，不是可微目标，无法与我们 J2 的编译路径比较 |
+| C14 | S12 | **S** | it validates directions against a theory-specified structure (Schwartz 20 values, MFT 6 foundations) rather than isolated behaviours, which is exactly the compiler-level test we lack — supports C14 and gives the design |
 | C14 | S7 | **S** | 同一坐标在两个不同读数的结论相反（J1 vs J2），证明 tau->J 的定义支配结论 |
+| C14 | S9 | **S** | it separates 2 explicit proxies (target-token log-prob for behaviour, output-distribution KL for capability), so the compiler's definition directly determines the optimised object — the compiler's definition directly determines the optimised object |
+| C15 | S9 | **W** | multiplicative gain is proportional to the activation a_tj, so at a=0 it is 0; our additive injection still moves the neuron there — multiplicative cannot do 'switch a silent neuron on' |
 | C2 | S1 | **N** | 单个 prompt，对跨上下文可复现零信息 |
+| C2 | S10 | **S** | they rank by a posterior with an uncertainty penalty (CAM) instead of a point estimate, and report forward-only scoring at about 1/100 of gradient cost — borrow: rank by a lower confidence bound, not by the mean |
 | C2 | S2 | **N** | 同一批 20 提示，无分半设计 |
 | C2 | S3 | **W** | 其 L13-only 与 L14-only 的差异说明单坐标行为不稳，但无分半检验 |
 | C2 | S4 | **X** | 稠密方向 4-bit->8-bit 不重调即迁移，但那是方向级不是坐标级 |
 | C3 | S2 | **S** | L14N8949 单坐标 12/20 hostile、剂量峰 14/20@0.75、broken 单调 0->20/20 |
 | C3 | S3 | **S** | 同一坐标 L14-only 6 个 violent terms vs 无干预 0；剂量 0.4-0.6 安静 / 1.0 恶意 |
 | C4 | S1 | **N** | 只有『是否 persona』，不是敌意 vs 其他特质 |
+| C4 | S12 | **X** | they test specificity with Schwartz 20-value and MFT 6-foundation compatible/opposing structure, but not a same-register semantic trait on our J2 readout — its design (many traits + predicted relations) is what our R2c lacks |
 | C4 | S2 | **N** | 只有敌意一个轴，无同语域对照 |
 | C4 | S3 | **N** | 无对照特质 |
 | C5 | S1 | **W** | 884,736 对里 persona 仅 3.87%，且干净 persona 只有 0.2405%（1/16） |
+| C5 | S12 | **X** | all 7 methods it evaluates (CAA, SAS, SphericalSteer, ODESteer, OPT, COLD-Steer, BiPO) are vector-level, none reports a top-K sparse set — same direction as the C5 weakening, but not a direct test |
 | C5 | S3 | **W** | 激活 z 最高的坐标（Attenborough L27N7938 z=242.0）单独推仍失败 |
 | C5 | S4 | **W** | 单神经元 0/16、三元组 0/6，稠密 4/6；p(target) 稀疏全 <0.01、稠密 0.44-0.77 |
 | C5 | S5 | **W** | 社区 63.1% 的配方是单神经元，但他人复现率仅 7.8% — 这是实践分布，不是效应检验 |
+| C5 | S9 | **W** | their object is a continuous scaling coefficient over ALL neurons, not a top-K set; put beside our measured capture rates (top-1 = 17.3% of the full-support effect, top-64 = 5.74% of //g//^2), it shows dense scaling is the publishable mainstream object — dense scaling is publishable mainstream practice |
 | C6 | S3 | **X** | 其剂量阶梯给出行为区间（0.8 过渡/1.0 恶意），但没有代理预测值可比 |
 | C6 | S4 | **X** | 其 logit-lens 预测的目标名概率 0.4398/0.7711/0.5785 与生成结果方向一致，但未报 calibration 误差 |
+| C6 | S9 | **S** | they report first-order prediction R2=0.996 / MAPE 22.0% and quadratic Fisher cost vs KL R2=0.922 / MAPE 8.7% (their numbers; body NOT read) — if true, better calibration than our 0.838-1.010 on top-K, but on a different setup |
 | C7 | S4 | **X** | 稠密 4/6 vs 稀疏 0/22 与此同向，但其方向是均值差、无 M 预算，非 M^+g |
 | C8 | S3 | **W** | 6(L14)+1(L13)=7 但双坐标实测 16（2.3x 超加性）=> 线性 Q(S) 结构上不足 |
 | C8 | S5 | **X** | 社区多坐标配方普遍给 overlap 效应描述（mashup 27 条），但无剂量-响应数据 |
+| C8 | S9 | **W** | they state diagonal Fisher ignores inter-neuron interaction, i.e. cannot express combination effects; consistent with the 2.3x superadditivity we measured (6+1 -> 16) — exactly the sentence our boundary clause needs |
+| C9 | S12 | **W** | its central finding is that steering success on isolated behaviours can be a behaviour-specific shortcut; consistent with our b=0.5 result (+1.27 readout while the capability proxy collapses by 0.64 nat) — independent support for our readout != behaviour |
 | C9 | S2 | **W** | 行为 hostile 峰在 0.75，2.0 时塌到 1/20，而 broken 到 20/20 => 读数式指标与行为不同步 |
 | C9 | S3 | **W** | 1.0 报『完全恶意』、1.2 已『不连贯』，可用窗很窄 |
 | C9 | S7 | **X** | 其读数是 logit 期望，且与 J2 不可混用 |
@@ -148,6 +162,10 @@
 | S6 | WDD（Write-Dictionary Decomposition） | 多模型（GPT-2/Qwen2.5/Qwen3-4B） | 多种 | 写入字典分解，非本线剂量 | KL / 激活分布统计 | session | — | — |
 | S7 | SNAM v1 实验包（外部交付） | Qwen3.5-4B | bf16 | alpha = u*p50/||W_down[:,n]||, budget=0.5 | logit 期望 J = E_q+[logit] - E_q-[logit]（单 | prompt x 坐标 | 6 | — |
 | S8 | 本线自己的 GPU 运行（内部基线） | Qwen3.5-4B | bf16 | dose*p50/||W_down[:,n]||，物理预算 sqrt(u'Mu) | J2 log-mass（线性于 logits）+ 无判官行为指标 | 上下文（8-30 条） | 8 | — |
+| S9 | CANS (preprint 2610.35530 v1) + official code/artifacts | Qwen3-4B (their release) | bf16 | MULTIPLICATIVE scaling alpha_j folded into dow | target-token log-prob (behaviour) + outp | all neurons (not sparse) | — | — |
+| S10 | RACE (2608.24758 v2) + code | several including small LLMs | - | no dose: forward-pass statistics (RDA + Normal | domain-wide functional-consistency score | neuron x token (streaming) | domain-wide | — |
+| S11 | Sparsified MLPs vs Transcoders (2610.24521 v1) | 13 open-source transcoders | - | no dose: feature-neuron weight alignment analy | alignment of transcoder features with ML | feature x transcoder | — | — |
+| S12 | Steering Geometry (2609.06289 v1, EMNLP 2026) + code/dataset | several + Schwartz 20 values / MFT 6 foundations | - | contrastive vectors (CAA/SAS/Spherical/ODE/OPT | geometric alignment + behavioural effect | value x method | — | — |
 
 <!-- auto:evidence-matrix:end -->
 
