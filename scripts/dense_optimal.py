@@ -85,6 +85,175 @@ def exact_sign_p(diffs):
     return min(1.0, 2 * sum(math.comb(n, i) for i in range(k + 1)) / 2 ** n), n
 
 
+def transfer(a, tok, model, lm, p50, norms, What, B, n_dim, d_dim, layers, budgets,
+             fams, ctx, dev, budget, to_budget, **_):
+    """G2-style transfer test for the R7 result (plan 2.22).
+
+    R7 showed u ~ M^+g beats u ~ g by 36-43% in 8/8 contexts -- but every one of those
+    measurements built the direction from the SAME context it was then measured on.
+    Plan 2.15.2 found that J'J's off-diagonal structure does NOT survive a change of context
+    (cross-context r = 0.12-0.18), so "does the direction transfer" is a live question.
+    M itself is context-free (weights only); context enters only through g.
+
+    Design: split the contexts into two trait-balanced halves (alternating index, because the
+    probe file groups pairs by trait), pool g within each half, build u_g and u_M from the
+    pooled g, then measure every direction on every context. That gives in-sample AND
+    out-of-sample measurements of the same arms, plus the registered G2 statistics on the two
+    halves' gradients.
+
+    FROZEN criteria
+      PRIMARY  out-of-sample, realized dJ2(u_M) > dJ2(u_g) in >= 7 of the 8 (half, context)
+               evaluations at each budget; exact two-sided sign test; median relative gain > 0.
+      G2       r(|g_A|, |g_B|) >= 0.50 AND top-64 overlap >= 0.30 (the registered gate).
+      ALSO     the out-of-sample M/g ratio must not collapse relative to in-sample.
+      Error    §2.18.4: differences below 1e-02 are not claimed from bf16 alone.
+    """
+    import torch
+    from engine import apply_steering, score_for_dose
+    from progress import Progress
+    from semantic import batch_mean_logp, build_batch, language_log_mass, sem_gradient
+
+    ids_all = [c['id'] for c in ctx]
+    halves = {'A': ids_all[0::2], 'B': ids_all[1::2]}
+    pools = {**halves, 'ALL': ids_all}
+    arms = ['u_g', 'u_M']
+    n_meas = len(pools) * len(arms) * len(ids_all) * len(budgets)
+    prog = Progress(len(ctx) * len(fams) + len(ctx) + n_meas)
+
+    batches, G_ctx = {}, {}
+    for c in ctx:
+        gsum = None
+        for fam, f in sorted(fams.items()):
+            _j2, gg = sem_gradient(tok, model, lm, layers, c['prompt'], f['template'], f, dev,
+                                   a.max_seq)
+            sc = {l: score_for_dose(gg[l].float(), p50[l], norms[l].to(gg[l].device)) for l in layers}
+            gsum = sc if gsum is None else {l: gsum[l] + sc[l] for l in layers}
+            prog.step(f'{c["id"]} g {fam}')
+        G_ctx[c['id']] = {l: (gsum[l] / len(fams)).double().to(dev) for l in layers}
+        batches[c['id']] = {fam: build_batch(tok, c['prompt'], f['template'], f['pos'], f['neg'],
+                                            dev, a.max_seq) for fam, f in sorted(fams.items())}
+
+    def j2_of(cid, iv):
+        with apply_steering(lm, iv, p50, norms), torch.inference_mode():
+            vals = []
+            for fam, (ids, pre, suf, kinds) in batches[cid].items():
+                S = batch_mean_logp(model, ids, pre, suf)
+                jp, _ = language_log_mass(S[kinds > 0].detach().float())
+                jn, _ = language_log_mass(S[kinds < 0].detach().float())
+                vals.append(jp - jn)
+        return sum(vals) / len(vals)
+
+    base = {cid: j2_of(cid, []) for cid in ids_all}
+    for cid in ids_all:
+        prog.step(f'{cid} base J2={base[cid]:+.6f}')
+
+    dirs, flat_g = {}, {}
+    for name, members in pools.items():
+        gm = {l: sum(G_ctx[c][l] for c in members) / len(members) for l in layers}
+        e = {l: What[l].T @ gm[l] for l in layers}
+        ds = {l: torch.linalg.solve(B[l], e[l]) for l in layers}
+        um = {l: What[l] @ torch.linalg.solve(B[l], ds[l]) for l in layers}
+        dirs[name] = {'u_g': gm, 'u_M': um}
+        flat_g[name] = torch.cat([gm[l] for l in layers])
+
+    res = {}
+    for name in pools:
+        for arm in arms:
+            v = dirs[name][arm]
+            for b in budgets:
+                u, _s = to_budget(v, b)
+                iv = [{'layer': l, 'neuron': i, 'dose': float(u[l][i])}
+                      for l in layers
+                      for i in torch.nonzero(u[l].abs() > 1e-15).flatten().tolist()]
+                for cid in ids_all:
+                    res[(name, arm, b, cid)] = j2_of(cid, iv) - base[cid]
+                    prog.step(f'{name} {arm} b={b} {cid} dJ2={res[(name, arm, b, cid)]:+.5f}')
+
+    # ---------------- frozen analysis ----------------
+    def ratio(name, b, members):
+        v = [res[(name, 'u_M', b, c)] / res[(name, 'u_g', b, c)] for c in members
+             if abs(res[(name, 'u_g', b, c)]) > 1e-12]
+        return statistics.fmean(v) if v else None
+
+    cos = lambda x, y: float(x @ y / (x.norm() * y.norm()))
+    gA, gB = flat_g['A'], flat_g['B']
+    r_abs = statistics.correlation([float(x) for x in gA.abs().cpu()],
+                                   [float(x) for x in gB.abs().cpu()])
+    tA = set(torch.topk(gA.abs(), 64).indices.tolist())
+    tB = set(torch.topk(gB.abs(), 64).indices.tolist())
+    rec = {'schema': 'qwentest-dense-transfer-v1', 'machine': platform.node(),
+           'gpu': torch.cuda.get_device_name(0), 'model': a.model, 'layers': layers,
+           'budgets': budgets, 'pool_variant': a.pool_variant, 'halves': halves,
+           'p50': {str(l): p50[l] for l in layers}, 'baseline_J2': base,
+           'g2_pearson_abs_g': r_abs, 'g2_top64_overlap': len(tA & tB) / 64,
+           'cos_u_g_A_B': cos(torch.cat([dirs['A']['u_g'][l] for l in layers]),
+                              torch.cat([dirs['B']['u_g'][l] for l in layers])),
+           'cos_u_M_A_B': cos(torch.cat([dirs['A']['u_M'][l] for l in layers]),
+                              torch.cat([dirs['B']['u_M'][l] for l in layers])),
+           'measurements': {f'{n}|{arm}|{b}|{c}': v for (n, arm, b, c), v in res.items()},
+           'analysis': {}}
+    for b in budgets:
+        for name in ('A', 'B', 'ALL'):
+            out = [c for c in ids_all if c not in pools[name]] if name != 'ALL' else []
+            ins = pools[name]
+            for tag, members in (('in', ins), ('out', out)):
+                if not members:
+                    continue
+                diffs = [res[(name, 'u_M', b, c)] - res[(name, 'u_g', b, c)] for c in members]
+                p, n = exact_sign_p(diffs)
+                rel = [res[(name, 'u_M', b, c)] / res[(name, 'u_g', b, c)] for c in members
+                       if abs(res[(name, 'u_g', b, c)]) > 1e-12]
+                rec['analysis'][f'b={b}|{name}|{tag}'] = {
+                    'n': n, 'wins': sum(d > 0 for d in diffs), 'sign_p': p,
+                    'median_abs_diff': statistics.median(diffs),
+                    'mean_ratio_M_over_g': ratio(name, b, members),
+                    'mean_dJ2_u_g': statistics.fmean(res[(name, 'u_g', b, c)] for c in members),
+                    'mean_dJ2_u_M': statistics.fmean(res[(name, 'u_M', b, c)] for c in members)}
+    oos = []
+    for b in budgets:
+        for name in ('A', 'B'):
+            oos += [res[(name, 'u_M', b, c)] - res[(name, 'u_g', b, c)]
+                    for c in ids_all if c not in pools[name]]
+    p_oos, n_oos = exact_sign_p(oos)
+    rec['primary_out_of_sample'] = {'n': n_oos, 'wins': sum(d > 0 for d in oos),
+                                    'exact_two_sided_sign_p': p_oos,
+                                    'median_abs_diff': statistics.median(oos)}
+    rec['g2_gate_pass'] = bool(r_abs >= 0.50 and len(tA & tB) / 64 >= 0.30)
+
+    out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
+    (out / 'dense_transfer.json').write_text(json.dumps(rec, ensure_ascii=False, indent=1),
+                                             encoding='utf8')
+    lines = ['# Does the R7 direction TRANSFER? (direction built on one half, measured on the other)', '',
+             f'- machine `{rec["machine"]}` / {rec["gpu"]} · layers {layers} · budgets {budgets}',
+             f'- half A = {halves["A"]}', f'- half B = {halves["B"]}',
+             f'- **G2 gate**: r(|g_A|,|g_B|) = {r_abs:.4f} (need >= 0.50), '
+             f'top-64 overlap = {rec["g2_top64_overlap"]:.3f} (need >= 0.30) -> '
+             f'{"PASS" if rec["g2_gate_pass"] else "**FAIL**"}',
+             f'- cos(u_g(A), u_g(B)) = {rec["cos_u_g_A_B"]:.4f}   '
+             f'cos(u_M(A), u_M(B)) = {rec["cos_u_M_A_B"]:.4f}', '',
+             '## realized mean dJ2, in-sample vs out-of-sample', '',
+             '| budget | pool | sample | n | u_g | u_M | mean ratio M/g | wins | sign p |',
+             '|---:|---|---|---:|---:|---:|---:|---:|---:|']
+    for b in budgets:
+        for name in ('A', 'B', 'ALL'):
+            for tag in ('in', 'out'):
+                k = f'b={b}|{name}|{tag}'
+                if k not in rec['analysis']:
+                    continue
+                v = rec['analysis'][k]
+                sp = 'n/a' if v['sign_p'] is None else f'{v["sign_p"]:.4f}'
+                lines.append(f'| {b} | {name} | {tag} | {v["n"]} | {v["mean_dJ2_u_g"]:+.5f} | '
+                             f'{v["mean_dJ2_u_M"]:+.5f} | {v["mean_ratio_M_over_g"]:.4f} | '
+                             f'{v["wins"]}/{v["n"]} | {sp} |')
+    po = rec['primary_out_of_sample']
+    lines += ['', f'**PRIMARY (out-of-sample, pooled over both halves and all budgets)**: '
+                  f'u_M > u_g in {po["wins"]}/{po["n"]}, exact two-sided sign p = '
+                  f'{po["exact_two_sided_sign_p"]:.4f}, median abs diff {po["median_abs_diff"]:+.5f}']
+    (out / 'dense_transfer.md').write_text('\n'.join(lines) + '\n', encoding='utf8')
+    print('\n' + '\n'.join(lines))
+    print(f'\nwrote {out}/dense_transfer.json and .md')
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--pkg', default='')
@@ -101,6 +270,9 @@ def main():
                     help='record this many coordinates of each arm, as neuron+sign+strength')
     ap.add_argument('--max-seq', type=int, default=384)
     ap.add_argument('--fp32', action='store_true')
+    ap.add_argument('--transfer', action='store_true',
+                    help='G2-style transfer test: build the direction on one half of the contexts '
+                         'and measure it on the other half (in-sample vs out-of-sample)')
     ap.add_argument('--out', default='out/dense_optimal')
     ap.add_argument('--dry-run', action='store_true')
     a = ap.parse_args()
@@ -180,6 +352,11 @@ def main():
             raise SystemExit('degenerate direction')
         s = b / bu
         return {l: u * s for l, u in u_by_layer.items()}, s
+
+    # ------------------------------------------------------------------ transfer mode
+    if a.transfer:
+        return transfer(a, tok, model, lm, p50, norms, What, B, n_dim, d_dim, layers, budgets,
+                        fams, ctx, dev, budget, to_budget, n_dim_per_layer=None)
 
     prog = Progress(len(ctx) * len(fams) + n_meas)
     rec = {'schema': 'qwentest-dense-optimal-v1', 'machine': platform.node(),
