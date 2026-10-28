@@ -16,9 +16,9 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.8.0` / `draft`（2026-10-28） |
-| 现役 | R6 active — control-cost metric settled: G = J'J on the readout's own output space (G=I refuted for combination synthesis; total-vs-collateral is an identity, not a choice). Next: verify on the real nonlinear model. R2 still paused — effect is hostility-directional within J2 (h↑, praise↓, 8/8, dose-monotone); specificity vs other traits untested |
-| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` preregistered, not run · `R6` active · `R1` todo · `R3` todo · `R4` todo · `R5` todo |
+| 版本 / 状态 | `0.9.0` / `draft`（2026-10-28） |
+| 现役 | R6 settled NEGATIVE — at a matched physical (dose) budget the J'J direction LOSES to plain gradient direction on the real model: 0/8 contexts, median -26.6%, exact sign p=0.0078; because the budget metric M (Gram of unit W_down columns) is near-identity (cond 1.43), G=I is already near-optimal for dose-budgeted steering. Plan 2.15.4 verdicts 1-2 WITHDRAWN. New positive lead: at equal budget, denser injection wins (1 coord +0.0365 < 2 +0.0417 < 32 +0.0562). R2 still paused — hostility-directional within J2, specificity vs other traits untested |
+| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` preregistered, not run · `R6` done, NEGATIVE · `R1` todo · `R3` todo · `R4` todo · `R5` todo |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
 | 结论 | J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回） |
 | 实测 | G1 r=0.693/J64=0.524（19 条 prompt） · G2 r=0.668–0.781 / J64=0.471–0.662（9v10 / 10v9） · verify 8/8 p=0.0078（6 reused probes -> replication, not confirmation） |
@@ -189,6 +189,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `slot_census_bffm.py` | R2c 前置门槛：BFFM-100 有多少词过得了单 token 槽位过滤 | 仅 tokenizer（CPU） |
 | `g_feasibility.py` | 非对角 `G = JᵀJ` 存不存在、是否上下文稳定（成本建在单位置） | 包 engine + tokenizer |
 | `g_j2_space.py` | 把 G 重建在 **J2 自己的输出空间**后，控制律变不变 | 包 engine+semantic + 词表 |
+| `g_nonlinear_verify.py` | **真实非线性模型上**，同一物理预算下各 G 暗示的方向谁拿到的实测 ΔJ2 更大 | 包 engine+semantic + 词表 + 上两者的 Ĝ/g |
 
 ---
 
@@ -200,6 +201,8 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 |---|---|
 | `g_feasibility_k32_m192_c3.{json,md}` | 单位置成本下的 Ĝ（3 上下文 × 32×32）、逐坐标表、折半信度、verdict A/B |
 | `g_j2_space_k32_m192_c3.{json,md}` | J2 匹配输出空间（916,480 维）下的 Ĝ、真实 g 向量、两种选对规则的联合 Q |
+| `g_j2_space_k32_m192_c8.{json,md}` | 同上，扩到 8 条上下文（非线性验证的输入） |
+| `g_nonlinear_c8.{json,md}` | 真实模型上的判决：8 上下文 × 7 臂 × 3 预算的实测与预测 ΔJ2、配对符号检验、标定比 |
 
 结论与边界见 `05_plan-gradient-discovery.md` §2.15。
 

@@ -322,7 +322,7 @@ def main():
                 q_m / r['Q_matched_at_G_is_I_pair'] - 1 if r['Q_matched_at_G_is_I_pair'] else None)
             r['Q_mismatched_at_mismatched_pair'] = q_x
             r['Q_mismatched_at_matched_pair'] = Q_joint(Gm, bp_m)
-            r['g'] = [float(x) for x in g]
+        r['g'] = [float(x) for x in g]
         # split-half reliability of the matched G
         h = V.shape[0] // 2
         GA = (V[:h].T @ V[:h]) / h
@@ -353,10 +353,14 @@ def main():
              '|---|---:|---:|---:|---:|---:|---|---:|---:|---:|']
     for cid, r in rec['per_context'].items():
         f3 = lambda v: 'n/a' if v is None else f'{v:.3f}'
+        # 'best_pair_agrees' only exists when a mismatched G was supplied for this context;
+        # rendering an absent field as "no" would fabricate a disagreement.
+        agree = r.get('best_pair_agrees')
+        agree_s = 'n/a' if agree is None else ('yes' if agree else '**no**')
         lines.append(f'| `{cid}` | {f3(r.get("cos_u_matched_vs_mismatched"))} | '
                      f'{r["cos_u_matched_vs_I"]:.3f} | {f3(r.get("cos_u_mismatched_vs_I"))} | '
                      f'{f3(r.get("pearson_offdiag_G"))} | {f3(r.get("spearman_diag_G"))} | '
-                     f'{"yes" if r.get("best_pair_agrees") else "**no**"} | '
+                     f'{agree_s} | '
                      f'{r["split_half_pearson_offdiag_rho"]:+.3f} | '
                      f'{r["median_abs_rho_offdiag"]:.3f} | {r["condition_number"]:.3g} |')
     lines += ['', '## best pair per context (same real g)', '',
