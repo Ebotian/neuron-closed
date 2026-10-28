@@ -16,9 +16,9 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.15.0` / `draft`（2026-10-28） |
-| 现役 | Support-size sweep + single-layer control (plan 2.20/2.21): at a fixed physical budget realized dJ2 grows monotonically with K to FULL support - two layers 5.78x (K=1->18432), and within L14 alone 4.41x (K=1->9216), so the layer confound is excluded: within-layer densification is 84.6% of the multiplicative gain, adding the second layer 14.8%. No sparse subset captures it (top-1 = 17.3% of the full-support effect, top-32 = 49.2%, top-64 holds 5.74% of ||g||^2). L14N8949 ranks 7 to >64 depending on context and L13N7956 is outside the top-64 in 8/8, which confirms numerically that the famous coordinate is a brute-force draw. NEW: the dose-budget metric is identity-like only for SPARSE supports (budget/||g|| = 1.000 at K=1, 1.193 at K=32) but inflates to 2.757 at full support, so plan 2.16's 'G=I is near-optimal' is scoped to K=32 and u ~ M^+ g is an untested candidate in the dense regime. R6 remains settled NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. |
-| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` todo |
+| 版本 / 状态 | `0.16.0` / `draft`（2026-10-28） |
+| 现役 | R7 POSITIVE - the first constructive result of the control-cost line (plan 2.22). In the dense regime the budget-optimal direction u ~ M^+g (M = What What', the exact dose-budget metric) beats 'follow the gradient' u ~ g by +36.28% / +43.49% / +36.91% (median relative gain at budgets 0.05/0.2/0.5), 8/8 contexts at every budget, exact two-sided sign p=0.0078, per-context ratio 1.320-1.417. The surrogate PREDICTED the ratio 1.3989 before measuring and agrees with the realized ratio to within 2.6% (0.976/1.012/0.974) - so absolute magnitudes are mispredicted but the RATIO between two directions is not, and the ratio is what a decision needs. This explains and bounds plan 2.16's negative verdict: J'J lost because it did not match the budget, and 'G=I is near-optimal' was measured on a 32-coordinate support where budget/||g|| = 1.193; at full support it is 2.757. Structural note: because alpha = dose*p50/||W[:,n]||, the dose-scaled gradient satisfies g = p50 * What jhat exactly (verified: residual 8.9e-16), so g lies in range(M) and the fixed-budget maximisation is well posed; d* ~ jhat and u* is the minimum-norm preimage, with an equivalence class of dimension 6656 per layer - exactly the requested output shape (residual direction + cheapest representative + equivalence class). CAVEAT: readout-level only, layers 13-14 only, no generation or capability measurement; at b=0.5 dJ2 = +1.27 which is far beyond any dose used before and may well be degenerate text. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. |
+| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
 | 结论 | J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回） |
 | 实测 | G1 r=0.693/J64=0.524（19 条 prompt） · G2 r=0.668–0.781 / J64=0.471–0.662（9v10 / 10v9） · verify 8/8 p=0.0078（6 reused probes -> replication, not confirmation） |
@@ -194,6 +194,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `j2_batch_sensitivity.py` | J2 读数对 **batch 形状**有多敏感（= 我们所有 ΔJ2 的数值误差条） | 包 engine+semantic + 词表 |
 | `j2_precision_check.py` | 同一生产形状下 **bf16 vs float32**，直接量 ΔJ2 的舍入误差 | 包 engine+semantic + 词表 + Ĝ/g |
 | `support_sweep.py` | 同一物理预算下，实测 ΔJ2 随**支撑集大小 K**（1 → 18432，嵌套 top-K）怎么变 | 包 engine+semantic + 词表 |
+| `dense_optimal.py` | **R7**：稠密区里预算最优方向 `u ∝ M⁺g` 是否赢过 `u ∝ g`（含残差方向 / 最小范数代表 / 等价类） | 包 engine+semantic + 词表 |
 
 ---
 
@@ -213,6 +214,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `support_sweep_c8.{json,md}` | 支撑集扫描：8 上下文 × 15 个 K × 3 预算的实测/预测 ΔJ2、实际预算、非零坐标数 |
 | `support_sweep_L14_c8.{json,md}` | **单层对照**（只动 L14，K=1→9216）：排除“动两层优于动一层”这个混淆 |
 | `support_sweep_topids_c8.json` | top-64 的**坐标身份**（层/神经元/符号/g/累计 ‖g‖² 份额）与两个知名坐标的排名 |
+| `dense_optimal_c8.{json,md}` | **R7 正面结果**：三臂 × 三预算的实测/预测 ΔJ2、每层残差范数、实际预算、各臂 top-64 坐标（层/神经元/符号/强度） |
 
 结论与边界见 `05_plan-gradient-discovery.md` §2.15–§2.18。**引用任何 ΔJ2 前先读 §2.17–§2.18**：J2 逐位确定、对行序零敏感（`repeat` 与 `shuffle` 都是 0.000e+00），但有 bf16 舍入误差——**单次** ΔJ2 为 ±2.0e-03（中位）/ ±6.5e-03（最坏），**8 上下文均值**约 ±9e-04。规矩：小于 1e-02 的新主张必须带 fp32 对照。
 
