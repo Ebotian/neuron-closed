@@ -1,6 +1,6 @@
 {
   "workstream": "qwentest",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "status": "draft",
   "date": "2026-10-28",
   "current": "R2 paused — effect is hostility-directional within J2 (h↑, praise↓, 8/8, dose-monotone); specificity vs other traits untested",
@@ -9,6 +9,7 @@
     "R2a": "done (slot census; Empath 1/20 vs HurtLex 13/20 coverage)",
     "R2b": "done, minimal (Jibes pool: adj 19/19, verb 14/14)",
     "R2": "paused (hostility-vs-praise shift confirmed 8/8 + dose-monotone; next: same-register slot pools for a second trait; the SNAM probes are paired continuations, not a J2 slot pool, so they answer cross-trait on shared contexts only)",
+    "R2c": "preregistered, blocked (cross-trait specificity on ONE instrument: Goldberg-1992 BFFM-100 pools, 10 pools / one register; criteria C1-C3 frozen in plan 2.14; blocking gate = scripts/slot_census_bffm.py, which needs the GPU box tokenizer - instance unreachable since 2026-10-28 09:50 UTC)",
     "R1": "todo",
     "R3": "todo",
     "R4": "todo",
@@ -185,7 +186,8 @@
     "plan": "05_plan-gradient-discovery.md §§2.9-2.12",
     "plan06_run": "AutoDL /root/autodl-tmp/runs/spec/dose_l14n8949 (dose.json, dose.md; 167 measurements, package v6 tree)",
     "snam_v1_package": "01_packages/snam-semantic-inverse-v1.zip (md5 9c3e109bd72ea6ea1c8fcdcde54ae0e9, 24 text files), delivered by an external session recorded in related_files/conversation-evil-qwen-recipe-to-snam-2026-10-26-27/ (share 6ae14833, 2026-10-26 02:48 to 10-27 09:51 UTC); unpacked by tools/migrate_repo_packages.py; NO LICENSE file in the package",
-    "snam_review_run": "AutoDL /root/autodl-tmp/snam-check/snam-semantic-inverse-v1: sha256sum -c 23/23 OK, unittest 24 OK (CPU), freeze.py + discover.py --traits hostility --discovery-limit 6 --top-k 8 in 25 s; the six top-1 coordinates, the W-vs-G agreement and the 351/384 consensus count in 00_README.md come from that single run's out/snam_v1/discovery"
+    "snam_review_run": "AutoDL /root/autodl-tmp/snam-check/snam-semantic-inverse-v1: sha256sum -c 23/23 OK, unittest 24 OK (CPU), freeze.py + discover.py --traits hostility --discovery-limit 6 --top-k 8 in 25 s; the six top-1 coordinates, the W-vs-G agreement and the 351/384 consensus count in 00_README.md come from that single run's out/snam_v1/discovery",
+    "bffm100_lexicon": "lexicons/bffm100_factors.json derived 2026-10-28 from two public sources: membership+spelling from TDA (Condon/Coughlin/Weston 2022, doi 10.7910/DVN/5T80PF, CC0 1.0, column BFFM100==1 -> exactly 100 adjectives; served .tab md5 f2feb5acd9900f5cf09b1f8fee72c8eb, original .csv md5 e858ae14f1d56211690562159c4f0f3d) and factor/key from Goldberg 1992 Table 3 (doi 10.1037/1040-3590.4.1.26, scanned PDF, OCR pdftoppm -r 300 -gray + tesseract --psm 4, key taken positionally); 100/100 terms matched by spelling; the APA-copyright PDF is NOT redistributed. Independent shape check: psychTools BFI.adjectives.dictionary keys Neuroticism 14+/6-, matching Factor IV 6+/14- (opposite polarity)."
   },
   "verdict_short": "J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回）",
   "verdict": {

@@ -316,6 +316,59 @@ VERB 敌意：`hold, wait, stop, run, handle, read, hide, grow, roast, spell, li
 **按预注册分支**：S2 未达 ⇒ 记为**未证明**（不写"已否定"）；R2 暂停。
 两条最小补强路径：①**补功效**——把共享上下文从 3 条扩到 ≥8 条，重测 S2 并给逐特质 CI（内容工作，无新语料）；②**补对照**——把负例换成同语域、非敌意的续写，使读数能分开"敌意"与"评判性"。
 
+### 2.14 R2c（预注册，未跑）——同一仪器上的跨特质特异性
+
+§2.13 结论四的缺口是：J2 的负例是**中性槽位**，所以它分不开「敌意」与「其他评判性语言」。
+`06_plan-specificity-dose.md` §8/§9 又证明了 J1 那套五特质矩阵**不能**用来补这个缺口（五个 contrast 共享同一中性负例，
+它测的是「评判性 vs 中性」）。所以补对照必须是：**同一个词表源、同一个语域、同一套槽位规则**下的多个特质轴。
+
+**词表源（已入仓，不自己发明）**：`lexicons/bffm100_factors.json` —— Goldberg (1992) 的 100 个
+Big-Five 单极标记形容词（*Psychological Assessment* 4(1):26–42，doi `10.1037/1040-3590.4.1.26`，Table 3），
+按 **因子 × 键向**分成 10 个池：
+
+| 池 | n | 内容 |
+|---|---:|---|
+| `II-` | 10 |  antagonism：cold, demanding, distrustful, harsh, rude, selfish, uncharitable, uncooperative, unkind, unsympathetic |
+| `II+` | 10 | warmth：agreeable, considerate, cooperative, generous, helpful, kind, pleasant, sympathetic, trustful, warm |
+| `I-` | 10 | withdrawal：bashful, inhibited, introverted, quiet, reserved, shy, timid, unadventurous, untalkative, withdrawn |
+| `III-` | 10 | irresponsibility：careless, disorganized, haphazard, impractical, inconsistent, inefficient, negligent, sloppy, undependable, unsystematic |
+| `IV-` | 14 | instability：anxious, emotional, envious, fearful, fretful, high-strung, insecure, irritable, jealous, moody, nervous, self-pitying, temperamental, touchy |
+| `V-` | 10 | unintellectual：imperceptive, shallow, simple, uncreative, unimaginative, uninquisitive, unintellectual, unintelligent, unreflective, unsophisticated |
+| `I+ III+ IV+ V+` | 10/10/6/10 | 四个正向池（对照侧） |
+
+成员与拼写来自 **TDA**（Condon/Coughlin/Weston 2022，doi `10.7910/DVN/5T80PF`，**CC0 1.0**，`BFFM100==1` 恰好 100 词），
+因子/键向来自论文 Table 3 的 OCR（`pdftoppm -r 300 -gray` + `tesseract --psm 4`；键向按**位置**判定，因为 OCR 把
+键标记渲染成 `I+ / I__. / - / II—- / N / V_`），100/100 词逐字对上，0 多 0 缺。`IV` 的 6/14 形状与
+`psychTools::BFI.adjectives.dictionary` 的 Neuroticism 键（14 正 / 6 负，极性相反）独立一致。
+论文 PDF 是 APA 版权，**不入仓**；入仓的只有「词 → 因子」这一事实映射。
+
+**为什么这次不会重犯 §9 的仪器错误**：五个特质轴出自同一份公开标记集、同一词性、同一语域（评价性人物描述词），
+负例侧不再共享一个中性串，而是**彼此互为对照**。
+
+**前置门槛（阻塞项，必须先过）**：`scripts/slot_census_bffm.py` —— 用与 `build_lexicon.py::ntoks`
+逐字相同的过滤（`len(tok.encode(' ' + w).tokens) == 1`，前导空格 + 单 token）普查 100 词，
+报告每个池的存活数。**判据：每个要用的池 ≥ 6 个存活槽位**（才能拆成两个 ≥3 的不相交半池，供 G1 用）。
+`high-strung` / `self-pitying` 这类连字符词预计会被淘汰，`IV-` 可能从 14 掉到 12。
+本机 `--dry-run` 已验（100 词、10 池、过滤串与冻结管线一致）；**真跑被阻**：2026-10-28 09:50 UTC 起
+GPU 机 `connect.westd.seetacloud.com:11168` 连接被拒（实例已关），本机无 `tokenizers` 也无 Qwen 的 `tokenizer.json`。
+
+**实验设计（门槛过了才跑）**：
+- 上下文：`probes/contrasts_v3.jsonl` 的 held-out 批扩到 **≥8 条共享上下文**（§2.13 的补功效路径①）。
+- 坐标：J2 扫描 top-8（含 `L14N8949 +1`）。
+- 每个 (上下文, 干预) **一次前向**，10 个池的 log-mass 从同一份 logits 读出 ⇒ 约 8×8 + 8 = **72 次前向**，GPU ~1 min。
+- 剂量：0.02 与 0.05 两档（与 §2.13 同标尺；`dose 0.05 × p50≈9.7 ≈ 0.49` 残差范数）。
+
+**判据（先冻结，跑完不许改）**：
+- **C1 排序**：`II-` 的 Δlog-mass 在 **≥7/8** 个坐标上高于 `I-`、`III-`、`IV-`、`V-` 各自的 Δ。
+- **C2 功效**：配对差 `Δ(II-) − mean Δ(其他四个负向池)` 在 ≥8 条上下文上的 bootstrap 95% CI **不跨零**。
+- **C3 可复现**：新池上重跑 G1（不相交半池）：`J_top64 ≥ 0.30` 且 `r(|g|) ≥ 0.50`。
+
+**分支（两种结果都写）**：
+- C1+C2+C3 全过 ⇒ 「敌意特异」第一次得到同语域证据，R2 可以从 paused 转回 active。
+- C1 或 C2 不过 ⇒ 结论是**该坐标是通用负向评价杠杆**，不是「敌意方向不存在」；
+  这与 §2.13 结论三（坐标来自一次暴力搜索抽样）一致，仍不能否证类。
+- 门槛不过（池太薄）⇒ 记为**不可执行**，转 §2.13 的路径①（只补上下文数，不换负例）。
+
 ## 3. TODO（本文件登记，暂不动手）
 
 ### R2a —— 槽位池可行性普查（✅ 2026-10-27 完成，结果与结论见 2.8）

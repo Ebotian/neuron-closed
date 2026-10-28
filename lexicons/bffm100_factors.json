@@ -1,0 +1,1180 @@
+{
+ "schema": "qwentest-lexicon-v1",
+ "name": "bffm100_factors",
+ "what": "Goldberg (1992) 100 unipolar Big-Five factor markers: term -> (factor, key). Ten pools of trait adjectives in ONE register (evaluative person descriptors), for cross-trait contrasts on the same instrument.",
+ "derived": "2026-10-28",
+ "provenance": {
+  "membership_and_spelling": {
+   "source": "Trait Descriptive Adjectives (TDA), Condon/Coughlin/Weston 2022, JOPD 10(1):1",
+   "doi_dataset": "10.7910/DVN/5T80PF",
+   "doi_paper": "10.5334/jopd.57",
+   "license": "CC0 1.0",
+   "file": "TDA_properties (dataset file id 5255447)",
+   "rule": "rows with column BFFM100 == 1  ->  exactly 100 adjectives",
+   "columns_kept": [
+    "prop = familiarity (proportion of respondents who picked the term from its definition)",
+    "gbooks.freq = Google Books log frequency",
+    "GN1710",
+    "SG435"
+   ],
+   "hashes": {
+    "served_tab": {
+     "bytes": 87240,
+     "md5": "f2feb5acd9900f5cf09b1f8fee72c8eb",
+     "url": "https://dataverse.harvard.edu/api/access/datafile/5255447"
+    },
+    "original_csv": {
+     "bytes": 83504,
+     "md5": "e858ae14f1d56211690562159c4f0f3d",
+     "url": "https://dataverse.harvard.edu/api/access/datafile/5255447?format=original"
+    }
+   },
+   "hash_note": "Dataverse publishes the md5 of the ORIGINAL csv (e858ae14...) but the plain access endpoint serves the converted .tab (f2feb5ac...). Both were downloaded and both hashes reproduced on 2026-10-28; the membership rule was read from the .tab."
+  },
+  "factor_and_key": {
+   "source": "Goldberg, L. R. (1992). The development of markers for the Big-Five factor structure. Psychological Assessment, 4(1), 26-42. Table 3.",
+   "doi": "10.1037/1040-3590.4.1.26",
+   "pdf_url": "https://projects.ori.org/lrg/PDFs_papers/Goldberg.Big-Five-Markers-Psych.Assess.1992.pdf",
+   "pdf_note": "scanned, APA copyright. The PDF is NOT redistributed here - only the term->factor mapping (facts, not expression). The local copy was 2,600,352 B / 17 pages.",
+   "extraction": "pdftoppm -r 300 -gray | tesseract --psm 4 on the two pages carrying Table 3 (printed pp. 34-35 = PDF pages 9-10)",
+   "rule": "the OCR renders the key glyphs unreliably (I+, I__., -, II-- , N, V_), so the key is taken POSITIONALLY: within each Factor block the first key header is \"+\", the second is \"-\". A \"(continued)\" header does not reset that counter.",
+   "match": "100/100 OCR term rows matched a TDA BFFM100 spelling exactly; 0 extra, 0 missing"
+  },
+  "independent_shape_check": {
+   "source": "psychTools::BFI.adjectives.dictionary keying (personality-project.org docs), same Goldberg 1992 set",
+   "finding": "its Neuroticism key lists 14 positive-keyed and 6 negative-keyed items; Table 3 Factor IV (Emotional Stability, opposite polarity) is 6 (+) / 14 (-). The two agree.",
+   "note": "the other four factors are 10/10 in both."
+  }
+ },
+ "factor_names": {
+  "I": "Surgency/Extraversion",
+  "II": "Agreeableness",
+  "III": "Conscientiousness",
+  "IV": "Emotional Stability",
+  "V": "Intellect"
+ },
+ "pools": {
+  "I+": [
+   "active",
+   "assertive",
+   "bold",
+   "daring",
+   "energetic",
+   "extraverted",
+   "talkative",
+   "unrestrained",
+   "verbal",
+   "vigorous"
+  ],
+  "I-": [
+   "bashful",
+   "inhibited",
+   "introverted",
+   "quiet",
+   "reserved",
+   "shy",
+   "timid",
+   "unadventurous",
+   "untalkative",
+   "withdrawn"
+  ],
+  "II+": [
+   "agreeable",
+   "considerate",
+   "cooperative",
+   "generous",
+   "helpful",
+   "kind",
+   "pleasant",
+   "sympathetic",
+   "trustful",
+   "warm"
+  ],
+  "II-": [
+   "cold",
+   "demanding",
+   "distrustful",
+   "harsh",
+   "rude",
+   "selfish",
+   "uncharitable",
+   "uncooperative",
+   "unkind",
+   "unsympathetic"
+  ],
+  "III+": [
+   "careful",
+   "conscientious",
+   "efficient",
+   "neat",
+   "organized",
+   "practical",
+   "prompt",
+   "steady",
+   "systematic",
+   "thorough"
+  ],
+  "III-": [
+   "careless",
+   "disorganized",
+   "haphazard",
+   "impractical",
+   "inconsistent",
+   "inefficient",
+   "negligent",
+   "sloppy",
+   "undependable",
+   "unsystematic"
+  ],
+  "IV+": [
+   "imperturbable",
+   "relaxed",
+   "undemanding",
+   "unemotional",
+   "unenvious",
+   "unexcitable"
+  ],
+  "IV-": [
+   "anxious",
+   "emotional",
+   "envious",
+   "fearful",
+   "fretful",
+   "high-strung",
+   "insecure",
+   "irritable",
+   "jealous",
+   "moody",
+   "nervous",
+   "self-pitying",
+   "temperamental",
+   "touchy"
+  ],
+  "V+": [
+   "artistic",
+   "bright",
+   "complex",
+   "creative",
+   "deep",
+   "imaginative",
+   "innovative",
+   "intellectual",
+   "introspective",
+   "philosophical"
+  ],
+  "V-": [
+   "imperceptive",
+   "shallow",
+   "simple",
+   "uncreative",
+   "unimaginative",
+   "uninquisitive",
+   "unintellectual",
+   "unintelligent",
+   "unreflective",
+   "unsophisticated"
+  ]
+ },
+ "terms": {
+  "active": {
+   "factor": "I",
+   "key": "I+",
+   "src_line": 20,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.96,
+   "gbooks_log_freq": 2.417,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "agreeable": {
+   "factor": "II",
+   "key": "II+",
+   "src_line": 47,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.58,
+   "gbooks_log_freq": 0.189,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "anxious": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 31,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.93,
+   "gbooks_log_freq": -0.236,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "artistic": {
+   "factor": "V",
+   "key": "V+",
+   "src_line": 55,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.94,
+   "gbooks_log_freq": 0.368,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "assertive": {
+   "factor": "I",
+   "key": "I+",
+   "src_line": 16,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.91,
+   "gbooks_log_freq": -0.185,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "bashful": {
+   "factor": "I",
+   "key": "I-",
+   "src_line": 33,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.85,
+   "gbooks_log_freq": -0.234,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "bold": {
+   "factor": "I",
+   "key": "I+",
+   "src_line": 19,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.9,
+   "gbooks_log_freq": -0.252,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "bright": {
+   "factor": "V",
+   "key": "V+",
+   "src_line": 53,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.9,
+   "gbooks_log_freq": 1.562,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "careful": {
+   "factor": "III",
+   "key": "III+",
+   "src_line": 72,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.87,
+   "gbooks_log_freq": -0.198,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "careless": {
+   "factor": "III",
+   "key": "III-",
+   "src_line": 10,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.86,
+   "gbooks_log_freq": 0.031,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "cold": {
+   "factor": "II",
+   "key": "II-",
+   "src_line": 52,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.8,
+   "gbooks_log_freq": 0.259,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "complex": {
+   "factor": "V",
+   "key": "V+",
+   "src_line": 51,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.95,
+   "gbooks_log_freq": 2.69,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "conscientious": {
+   "factor": "III",
+   "key": "III+",
+   "src_line": 74,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.8,
+   "gbooks_log_freq": -0.114,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "considerate": {
+   "factor": "II",
+   "key": "II+",
+   "src_line": 45,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.9,
+   "gbooks_log_freq": -0.182,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "cooperative": {
+   "factor": "II",
+   "key": "II+",
+   "src_line": 41,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.89,
+   "gbooks_log_freq": 0.053,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "creative": {
+   "factor": "V",
+   "key": "V+",
+   "src_line": 50,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.94,
+   "gbooks_log_freq": -0.112,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "daring": {
+   "factor": "I",
+   "key": "I+",
+   "src_line": 21,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.91,
+   "gbooks_log_freq": -0.245,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "deep": {
+   "factor": "V",
+   "key": "V+",
+   "src_line": 56,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.39,
+   "gbooks_log_freq": -0.252,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "demanding": {
+   "factor": "II",
+   "key": "II-",
+   "src_line": 57,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.93,
+   "gbooks_log_freq": 0.157,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "disorganized": {
+   "factor": "III",
+   "key": "III-",
+   "src_line": 9,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.66,
+   "gbooks_log_freq": -0.209,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "distrustful": {
+   "factor": "II",
+   "key": "II-",
+   "src_line": 55,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.87,
+   "gbooks_log_freq": -0.236,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "efficient": {
+   "factor": "III",
+   "key": "III+",
+   "src_line": 71,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.81,
+   "gbooks_log_freq": -0.209,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "emotional": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 35,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.86,
+   "gbooks_log_freq": 1.194,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "energetic": {
+   "factor": "I",
+   "key": "I+",
+   "src_line": 18,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.9,
+   "gbooks_log_freq": -0.253,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "envious": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 34,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.93,
+   "gbooks_log_freq": -0.181,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "extraverted": {
+   "factor": "I",
+   "key": "I+",
+   "src_line": 14,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.83,
+   "gbooks_log_freq": null,
+   "in_GN1710": false,
+   "in_SG435": false
+  },
+  "fearful": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 42,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.67,
+   "gbooks_log_freq": 0.18,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "fretful": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 37,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.76,
+   "gbooks_log_freq": -0.236,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "generous": {
+   "factor": "II",
+   "key": "II+",
+   "src_line": 49,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.58,
+   "gbooks_log_freq": 0.456,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "haphazard": {
+   "factor": "III",
+   "key": "III-",
+   "src_line": 17,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.58,
+   "gbooks_log_freq": -0.213,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "harsh": {
+   "factor": "II",
+   "key": "II-",
+   "src_line": 56,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.8,
+   "gbooks_log_freq": -0.248,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "helpful": {
+   "factor": "II",
+   "key": "II+",
+   "src_line": 48,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.94,
+   "gbooks_log_freq": -0.243,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "high-strung": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 44,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.8,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "imaginative": {
+   "factor": "V",
+   "key": "V+",
+   "src_line": 52,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.96,
+   "gbooks_log_freq": -0.036,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "imperceptive": {
+   "factor": "V",
+   "key": "V-",
+   "src_line": 68,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.76,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": false
+  },
+  "imperturbable": {
+   "factor": "IV",
+   "key": "IV+",
+   "src_line": 26,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.47,
+   "gbooks_log_freq": -0.24,
+   "in_GN1710": true,
+   "in_SG435": false
+  },
+  "impractical": {
+   "factor": "III",
+   "key": "III-",
+   "src_line": 14,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.86,
+   "gbooks_log_freq": -0.203,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "inconsistent": {
+   "factor": "III",
+   "key": "III-",
+   "src_line": 16,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.91,
+   "gbooks_log_freq": 0.076,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "inefficient": {
+   "factor": "III",
+   "key": "III-",
+   "src_line": 12,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.95,
+   "gbooks_log_freq": -0.132,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "inhibited": {
+   "factor": "I",
+   "key": "I-",
+   "src_line": 30,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.58,
+   "gbooks_log_freq": -0.172,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "innovative": {
+   "factor": "V",
+   "key": "V+",
+   "src_line": 57,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.88,
+   "gbooks_log_freq": 0.094,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "insecure": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 41,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.87,
+   "gbooks_log_freq": -0.169,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "intellectual": {
+   "factor": "V",
+   "key": "V+",
+   "src_line": 49,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.81,
+   "gbooks_log_freq": -0.098,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "introspective": {
+   "factor": "V",
+   "key": "V+",
+   "src_line": 58,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.93,
+   "gbooks_log_freq": -0.232,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "introverted": {
+   "factor": "I",
+   "key": "I-",
+   "src_line": 25,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.88,
+   "gbooks_log_freq": -0.248,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "irritable": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 36,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.96,
+   "gbooks_log_freq": -0.173,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "jealous": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 38,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.89,
+   "gbooks_log_freq": -0.251,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "kind": {
+   "factor": "II",
+   "key": "II+",
+   "src_line": 40,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.87,
+   "gbooks_log_freq": -0.254,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "moody": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 32,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.87,
+   "gbooks_log_freq": -0.221,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "neat": {
+   "factor": "III",
+   "key": "III+",
+   "src_line": 70,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.94,
+   "gbooks_log_freq": -0.253,
+   "in_GN1710": false,
+   "in_SG435": false
+  },
+  "negligent": {
+   "factor": "III",
+   "key": "III-",
+   "src_line": 15,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.67,
+   "gbooks_log_freq": -0.172,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "nervous": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 40,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.54,
+   "gbooks_log_freq": 0.75,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "organized": {
+   "factor": "III",
+   "key": "III+",
+   "src_line": 66,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.94,
+   "gbooks_log_freq": -0.201,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "philosophical": {
+   "factor": "V",
+   "key": "V+",
+   "src_line": 54,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.93,
+   "gbooks_log_freq": -0.079,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "pleasant": {
+   "factor": "II",
+   "key": "II+",
+   "src_line": 46,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.63,
+   "gbooks_log_freq": -0.203,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "practical": {
+   "factor": "III",
+   "key": "III+",
+   "src_line": 69,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.65,
+   "gbooks_log_freq": 1.903,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "prompt": {
+   "factor": "III",
+   "key": "III+",
+   "src_line": 76,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.89,
+   "gbooks_log_freq": 0.105,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "quiet": {
+   "factor": "I",
+   "key": "I-",
+   "src_line": 27,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.98,
+   "gbooks_log_freq": -0.196,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "relaxed": {
+   "factor": "IV",
+   "key": "IV+",
+   "src_line": 25,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.87,
+   "gbooks_log_freq": 0.12,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "reserved": {
+   "factor": "I",
+   "key": "I-",
+   "src_line": 28,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.65,
+   "gbooks_log_freq": 0.519,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "rude": {
+   "factor": "II",
+   "key": "II-",
+   "src_line": 58,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.92,
+   "gbooks_log_freq": -0.249,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "self-pitying": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 43,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.95,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "selfish": {
+   "factor": "II",
+   "key": "II-",
+   "src_line": 59,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.95,
+   "gbooks_log_freq": 0.127,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "shallow": {
+   "factor": "V",
+   "key": "V-",
+   "src_line": 70,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.86,
+   "gbooks_log_freq": -0.24,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "shy": {
+   "factor": "I",
+   "key": "I-",
+   "src_line": 26,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.88,
+   "gbooks_log_freq": -0.247,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "simple": {
+   "factor": "V",
+   "key": "V-",
+   "src_line": 65,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.77,
+   "gbooks_log_freq": -0.008,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "sloppy": {
+   "factor": "III",
+   "key": "III-",
+   "src_line": 18,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.94,
+   "gbooks_log_freq": -0.223,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "steady": {
+   "factor": "III",
+   "key": "III+",
+   "src_line": 73,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.59,
+   "gbooks_log_freq": 0.638,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "sympathetic": {
+   "factor": "II",
+   "key": "II+",
+   "src_line": 42,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.93,
+   "gbooks_log_freq": 0.168,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "systematic": {
+   "factor": "III",
+   "key": "III+",
+   "src_line": 67,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.95,
+   "gbooks_log_freq": -0.191,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "talkative": {
+   "factor": "I",
+   "key": "I+",
+   "src_line": 15,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.91,
+   "gbooks_log_freq": -0.222,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "temperamental": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 33,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.83,
+   "gbooks_log_freq": -0.239,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "thorough": {
+   "factor": "III",
+   "key": "III+",
+   "src_line": 68,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.84,
+   "gbooks_log_freq": 0.223,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "timid": {
+   "factor": "I",
+   "key": "I-",
+   "src_line": 32,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.91,
+   "gbooks_log_freq": -0.074,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "touchy": {
+   "factor": "IV",
+   "key": "IV-",
+   "src_line": 39,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.66,
+   "gbooks_log_freq": -0.24,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "trustful": {
+   "factor": "II",
+   "key": "II+",
+   "src_line": 44,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.72,
+   "gbooks_log_freq": -0.245,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "unadventurous": {
+   "factor": "I",
+   "key": "I-",
+   "src_line": 35,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.93,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "uncharitable": {
+   "factor": "II",
+   "key": "II-",
+   "src_line": 61,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.57,
+   "gbooks_log_freq": -0.246,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "uncooperative": {
+   "factor": "II",
+   "key": "II-",
+   "src_line": 60,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.98,
+   "gbooks_log_freq": -0.247,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "uncreative": {
+   "factor": "V",
+   "key": "V-",
+   "src_line": 64,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.94,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": false
+  },
+  "undemanding": {
+   "factor": "IV",
+   "key": "IV+",
+   "src_line": 28,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.86,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "undependable": {
+   "factor": "III",
+   "key": "III-",
+   "src_line": 13,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.94,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "unemotional": {
+   "factor": "IV",
+   "key": "IV+",
+   "src_line": 24,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.85,
+   "gbooks_log_freq": -0.249,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "unenvious": {
+   "factor": "IV",
+   "key": "IV+",
+   "src_line": 23,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.8,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": false
+  },
+  "unexcitable": {
+   "factor": "IV",
+   "key": "IV+",
+   "src_line": 27,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.88,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "unimaginative": {
+   "factor": "V",
+   "key": "V-",
+   "src_line": 63,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.92,
+   "gbooks_log_freq": -0.247,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "uninquisitive": {
+   "factor": "V",
+   "key": "V-",
+   "src_line": 69,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.78,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "unintellectual": {
+   "factor": "V",
+   "key": "V-",
+   "src_line": 61,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.87,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "unintelligent": {
+   "factor": "V",
+   "key": "V-",
+   "src_line": 62,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.91,
+   "gbooks_log_freq": -0.246,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "unkind": {
+   "factor": "II",
+   "key": "II-",
+   "src_line": 53,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.82,
+   "gbooks_log_freq": -0.177,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "unreflective": {
+   "factor": "V",
+   "key": "V-",
+   "src_line": 67,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.56,
+   "gbooks_log_freq": -0.255,
+   "in_GN1710": true,
+   "in_SG435": false
+  },
+  "unrestrained": {
+   "factor": "I",
+   "key": "I+",
+   "src_line": 23,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.96,
+   "gbooks_log_freq": -0.206,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "unsophisticated": {
+   "factor": "V",
+   "key": "V-",
+   "src_line": 66,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.79,
+   "gbooks_log_freq": -0.227,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "unsympathetic": {
+   "factor": "II",
+   "key": "II-",
+   "src_line": 54,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.92,
+   "gbooks_log_freq": -0.23,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "unsystematic": {
+   "factor": "III",
+   "key": "III-",
+   "src_line": 11,
+   "src_page": "p10_psm4.txt",
+   "familiarity_prop": 0.63,
+   "gbooks_log_freq": -0.251,
+   "in_GN1710": true,
+   "in_SG435": false
+  },
+  "untalkative": {
+   "factor": "I",
+   "key": "I-",
+   "src_line": 29,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.94,
+   "gbooks_log_freq": null,
+   "in_GN1710": true,
+   "in_SG435": false
+  },
+  "verbal": {
+   "factor": "I",
+   "key": "I+",
+   "src_line": 17,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.92,
+   "gbooks_log_freq": -0.195,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "vigorous": {
+   "factor": "I",
+   "key": "I+",
+   "src_line": 22,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.88,
+   "gbooks_log_freq": 0.158,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "warm": {
+   "factor": "II",
+   "key": "II+",
+   "src_line": 43,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.68,
+   "gbooks_log_freq": -0.188,
+   "in_GN1710": true,
+   "in_SG435": true
+  },
+  "withdrawn": {
+   "factor": "I",
+   "key": "I-",
+   "src_line": 31,
+   "src_page": "p09_psm4.txt",
+   "familiarity_prop": 0.74,
+   "gbooks_log_freq": 0.058,
+   "in_GN1710": true,
+   "in_SG435": true
+  }
+ }
+}
