@@ -14,7 +14,7 @@
 | `fermicat/evil-qwen-playground` | raw.githubusercontent | Qwen3.5-4B **8-bit**，MLX 0.32.4 | **无 LICENSE** | 见 `09_reference`（已单独记录） |
 | **`martinbowling/qwen-neuron-audit`** | codeload tar | Qwen3.5-4B **4-bit**（`mlx-community/Qwen3.5-4B-MLX-4bit`） | 有 LICENSE | `EVIL_PAIR.md`（12 提示逐条表）、`CELEBRITY.md`、`results/activation_census_top.json`、`blog/post.md` |
 | **`martinbowling/qwen-celebrity-neurons`** | codeload tar | 同上 4-bit + 8-bit | 有 LICENSE | `results/celebrity_{census,direction,matrix,trios_results,spotcheck,newton,curie…}.json`、`celebrity_directions.npz` |
-| **`lyramakesmusic/neuronary`** | raw + 站点 | — | 开源（README 未写具体许可） | README（其示例就是 `L13N7956-1.0 L14N8949+1.0`）、`recipes/index.json` |
+| **`lyramakesmusic/neuronary`** | 站点 + 公开 API（需 `curl -4`；anon key 在 `config.js`） | — | 开源（README 未写具体许可） | **全量 141 条配方**（两页 offset 合并）、`config.js`、`js/app.js` |
 | **`sunmoonron/wdd-descendants`** | raw | 多模型（GPT-2 / Qwen2.5 / Qwen3-4B） | 开源 | README 192 KB，含**自撤一条 Erratum** |
 | `balaena01/gguf-neuron-explorer` | raw | GGUF / llama.cpp | MIT | README（工具，含随机方向对照） |
 | `lyramakesmusic/neuron-explorer` | raw | Qwen3.5-4B | — | README（steer-lens 缓存的上游） |
@@ -94,15 +94,57 @@ for scientist identities in this test."
 
 ## 5. 可核查性与自我纠正
 
-### 5.1 **`neuronary` 的 API 是空的**（我已实测两次）
+### 5.1 **`neuronary` 的配方库：已取到全量 141 条**（此前记的"count 0 / 不可核验"已更正）
 
-- `https://neuronary.org/recipes/index.json` → `{"version": 1, "count": 0, "recipes": []}`（47 B，HTTP 200，直连）
-- 其 README 明确写"**Each recipe is a set of MLP neurons and doses, e.g. `L13N7956-1.0 L14N8949+1.0`**"
-  ⇒ **社区把我们的那对坐标当成了字典里的规范示例**。
-- 对话转述的"Supabase 端点返回 **135** 条配方"：本机对该域名 **TLS 握手失败**，**无法核验**。
+上一次我报告"`recipes/index.json` 是 `count: 0`、Supabase 端点 TLS 不通、135 条无法核验"。**这两条都是我的取法问题，不是数据不存在。**
 
-**判读 M**：一个"配方库"可以有一个**可克隆但为空**的仓库 + 一个**不可克隆的后端**。
-⇒ 引用任何"社区有 N 条配方"之前，必须先取到**能哈希的快照**；我们这次的快照是 `count: 0`。
+- 站点首页与 `config.js`、`js/app.js` 都能取到（`--noproxy '*'`）。
+- `config.js` 自己写明：**"The Supabase anon key is public by design; row-level security guards writes."**
+  于是公开读权限就是设计的一部分，用它读公开配方是正常用法，不是绕过。
+- 真正的阻塞是 **IPv6**：`mcczbdcymyhzfputyqcr.supabase.co` 同时解析到 v4 与 v6，本机 v6 路由到该主机时 TLS 1.3 握手在
+  `write:errno=104` 处断开（`openssl s_client` 也一样）；**加 `-4` 就 200**。
+- 分页：`?limit=100` 与 `?limit=500` 都只回 100 条（服务端上限），**必须用 `offset`**。两页合并：`offset=0` 100 条 + `offset=100` 41 条
+  = **141 条，与 API 自报 `count: 141` 一致，141 个 id 全不重复**。快照文件 `neuronary_141.json`（54,974 + 21,597 B 两页）。
+
+**全量重算（141 条配方 / 235 个 神经元-剂量 行 / 9 位作者）**：
+
+| 量 | 值 |
+|---|---|
+| 模型 | **Qwen3.5-4B 138** / Qwen3.8-27B 2 / Qwen3-8B 1 |
+| 作者（前四） | `treetowntree` 83、**`_lyraaaa_` 31**（原始发现者）、`jacobmolbio` 11、`tungtungtung` 11 |
+| 日期 | 2026-10-26 至 10-28（**三天内**） |
+| **输出形式** | **1 神经元 89 条（63.1%）**、2 个 41（29.1%）、3 个 5、4 个 4、7 个 1、**26 个 1**；**≥3 个只有 11/141 = 7.8%** |
+| 剂量（235 行） | 中位 **0.4**、IQR −0.6…0.7；**\|dose\| = 0.6 有 67 行、= 0.8 有 48 行**；\|dose\|<0.2 仅 25 行；\|dose\|>1.0 仅 12 行 |
+| 符号 | 正 101、负 71（无 0） |
+| 层分布峰 | **L7 29、L4 21、L22 18、L23 14、L26 13、L9 11**；**L13 6、L14 2**；从未用过 **L0/L1/L11/L27/L29/L30/L31**；L14 及以前累计只占 **45.5%** |
+| 社区核验 | **≥1 次他人复现只有 11/141（7.8%）**，partial 2 条，**failed 0 条**；`score>0` 仅 11 条 |
+| 采样设置 | 94 条 `temperature: 0`，34 条未记，其余 11 条带 `repetition_penalty` |
+
+**我们那对坐标在库里的样子**（唯一条目，作者就是原始发现者）：
+
+```json
+{"id":"x8azwjhk", "name":"OG Evil Qwen", "recipe":"L13N7956-0.7 L14N8949+0.7",
+ "author":"_lyraaaa_", "date":"2026-10-27", "score":1,
+ "reproductions":0, "reproductions_partial":0, "reproductions_failed":0,
+ "tags":["evil","stupid","persona","attitude"],
+ "source":"https://x.com/_lyraaaa_/status/2113833330429083662"}
+```
+
+注意三点：**剂量是 0.7 而不是 1.0**；**他人复现次数为 0**；它是 141 条里**唯一**同时含 `N8949` 与 `N7956` 的一条
+（两者各只出现 1/141 次）。
+
+**判读**
+
+- **S（对我们 §2.25/§2.26 的可用带）**：作者自己的配方用 **±0.7**，而 `fermicat` 的行为峰在 **α=0.75**、`audit` 说 **0.8 过渡 / 1.0 才完全恶意**。
+  **四个独立来源（含原始发现者）收敛到 ≈0.7–0.8**，与我们 b=0.5–0.1 的干净区一致，与 α≥1.2 的崩塌一致。
+- **S（对"输出形式"这个设计问题）**：库里 **63.1% 是单神经元**，而外部行为测量说单神经元 **0/16 有效**（§3）。
+  ⇒ 社区默认发布的形式，恰好是**最不容易奏效的形式**；这支持我们"输出应是排序列表 + 累计捕获率"而不是"十个触发键"（§2.20.2 结论四）。
+- **W（对"社区已验证"的假设）**：**7.8%** 有他人复现、**0** 条记录失败、`score>0` 只有 11 条 ⇒ 这个库目前是**候选池**，不是验证集。
+  任何"社区共识"式表述都不成立。
+- **W/X（对我们的层选择）**：峰在 **L4–L9** 与 **L21–L26** 两段，**L13/L14 只有 6/2 行**；L14 及以前占 45.5%。
+  这与 `08_reference` 的外部图谱（严格峰在相对深度 0.25–0.33 = L9–L12/36）以及我们"L13–14 是继承来的、未经测量选择"的自述**同向**。
+  但这是**人群的选择偏差**（热门卡片互相模仿），不能当作"层效应"的证据。⇒ 记为 **X**，不是 S。
+- **M**：引用任何"社区有 N 条配方"之前，先确认 (a) 是否要 `-4`，(b) 是否要 `offset` 分页，(c) anon key 是否在 `config.js` 里公开。
 
 ### 5.2 `wdd-descendants` 自撤了一批数字（**M，且很有教育意义**）
 
@@ -148,9 +190,13 @@ for scientist identities in this test."
 | "解析组合"能表达交互 | **W（结构性）** | §4：`6+1=7` vs 实测 **16**（超加性 2.3×），线性代理表达不了 |
 | 跨量化复用剂量 | **W/X** | §2：p50 在 4-bit/bf16/8-bit 上散布 ±6%（4-bit vs 8-bit 差 12%） |
 | 我们能用外部数据检验 R7 的 36–43% | **X** | §3：他们的稠密方向是均值差，不是 `M⁺g`，且无物理预算 |
-| 引用"社区有 135 条配方" | **N**（未核验） | §5.1：本机 TLS 不通；可克隆的那份是 `count: 0` |
+| 引用"社区有 135 条配方" | **已更正** | §5.1：实为 **141 条**（三日内、9 位作者）；我上次的失败是 IPv6 与分页，不是数据不存在 |
 | 引用 `terrafying/model-ethics-lab` | **N** | §5.3：404 |
 | 每个读数都要独立校验 | **M** | §5.2：WDD 因"final norm 应用两次"作废 10 个 session 的 KL 数字 |
+| 作者自己的配方剂量 ≈0.7–0.8 | **S** | §5.1：`OG Evil Qwen` 用 **±0.7**；fermicat 峰 0.75；audit 说 0.8 过渡、1.0 才完全恶意 |
+| "输出是几个触发键"这个形式 | **W** | §5.1：库里 **63.1% 是单神经元**，而行为测量说单神经元 **0/16** 有效 ⇒ 社区默认形式是最不容易奏效的形式 |
+| "社区已验证"这个假设 | **W** | §5.1：**7.8%** 有他人复现、**failed 0** 条、`score>0` 仅 11 条 ⇒ 候选池，不是验证集 |
+| 我们的 L13–L14 层选择 | **X（偏 W）** | §5.1：库峰在 L4–L9 与 L21–L26，L13/L14 只 6/2 行；但这是人群模仿偏差，不能当层效应 |
 | 引用 RACE 必须写 v2 | **M** | §6：多版本 |
 
 ---
@@ -159,7 +205,7 @@ for scientist identities in this test."
 
 1. **不要把我们 bf16 的 dose 与他们的 4-bit/8-bit α 并列**（§2：±6% 的 p50 差）。
 2. **不要用他们的稠密方向"证明"R7**（§3 X：那是均值差，不是 `M⁺g`；也没有 M 预算）。
-3. **不要引用"135 条配方"或 `model-ethics-lab`**（§5.1、§5.3 未核验）。
+3. **不要引用"135 条配方"**（实为 **141 条**，§5.1）；`model-ethics-lab` 仍未核验（§5.3，README 404）。
 4. **不要引用 CANS/RACE 的内部数字**（§6：版本已钉，但正文未读；对话里的 `R²=0.996`、MAPE 22.0%、15.50%→1.75% 等**均未核实**）。
 
 ---

@@ -1,6 +1,6 @@
 {
   "workstream": "qwentest",
-  "version": "0.22.1",
+  "version": "0.23.0",
   "status": "draft",
   "date": "2026-10-28",
   "current": "R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused.",
@@ -507,9 +507,71 @@
         "terrafying_model_ethics_lab": "main/README.md returns 404",
         "cans_race_internal_numbers": "versions pinned (RACE v2 2026-09-01, CANS v1 2026-10-26, 2610.24521 v1) but the papers were NOT read, so no internal number is cited"
       }
+    },
+    "neuronary_141": {
+      "what": "full snapshot of the community recipe dictionary neuronary.org, fetched 2026-10-28 (record 10 section 5.1)",
+      "retrieval": "GET https://mcczbdcymyhzfputyqcr.supabase.co/functions/v1/api/recipes?limit=100&offset=0 then &offset=100, curl -4 (IPv6 to that host breaks TLS at write:errno=104), Authorization: Bearer <anon key from https://neuronary.org/config.js> - the key is public by design per that file",
+      "count": 141,
+      "pages": "100 + 41 = 141, unique ids 141, matches the API count field",
+      "bytes": {
+        "page1": 54974,
+        "page2": 21597,
+        "sha256_merged": "f441b68920d7f9b89dacb94acc9e84243c495e555bf801543d1ec5256387e450 (82727 B, merged 141 rows)"
+      },
+      "sha256_merged": "<computed locally; rows NOT committed (unknown licence for community-submitted rows)>",
+      "scale": {
+        "neuron_rows": 235,
+        "authors": 9,
+        "models": {
+          "Qwen/Qwen3.5-4B": 138,
+          "Qwen/Qwen3.8-27B": 2,
+          "Qwen/Qwen3-8B": 1
+        },
+        "dates": "2026-10-26..28 (three days)"
+      },
+      "output_form": {
+        "1_neuron": "89 (63.1%)",
+        "2": "41",
+        "3": "5",
+        "4": "4",
+        "7": "1",
+        "26": "1",
+        "ge3": "11/141 = 7.8%"
+      },
+      "dose": {
+        "median": 0.4,
+        "iqr": [
+          -0.6,
+          0.7
+        ],
+        "abs_0.6": 67,
+        "abs_0.8": 48,
+        "abs_lt_0.2": 25,
+        "abs_gt_1.0": 12,
+        "sign": {
+          "positive": 101,
+          "negative": 71
+        }
+      },
+      "layers": {
+        "top": "L7 29, L4 21, L22 18, L23 14, L26 13, L9 11",
+        "our_band": "L13 6, L14 2",
+        "never_used": "L0,L1,L11,L27,L29,L30,L31",
+        "share_up_to_L14": 0.455
+      },
+      "community_verification": {
+        "reproductions_ge1": "11/141 = 7.8%",
+        "partial_gt0": 2,
+        "failed_gt0": 0,
+        "score_gt0": 11
+      },
+      "our_coordinates": {
+        "matches": "1/141 - \"OG Evil Qwen\" L13N7956-0.7 L14N8949+0.7 by _lyraaaa_ (the original discoverer), date 2026-10-27, score 1, reproductions 0, tags evil/stupid/persona/attitude",
+        "dose_note": "the author uses 0.7, NOT 1.0"
+      }
     }
   },
-  "notes": "Numbers are copied from the runs recorded in qwentest/05_plan-gradient-discovery.md; the doc renders them, so they must be edited here first. 08_reference-*.md records an external dataset's statistics with a fixed taxonomy: S strengthens / W weakens / X intersects-but-different-premises / M methodological transfer / N unusable, applied per claim in its section 11. 0.22.1: qwentest/scripts/layer_sweep.py was committed by accident inside 37487411; it is a DRAFT - never dry-run, never executed, never validated - and its status header now says so. Do not cite it.",
+  "notes": "Numbers are copied from the runs recorded in qwentest/05_plan-gradient-discovery.md; the doc renders them, so they must be edited here first. 08_reference-*.md records an external dataset's statistics with a fixed taxonomy: S strengthens / W weakens / X intersects-but-different-premises / M methodological transfer / N unusable, applied per claim in its section 11. 0.22.1: qwentest/scripts/layer_sweep.py was committed by accident inside 37487411; it is a DRAFT - never dry-run, never executed, never validated - and its status header now says so. Do not cite it. 0.23.0: corrected two of my own retrieval failures - neuronary is reachable with curl -4 and needs offset pagination to see all 141 recipes; its cloneable index.json really is count:0, so the repo and the backend disagree.",
   "sources": {
     "g1_g2_runs": "AutoDL /root/autodl-tmp/runs/v7/j2_19p_full|_A|_B (package v6 tree, probes/contrasts_v3.jsonl, 19 discovery prompts)",
     "verify_run": "AutoDL /root/autodl-tmp/runs/v7/verify_j2_19p (6 reused held-out probes, dose 0.02)",
@@ -536,7 +598,8 @@
     "envelope_runs": "AutoDL 4080 SUPER, two runs on the same 7-budget grid {0.05,0.1,0.15,0.2,0.3,0.4,0.5} x 8 contexts: /root/autodl-tmp/runs/gfeas/behav_envelope (scripts/behavior_check.py, 120 greedy generations of <=96 tokens + 120 capability forwards, 393 s) and /root/autodl-tmp/runs/gfeas/dense_envelope (scripts/dense_optimal.py --record-top 0, 176 J2 evaluations, 164 s). No new code was written for this round - both scripts already took --budgets, and the §2.25 criterion was reused unchanged. Committed: 07_results/behavior_envelope_c8.{json,md}, 07_results/dense_optimal_envelope_c8.{json,md}.",
     "external_mlx_replication": "fermicat/evil-qwen-playground, fetched via raw.githubusercontent.com on 2026-10-28 (no LICENSE file -> raw rows NOT committed; only my recomputed statistics and citations). Files: README.md 3,971 B; results/summary.json 13,905; sampled.json 148,360; dose.json 165,869; replicate.json 112,648; labels.json 124,737; lens_search.json 12,855; jlens.json 28,944; persona.json 27,450. Missing (404): results/dose_map.json, RESULTS.md. Model models/qwen35-4b-8bit, mlx 0.32.4, arm64 27.0.1, per-file code_sha256 present. Record: 09_reference-evil-qwen-mlx-replication.md with the S/W/X/M/N taxonomy.",
     "external_community_atlas": "Fetched 2026-10-28 via raw.githubusercontent.com / codeload.github.com (no third-party rows committed; both martinbowling repos carry a LICENSE but their outputs are hostile/sexual so only statistics are recorded): martinbowling/qwen-neuron-audit (EVIL_PAIR.md, CELEBRITY.md, results/activation_census_top.json), martinbowling/qwen-celebrity-neurons (results/celebrity_{census,direction,matrix,trios_results,spotcheck,newton,refine}.json, celebrity_directions.npz), lyramakesmusic/neuronary (README + recipes/index.json), sunmoonron/wdd-descendants (README with the self-retraction), balaena01/gguf-neuron-explorer, lyramakesmusic/neuron-explorer, plus README-level checks of RACE, CANS-Steer, Steering_Geometry, Contrastive-Neuron-Regulation, NousResearch/neural-steering, NeuronDump, neuron-explorer-gemma, jlens-doom-loop-analysis, makefunstuff/qwen-neurons, Atlas3DSS/Character-Creation. 404: terrafying/model-ethics-lab. arXiv versions pinned from arxiv.org/abs (the API returned HTTP 429): RACE 2608.24758 v2, CANS 2610.35530 v1, 2610.24521 v1. Record: 10_reference-qwen35-community-atlas.md.",
-    "layer_sweep_draft": "qwentest/scripts/layer_sweep.py - DRAFT, unrun, unvalidated (accidentally committed in 37487411)"
+    "layer_sweep_draft": "qwentest/scripts/layer_sweep.py - DRAFT, unrun, unvalidated (accidentally committed in 37487411)",
+    "neuronary_141": "neuronary.org public API, 141 recipes fetched 2026-10-28 with curl -4 and the anon key published in config.js; two pages (limit=100 offset=0 and offset=100). Rows NOT committed: community-submitted content with no stated licence. Record: 10_reference-qwen35-community-atlas.md section 5.1, which CORRECTS my earlier claim that the database was empty/unreachable (it was IPv6 plus missing pagination)."
   },
   "verdict_short": "J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回）",
   "verdict": {

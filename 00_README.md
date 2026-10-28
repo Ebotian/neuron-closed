@@ -16,7 +16,7 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.22.1` / `draft`（2026-10-28） |
+| 版本 / 状态 | `0.23.0` / `draft`（2026-10-28） |
 | 现役 | R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE, with a measured envelope |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
@@ -336,6 +336,14 @@ Binary ZIP files remain ignored; text versions are under `03_unpacked/`.
 4. **一个外部项目自撤了 10 个 session 的 KL 数字**（WDD：readout 把最终 norm 应用了两次，部分结论未幸存）
    ⇒ 支持我们 §2.17/§2.18 的做法：每个读数都要有一条独立于该读数的校验。
 
-另记两条**未核验**：`neuronary` 的 Supabase "135 条配方"（本机 TLS 不通；可克隆的 `index.json` 实测是 `count: 0`）、
-`terrafying/model-ethics-lab`（README 404）。论文版本已钉（RACE **v2**、CANS v1、2610.24521 v1）但**正文未读**，
+**更正（同日）**：`neuronary` 的配方库**已取到全量 141 条**。我先前报的"TLS 不通 / count: 0 / 135 条无法核验"是**取法错误**：
+该主机同时有 v4/v6 解析，本机 v6 到它的 TLS 1.3 握手会在 `write:errno=104` 处断开，**加 `-4` 即 200**；
+而且服务端 `limit` 上限是 100，**必须用 `offset` 分页**（100 + 41 = 141，与 API 自报 count 一致，id 无重复）。
+anon key 就在 `https://neuronary.org/config.js`，该文件自己写明它**是公开设计**。全量重算（141 条 / 235 个 神经元-剂量 行 / 9 位作者 / 三天内）：
+**63.1% 只有 1 个神经元**、≥3 个仅 7.8%；剂量中位 0.4，但众数在 **0.6（67 行）与 0.8（48 行）**；层峰在 **L7/L4/L22**，
+**L13/L14 只有 6/2 行**；**他人复现 ≥1 次只有 11/141（7.8%）**、记录失败 **0** 条 ⇒ 这是候选池，不是验证集。
+我们那对坐标在库里只有一条：**`OG Evil Qwen` `L13N7956-0.7 L14N8949+0.7`**，作者就是原始发现者 `_lyraaaa_`，
+**用的是 0.7 而不是 1.0**，他人复现 **0** 次。原始 141 行**不入仓**（社区提交内容、无明确许可），只入统计量与 sha256。
+
+仍未核验：`terrafying/model-ethics-lab`（README 404）。论文版本已钉（RACE **v2**、CANS v1、2610.24521 v1）但**正文未读**，
 故不引述任何论文内部数字。
