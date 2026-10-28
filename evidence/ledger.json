@@ -1,0 +1,487 @@
+{
+ "schema": "qwentest-external-evidence-v1",
+ "built": "2026-10-28",
+ "purpose": "external sources vs our closed-form inverse-mapping claims, with numeric basis",
+ "verdict_scale": {
+  "S": "strengthens",
+  "W": "weakens",
+  "X": "overlaps but premises differ",
+  "N": "no information",
+  "M": "methodological transfer"
+ },
+ "sources": [
+  {
+   "id": "S1",
+   "label": "Qwen3-8B 单神经元全量图谱（第三方站点）",
+   "record": "08_reference-qwen3-8b-neuron-atlas.md",
+   "model": "Qwen3-8B",
+   "quant": "unknown (8B, api/vercel 站点)",
+   "dose_def": "+/-alpha*r_L/||W_down[:,n]||, alpha in {1.25,1.0,0.75,0.5}, 阶梯重试",
+   "dose_range": [
+    0.5,
+    1.25
+   ],
+   "outcome": "自由生成 160 token -> LLM 判类（persona/broken 等）",
+   "unit": "神经元 x 方向（884,736 对）",
+   "n_contexts": 1,
+   "judge": "Claude Haiku 5.5",
+   "judge_kappa": null,
+   "verifiable": "部分（四个 JSON 可重算；缺原始重试与 580/536）",
+   "licence": "无声明",
+   "rows_committed": false
+  },
+  {
+   "id": "S2",
+   "label": "fermicat Evil-Qwen MLX 复现",
+   "record": "09_reference-evil-qwen-mlx-replication.md",
+   "model": "Qwen3.5-4B",
+   "quant": "MLX 8-bit",
+   "dose_def": "dose*median(||resid leaving L||)/||W_down[:,n]||（与我们的 p50 逐字同构）",
+   "dose_range": [
+    0.0,
+    2.0
+   ],
+   "outcome": "自由生成 120 token -> LLM 判 hostile/broken",
+   "unit": "条件 x 20 提示",
+   "n_contexts": 20,
+   "judge": "LLM 盲评 + 129 条盲复评",
+   "judge_kappa": {
+    "hostile": 0.8913,
+    "broken": 0.9544,
+    "tone5": 0.907
+   },
+   "verifiable": "是（逐条输出+标签全公开，我 12/12 条件重建一致）",
+   "licence": "无声明",
+   "rows_committed": false
+  },
+  {
+   "id": "S3",
+   "label": "qwen-neuron-audit（4-bit 审计）",
+   "record": "10_reference-qwen35-community-atlas.md §4",
+   "model": "Qwen3.5-4B",
+   "quant": "MLX 4-bit",
+   "dose_def": "dose*median_residual[L]/||W_down[:,n]||（同构）",
+   "dose_range": [
+    0.4,
+    1.2
+   ],
+   "outcome": "12 提示的 regex 计数的 violent terms + 拒答 + rep4",
+   "unit": "条件 x 12 提示",
+   "n_contexts": 12,
+   "judge": "人工 1-5 严重度 + regex",
+   "judge_kappa": null,
+   "verifiable": "部分（EVIL_PAIR.md 有逐条表，raw json 未取）",
+   "licence": "有",
+   "rows_committed": false
+  },
+  {
+   "id": "S4",
+   "label": "qwen-celebrity-neurons（稀疏 vs 稠密）",
+   "record": "10_reference-qwen35-community-atlas.md §3",
+   "model": "Qwen3.5-4B",
+   "quant": "MLX 4-bit（+8-bit 复核）",
+   "dose_def": "稀疏: 神经元 x alpha; 稠密: resid += f*||resid_L||*v/||v|| (v=均值差)",
+   "dose_range": [
+    0.4,
+    1.0
+   ],
+   "outcome": "目标名字的下一 token 概率 + 生成身份",
+   "unit": "规格 x 人",
+   "n_contexts": 3,
+   "judge": "无（概率与文本直读）",
+   "judge_kappa": null,
+   "verifiable": "是（results/*.json + npz 全公开）",
+   "licence": "有",
+   "rows_committed": false
+  },
+  {
+   "id": "S5",
+   "label": "neuronary 社区配方库",
+   "record": "10_reference-qwen35-community-atlas.md §5.1",
+   "model": "Qwen3.5-4B 为主",
+   "quant": "未记",
+   "dose_def": "dose（作者自报，同一约定假定）",
+   "dose_range": [
+    -1.2,
+    1.5
+   ],
+   "outcome": "示例输出（定性）+ 他人复现计数",
+   "unit": "配方（141 条 / 235 行）",
+   "n_contexts": null,
+   "judge": "社区点赞/复现",
+   "judge_kappa": null,
+   "verifiable": "是（公开 API，141 条已全量快照）",
+   "licence": "未声明",
+   "rows_committed": false
+  },
+  {
+   "id": "S6",
+   "label": "WDD（Write-Dictionary Decomposition）",
+   "record": "10_reference-qwen35-community-atlas.md §5.2",
+   "model": "多模型（GPT-2/Qwen2.5/Qwen3-4B）",
+   "quant": "多种",
+   "dose_def": "写入字典分解，非本线剂量",
+   "dose_range": null,
+   "outcome": "KL / 激活分布统计",
+   "unit": "session",
+   "n_contexts": null,
+   "judge": "无",
+   "judge_kappa": null,
+   "verifiable": "部分（含自撤 Erratum）",
+   "licence": "有",
+   "rows_committed": false
+  },
+  {
+   "id": "S7",
+   "label": "SNAM v1 实验包（外部交付）",
+   "record": "00_README.md §snam / 05_plan §2.15 引用",
+   "model": "Qwen3.5-4B",
+   "quant": "bf16",
+   "dose_def": "alpha = u*p50/||W_down[:,n]||, budget=0.5",
+   "dose_range": [
+    0.5,
+    0.5
+   ],
+   "outcome": "logit 期望 J = E_q+[logit] - E_q-[logit]（单位置）",
+   "unit": "prompt x 坐标",
+   "n_contexts": 6,
+   "judge": "无",
+   "judge_kappa": null,
+   "verifiable": "是（23/23 校验和、24 单测、我实跑过）",
+   "licence": "包内无 LICENSE",
+   "rows_committed": true
+  },
+  {
+   "id": "S8",
+   "label": "本线自己的 GPU 运行（内部基线）",
+   "record": "05_plan §2.20-§2.26 + 07_results/",
+   "model": "Qwen3.5-4B",
+   "quant": "bf16",
+   "dose_def": "dose*p50/||W_down[:,n]||，物理预算 sqrt(u'Mu)",
+   "dose_range": [
+    0.005,
+    0.5
+   ],
+   "outcome": "J2 log-mass（线性于 logits）+ 无判官行为指标",
+   "unit": "上下文（8-30 条）",
+   "n_contexts": 8,
+   "judge": "无（rep4 / distinct-2 / REFERENCE_TEXT logP）",
+   "judge_kappa": null,
+   "verifiable": "是（07_results 逐点 + fp32 对照）",
+   "licence": "Apache-2.0/CC BY 4.0",
+   "rows_committed": true
+  }
+ ],
+ "claims": [
+  {
+   "id": "C1",
+   "claim": "跨神经元的剂量归一化 dose*p50/||W_down[:,n]|| 是正确且可复用的约定"
+  },
+  {
+   "id": "C2",
+   "claim": "坐标级效应可复现（换词半/换 prompt 半仍选到同一批坐标）"
+  },
+  {
+   "id": "C3",
+   "claim": "找到的坐标是真实、有方向、剂量单调的杠杆"
+  },
+  {
+   "id": "C4",
+   "claim": "效应具有敌意特异性（vs 其他同语域特质）"
+  },
+  {
+   "id": "C5",
+   "claim": "少数稀疏坐标（top-K）能抓住该效应"
+  },
+  {
+   "id": "C6",
+   "claim": "线性代理能预测效应幅度（calibration）"
+  },
+  {
+   "id": "C7",
+   "claim": "闭式最优控制 u ~ M^+g 在稠密区优于 u ~ g"
+  },
+  {
+   "id": "C8",
+   "claim": "解析组合 Q(S)=g_S' G_SS^-1 g_S 能表达多坐标的交互"
+  },
+  {
+   "id": "C9",
+   "claim": "读数改善等价于行为改善"
+  },
+  {
+   "id": "C10",
+   "claim": "层 13-14 是对的作用层"
+  },
+  {
+   "id": "C11",
+   "claim": "读数数值误差可控（可跨 run 比较 1e-03 级差异）"
+  },
+  {
+   "id": "C12",
+   "claim": "读数/标签可由 LLM 判官可靠给出"
+  },
+  {
+   "id": "C13",
+   "claim": "输出形式应为『神经元+符号+强度』的短列表"
+  },
+  {
+   "id": "C14",
+   "claim": "语义编译 tau -> J_tau 是整个映射的主要难点"
+  }
+ ],
+ "verdicts": [
+  {
+   "claim": "C1",
+   "source": "S1",
+   "verdict": "S",
+   "basis": "alpha 与我们的 dose 逐字同构；r_L 定义=去掉首 token 的残差范数中位数，与 estimate_p50 一致",
+   "note": ""
+  },
+  {
+   "claim": "C1",
+   "source": "S2",
+   "verdict": "S",
+   "basis": "公式逐字同构；L13 10.066 / L14 11.014 vs 我们 bf16 9.752792 / 10.329014（+3.2%/+6.6%）",
+   "note": ""
+  },
+  {
+   "claim": "C1",
+   "source": "S3",
+   "verdict": "S",
+   "basis": "公式同构；L13 9.163 / L14 9.694（4-bit，比我们 bf16 低 6.0%/6.2%）",
+   "note": ""
+  },
+  {
+   "claim": "C1",
+   "source": "S5",
+   "verdict": "S",
+   "basis": "141 条配方的剂量轴与该约定相容：中位 0.4、众数 0.6/0.8",
+   "note": "但作者未记 p50，无法逐条核"
+  },
+  {
+   "claim": "C10",
+   "source": "S1",
+   "verdict": "X",
+   "basis": "其严格化后 persona 峰在相对深度 0.25-0.33（L9-L12/36），我们 L13-14/32 是 0.41-0.44",
+   "note": "前提不同，只能记张力"
+  },
+  {
+   "claim": "C10",
+   "source": "S4",
+   "verdict": "X",
+   "basis": "最佳稠密层随人不同（L14/L12/L8），说明层不是常数",
+   "note": ""
+  },
+  {
+   "claim": "C10",
+   "source": "S5",
+   "verdict": "X",
+   "basis": "社区层峰在 L7/L4/L22，L13/L14 只 6/2 行；但这是模仿偏差",
+   "note": ""
+  },
+  {
+   "claim": "C11",
+   "source": "S6",
+   "verdict": "W",
+   "basis": "外部项目因 readout 把 final norm 应用两次而作废 10 个 session 的 KL 数字",
+   "note": "同类风险"
+  },
+  {
+   "claim": "C11",
+   "source": "S8",
+   "verdict": "S",
+   "basis": "内部已量：单次 dJ2 ±2.0e-03(中位)/6.5e-03(最坏)，8 上下文均值 ~9e-04",
+   "note": ""
+  },
+  {
+   "claim": "C12",
+   "source": "S1",
+   "verdict": "W",
+   "basis": "同一判官对『退化』给出 4.297%/7.74%/48.156% 三个口径（差 11 倍）",
+   "note": ""
+  },
+  {
+   "claim": "C12",
+   "source": "S2",
+   "verdict": "S",
+   "basis": "129 条盲复评：hostile kappa 0.8913、broken 0.9544；五分类 tone 仅 0.9070",
+   "note": ""
+  },
+  {
+   "claim": "C13",
+   "source": "S4",
+   "verdict": "W",
+   "basis": "稀疏 0/16、三元组 0/6、稠密 4/6（p(target)=0.44–0.77）",
+   "note": ""
+  },
+  {
+   "claim": "C13",
+   "source": "S5",
+   "verdict": "W",
+   "basis": "社区 63.1% 单神经元、≥3 个仅 7.8%，而单神经元有效率为 0/16",
+   "note": ""
+  },
+  {
+   "claim": "C14",
+   "source": "S1",
+   "verdict": "X",
+   "basis": "其对 persona 的定义是 LLM 给的标签，不是可微目标，无法与我们 J2 的编译路径比较",
+   "note": ""
+  },
+  {
+   "claim": "C14",
+   "source": "S7",
+   "verdict": "S",
+   "basis": "同一坐标在两个不同读数的结论相反（J1 vs J2），证明 tau->J 的定义支配结论",
+   "note": ""
+  },
+  {
+   "claim": "C2",
+   "source": "S1",
+   "verdict": "N",
+   "basis": "单个 prompt，对跨上下文可复现零信息",
+   "note": ""
+  },
+  {
+   "claim": "C2",
+   "source": "S2",
+   "verdict": "N",
+   "basis": "同一批 20 提示，无分半设计",
+   "note": ""
+  },
+  {
+   "claim": "C2",
+   "source": "S3",
+   "verdict": "W",
+   "basis": "其 L13-only 与 L14-only 的差异说明单坐标行为不稳，但无分半检验",
+   "note": ""
+  },
+  {
+   "claim": "C2",
+   "source": "S4",
+   "verdict": "X",
+   "basis": "稠密方向 4-bit->8-bit 不重调即迁移，但那是方向级不是坐标级",
+   "note": ""
+  },
+  {
+   "claim": "C3",
+   "source": "S2",
+   "verdict": "S",
+   "basis": "L14N8949 单坐标 12/20 hostile、剂量峰 14/20@0.75、broken 单调 0->20/20",
+   "note": ""
+  },
+  {
+   "claim": "C3",
+   "source": "S3",
+   "verdict": "S",
+   "basis": "同一坐标 L14-only 6 个 violent terms vs 无干预 0；剂量 0.4-0.6 安静 / 1.0 恶意",
+   "note": ""
+  },
+  {
+   "claim": "C4",
+   "source": "S1",
+   "verdict": "N",
+   "basis": "只有『是否 persona』，不是敌意 vs 其他特质",
+   "note": ""
+  },
+  {
+   "claim": "C4",
+   "source": "S2",
+   "verdict": "N",
+   "basis": "只有敌意一个轴，无同语域对照",
+   "note": ""
+  },
+  {
+   "claim": "C4",
+   "source": "S3",
+   "verdict": "N",
+   "basis": "无对照特质",
+   "note": ""
+  },
+  {
+   "claim": "C5",
+   "source": "S1",
+   "verdict": "W",
+   "basis": "884,736 对里 persona 仅 3.87%，且干净 persona 只有 0.2405%（1/16）",
+   "note": ""
+  },
+  {
+   "claim": "C5",
+   "source": "S3",
+   "verdict": "W",
+   "basis": "激活 z 最高的坐标（Attenborough L27N7938 z=242.0）单独推仍失败",
+   "note": ""
+  },
+  {
+   "claim": "C5",
+   "source": "S4",
+   "verdict": "W",
+   "basis": "单神经元 0/16、三元组 0/6，稠密 4/6；p(target) 稀疏全 <0.01、稠密 0.44-0.77",
+   "note": ""
+  },
+  {
+   "claim": "C5",
+   "source": "S5",
+   "verdict": "W",
+   "basis": "社区 63.1% 的配方是单神经元，但他人复现率仅 7.8%",
+   "note": "这是实践分布，不是效应检验"
+  },
+  {
+   "claim": "C6",
+   "source": "S3",
+   "verdict": "X",
+   "basis": "其剂量阶梯给出行为区间（0.8 过渡/1.0 恶意），但没有代理预测值可比",
+   "note": ""
+  },
+  {
+   "claim": "C6",
+   "source": "S4",
+   "verdict": "X",
+   "basis": "其 logit-lens 预测的目标名概率 0.4398/0.7711/0.5785 与生成结果方向一致，但未报 calibration 误差",
+   "note": ""
+  },
+  {
+   "claim": "C7",
+   "source": "S4",
+   "verdict": "X",
+   "basis": "稠密 4/6 vs 稀疏 0/22 与此同向，但其方向是均值差、无 M 预算，非 M^+g",
+   "note": ""
+  },
+  {
+   "claim": "C8",
+   "source": "S3",
+   "verdict": "W",
+   "basis": "6(L14)+1(L13)=7 但双坐标实测 16（2.3x 超加性）=> 线性 Q(S) 结构上不足",
+   "note": ""
+  },
+  {
+   "claim": "C8",
+   "source": "S5",
+   "verdict": "X",
+   "basis": "社区多坐标配方普遍给 overlap 效应描述（mashup 27 条），但无剂量-响应数据",
+   "note": ""
+  },
+  {
+   "claim": "C9",
+   "source": "S2",
+   "verdict": "W",
+   "basis": "行为 hostile 峰在 0.75，2.0 时塌到 1/20，而 broken 到 20/20 => 读数式指标与行为不同步",
+   "note": ""
+  },
+  {
+   "claim": "C9",
+   "source": "S3",
+   "verdict": "W",
+   "basis": "1.0 报『完全恶意』、1.2 已『不连贯』，可用窗很窄",
+   "note": ""
+  },
+  {
+   "claim": "C9",
+   "source": "S7",
+   "verdict": "X",
+   "basis": "其读数是 logit 期望，且与 J2 不可混用",
+   "note": ""
+  }
+ ]
+}

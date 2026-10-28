@@ -10,6 +10,8 @@ Checks (each also runnable alone):
   dedup       no cross-version-family duplicate text, except the reviewed entries
               in tools/dedup_allow.json (01_packages/02_archives excluded)
   git         no binary/derived file is tracked
+  ledger      evidence/ledger.json is valid and the rendered matrix in
+              11_synthesis-external-evidence.md matches it (tools/evidence_ledger.py)
 
 Rendering:  render-status --write   /   render-provenance --write
 Stdlib only; no network, no GPU, no torch.
@@ -199,6 +201,35 @@ def check_dedup():
     return bad, label
 
 
+def check_ledger():
+    """The external-evidence ledger must validate AND match the rendered block.
+
+    Rendering is checked, not just schema: a hand-edited matrix would otherwise drift from
+    the JSON that the numeric bases live in.
+    """
+    sys.path.insert(0, str(ROOT / 'tools'))
+    from evidence_ledger import DOC, END, START, load, render, validate
+    try:
+        d = load()
+    except (OSError, ValueError) as exc:
+        return [f'evidence/ledger.json is not readable: {exc}']
+    bad = validate(d)
+    if bad:
+        return bad[:8]
+    if not DOC.is_file():
+        return [f'missing {DOC.name}']
+    text = DOC.read_text(encoding='utf8')
+    i, j = text.find(START), text.find(END)
+    if i < 0 or j < i:
+        return [f'{DOC.name}: missing the auto:evidence-matrix block']
+    body = render(d).split(START + '\n', 1)[1].rsplit('\n' + END, 1)[0]
+    got = text[i + len(START) + 1: j - 1]
+    if got.strip() != body.strip():
+        return [f'{DOC.name}: rendered matrix is stale; run '
+                f'python3 tools/evidence_ledger.py --write']
+    return []
+
+
 def check_git():
     r = subprocess.run(['git', 'ls-files', str(ROOT)], cwd=REPO, capture_output=True, text=True)
     bad = [f'tracked derived/binary file: {l}' for l in r.stdout.splitlines()
@@ -231,6 +262,8 @@ def main():
         results[f'tests ({ran} files run, {len(skipped)} need torch)'] = bad
     if cmd in ('all', 'dedup'):
         bad, n = check_dedup(); results[f'dedup ({n})'] = bad
+    if cmd in ('all', 'ledger'):
+        bad = check_ledger(); results[f'ledger ({len(json.loads((ROOT / "evidence/ledger.json").read_text(encoding="utf8"))["verdicts"])} verdicts)'] = bad
     if cmd in ('all', 'git'):
         bad, n = check_git(); results[f'git ({n} tracked files)'] = bad
     fail = 0

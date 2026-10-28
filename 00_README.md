@@ -16,8 +16,8 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.23.0` / `draft`（2026-10-28） |
-| 现役 | R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. |
+| 版本 / 状态 | `0.24.0` / `draft`（2026-10-28） |
+| 现役 | R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. 2026-10-28 evening: external evidence consolidated into a MACHINE-CHECKED ledger (qwentest/evidence/ledger.json, 8 sources x 14 claims x 36 verdicts, rendered by tools/evidence_ledger.py and gated by make check). Result of the abstraction: every 'premises differ' case reduces to 7 axes with measured magnitudes - P1 dose normalisation (p50 differs 6-12% across quantisation), P2 dose range (behavioural usable band alpha~0.8-1.0, collapse >=1.2, community median 0.4), P3 outcome measure (readout monotone vs behaviour non-monotone), P4 support form (K=1->full is 5.78x internally; 0/16 and 0/6 vs 4/6 externally), P5 linearisation (6+1=7 but 16 measured, 2.3x superadditive), P6 layer (external peaks 0.25-0.33 relative depth vs our inherited 0.41-0.44), P7 judge (binary kappa 0.8913/0.9544, 5-way tone only 90.70%, category-vs-tag spread 11x). Strengthened: C1 (4 sources), C7 (indirect), C11. Weakened: C5, C8, C9, C13. No information on C2 and C4 - the two we are actually stuck on, so no amount of further external mining can resolve R2. |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE, with a measured envelope |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
 | 结论 | J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回） |
@@ -38,6 +38,7 @@
 | 测试 | 免 torch 的单测必须通过；其余标为 skipped 并提示到 GPU 机跑 |
 | 去重 | 版本族内允许重复，**跨族重复即失败**（`dedup`，只读不删）。例外只能写在 `tools/dedup_allow.json`：按 **sha256** 逐条登记、写明理由与日期、并列出该组**全部**文件；条目与磁盘不符（内容改了、副本增删）即再次失败 |
 | Git 边界 | 任何 `*.zip / *.tar.gz / *.pyc / *.pt` 被跟踪即失败（`git`） |
+| 外部证据 | `evidence/ledger.json` 必须通过校验，且 `11_` 里的矩阵必须**等于**渲染结果；**每条 S/W/X 判定必须含数字**（`ledger`） |
 
 - 入口：`make -C qwentest check`（stdlib-only，无网络、无 GPU、无 torch）；分项可用 `make -C qwentest blocks|ziptrees|checksums|compile|tests|dedup|git`。
 - 钩子（opt-in）：`make -C qwentest hooks` → `core.hooksPath=.githooks`，`pre-commit` 只在 `qwentest/` 被暂存时跑 `make check`（约 2 s），非 qwentest 提交不受影响。
@@ -60,6 +61,8 @@ qwentest/
 ├── 08_reference-qwen3-8b-neuron-atlas.md  外部参考数据集的统计记录（逐条标 S/W/X/M/N 对我方主张的影响）
 ├── 09_reference-evil-qwen-mlx-replication.md  第二份外部参考统计记录（同一模型的 MLX 8-bit 独立复现）
 ├── 10_reference-qwen35-community-atlas.md  第三份：社区多源横向重算（4-bit/8-bit 交叉、稠密 vs 稀疏、超加性、自撤）
+├── 11_synthesis-external-evidence.md  证据总账：14 条主张 × 8 个来源的机械校验矩阵 + 7 条前提轴
+├── evidence/ledger.json   证据总账的数据（唯一来源；`tools/evidence_ledger.py` 渲染到 11_）
 ├── 07_results/             GPU 运行的原始产物（JSON/MD，文本入仓）
 ├── lexicons/               可复现词表（jibes_adj_verb_pools.json、bffm100_factors.json）
 ├── probes/                 探针输入（contrasts_v3.jsonl）——冻结包之外
@@ -347,3 +350,21 @@ anon key 就在 `https://neuronary.org/config.js`，该文件自己写明它**�
 
 仍未核验：`terrafying/model-ethics-lab`（README 404）。论文版本已钉（RACE **v2**、CANS v1、2610.24521 v1）但**正文未读**，
 故不引述任何论文内部数字。
+
+### 11_synthesis — 证据总账（程序化）
+
+`11_synthesis-external-evidence.md` 把 8 个来源 × 14 条主张压成一张**机械校验**的矩阵，
+数据在 `evidence/ledger.json`，渲染与校验在 `tools/evidence_ledger.py`，并已接入 `make check`：
+
+- **每条 S/W/X 判定必须含至少一个数字**，否则 check 失败（"增强"没有数字正是要防的失效）；
+- **手改 11_ 里的矩阵会被抓**（渲染结果必须与 JSON 一致）；
+- 三条负测试实测 exit=1：改一个字母、指向不存在的来源、手改一行矩阵。
+
+**共同抽象**：所有"交集但前提不同"都能落到 **7 条前提轴**，且每条都有量 ——
+P1 剂量归一化（量化让 p50 差 **6–12%**）、P2 剂量区间（行为可用带 α≈0.8–1.0，**≥1.2 崩塌**，社区中位 0.4）、
+P3 结局量（读数**单调**、行为**非单调**）、P4 支撑集形态（内部 K=1→全支撑 **5.78×**；外部 **0/16、0/6 vs 4/6**）、
+P5 线性化（**6+1=7 而实测 16**）、P6 层（外部峰 0.25–0.33 vs 我们继承的 0.41–0.44）、
+P7 判官（二元 κ **0.8913/0.9544**；五分类仅 **0.90**；同一判官口径差 **11 倍**）。
+
+**净结果**：增强的是 C1（4 个来源）、C7（间接）、C11；弱化的是 **C5 稀疏、C8 可加、C9 读数=行为、C13 短列表输出**；
+而 **C2 可复现与 C4 特异性是 N** —— 恰恰是我们卡住的两条，**继续挖外部数据在结构上解不开 R2**。
