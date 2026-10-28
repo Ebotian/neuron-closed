@@ -16,7 +16,7 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.9.0` / `draft`（2026-10-28） |
+| 版本 / 状态 | `0.10.0` / `draft`（2026-10-28） |
 | 现役 | R6 settled NEGATIVE — at a matched physical (dose) budget the J'J direction LOSES to plain gradient direction on the real model: 0/8 contexts, median -26.6%, exact sign p=0.0078; because the budget metric M (Gram of unit W_down columns) is near-identity (cond 1.43), G=I is already near-optimal for dose-budgeted steering. Plan 2.15.4 verdicts 1-2 WITHDRAWN. New positive lead: at equal budget, denser injection wins (1 coord +0.0365 < 2 +0.0417 < 32 +0.0562). R2 still paused — hostility-directional within J2, specificity vs other traits untested |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` preregistered, not run · `R6` done, NEGATIVE · `R1` todo · `R3` todo · `R4` todo · `R5` todo |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
@@ -57,6 +57,7 @@ qwentest/
 ├── tools/                  本目录的工程门禁：check.py、migrate_repo_packages.py、dedup_check.py、dedup_allow.json
 ├── 05_plan-gradient-discovery.md  梯度发现的读数路线（R2 暂停、R6 现役，其余 TODO）
 ├── 06_plan-specificity-dose.md    计划 06：特异性与剂量（已执行，含 §9 结论修正）
+├── 08_reference-qwen3-8b-neuron-atlas.md  外部参考数据集的统计记录（逐条标 S/W/X/M/N 对我方主张的影响）
 ├── 07_results/             GPU 运行的原始产物（JSON/MD，文本入仓）
 ├── lexicons/               可复现词表（jibes_adj_verb_pools.json、bffm100_factors.json）
 ├── probes/                 探针输入（contrasts_v3.jsonl）——冻结包之外
@@ -204,7 +205,20 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `g_j2_space_k32_m192_c8.{json,md}` | 同上，扩到 8 条上下文（非线性验证的输入） |
 | `g_nonlinear_c8.{json,md}` | 真实模型上的判决：8 上下文 × 7 臂 × 3 预算的实测与预测 ΔJ2、配对符号检验、标定比 |
 
-结论与边界见 `05_plan-gradient-discovery.md` §2.15。
+结论与边界见 `05_plan-gradient-discovery.md` §2.15–§2.16。
+
+---
+
+## 08_reference — 外部参考数据集的统计记录
+
+`08_reference-qwen3-8b-neuron-atlas.md` 是对第三方 **Qwen3-8B 单神经元图谱**（884,736 个 神经元×方向 对，
+1,891,603 条回复，13,861 个双神经元组合）的**我方重算记录**：所有统计量都在其公开的四个 JSON 上重算，
+并逐条标上对我方主张的影响类别（**S** 增强 / **W** 减弱 / **X** 交集但前提不同 / **M** 方法学迁移 / **N** 不可用）。
+
+许可未声明 ⇒ **其原始数据不入仓**（只留在本机 `/tmp/qn`）；仓内只有我重算的统计量、其自报数字与四个文件的 md5。
+最重要的三条：干净 persona 基率是 **0.2405%**（头条 3.87% 的 1/16，其余与退化纠缠）、
+双神经元组合的 **blend 仅 0.71%**（从行为端独立支持 §2.16 的负判决）、
+以及同一个 LLM 判官对“退化”给出 **4.30% / 7.74% / 48.16%** 三个相差 11 倍的数（⇒ R5 必须先测判官自一致性）。
 
 ---
 
