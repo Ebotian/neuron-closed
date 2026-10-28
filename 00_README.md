@@ -16,7 +16,7 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.27.0` / `draft`（2026-10-28） |
+| 版本 / 状态 | `0.28.0` / `draft`（2026-10-28） |
 | 现役 | R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. 2026-10-28 evening: external evidence consolidated into a MACHINE-CHECKED ledger (qwentest/evidence/ledger.json, 8 sources x 14 claims x 36 verdicts, rendered by tools/evidence_ledger.py and gated by make check). Result of the abstraction: every 'premises differ' case reduces to 7 axes with measured magnitudes - P1 dose normalisation (p50 differs 6-12% across quantisation), P2 dose range (behavioural usable band alpha~0.8-1.0, collapse >=1.2, community median 0.4), P3 outcome measure (readout monotone vs behaviour non-monotone), P4 support form (K=1->full is 5.78x internally; 0/16 and 0/6 vs 4/6 externally), P5 linearisation (6+1=7 but 16 measured, 2.3x superadditive), P6 layer (external peaks 0.25-0.33 relative depth vs our inherited 0.41-0.44), P7 judge (binary kappa 0.8913/0.9544, 5-way tone only 90.70%, category-vs-tag spread 11x). Strengthened: C1 (4 sources), C7 (indirect), C11. Weakened: C5, C8, C9, C13. No information on C2 and C4 - the two we are actually stuck on, so no amount of further external mining can resolve R2. |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE, with a measured envelope |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
@@ -205,6 +205,8 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `dense_optimal.py --transfer` | R7 的**迁移检验**：把方向建在一半上下文上、到另一半去测（in/out-of-sample + G2 门） | 同上 |
 | `dense_optimal.py --g1` | R7 的 **G1 检验**：把整套在两个不相交词半（`pos_A`/`pos_B`）上重建重测 | 同上 |
 | `lcb_rank.py` | 检验 RACE 的 CAM 思想：按上下文自助下界排序是否比按 \|mean g\| 排序更省坐标 | 包 engine+semantic + 词表 |
+| `compiler_pareto.py` | **编译器 vs 独立尺子**：3 个编译器 × 同一求解器 × 两个借来的毒性分类器（**DRY-RUN OK，未执行**） | 包 engine+semantic + 词表 + 两个分类器 |
+| `fetch_models.py` | 给**连不上 huggingface.co** 的机器用的分块下载器（range + 重试 + sha256 校验 + manifest） | 仅 curl |
 | `behavior_check.py` | **行为端**（无判官）：R7 各臂的生成退化指标 + 中性参考文本 logP 的能力代理 | 包 engine+semantic + 词表 |
 
 ---
@@ -422,3 +424,10 @@ Steering Geometry（2609.06289）给了**带预期结构的多特质特异性设
 原因可解释：我们均值排序的顶端**本来就是高置信区**（8 条上下文的共同分量很强，这正是 G1/G2 测到的），
 下界主要是**重新缩放**而非**重新排序**；它真改了成员时（`12663`、`18165` 进、`16976`、`18397` 出）就付代价。
 ⇒ **不确定度不是我们的瓶颈**；`11_synthesis` 里 `C2×S10` 由 S 改为 **W**（检验的是移植，不是 RACE 自己的估计器）。
+
+### 收工状态（2026-10-28 晚，远端已关机）
+
+- **今天跑完并落账**：R7 的 G2/G1 双轴复现、行为端包络（7 档预算）、J2 的 bf16/fp32 误差标尺、外部证据总账（12 来源 × 15 主张 × 51 判定，机械校验）、CANS 正文精读（发现并更正我自己 "R²=0.996" 的转述错误）、RACE 的 CAM 移植检验（**登记预测被否**）。
+- **未跑（明天第一件事）**：`compiler_pareto.py` —— 3 个编译器（CAA-Jibes / CAA-BFFM / J2）× 同一求解器 × 两个**借来的**毒性分类器（toxic-bert 6 输出 sigmoid 取 `toxic`；s-nlp 二元 softmax 取 `toxic`，后者是 CANS 引的那条 ParaDetox 线）。脚本 `--dry-run` 通过，**从未执行**。
+- **阻塞原因**：远端**连不上 huggingface.co**（curl 000），但能连 **hf-mirror.com**（200，1.3 MB/s）。已写 `fetch_models.py`（range 分块 + 重试 + sha256），跑到 **280/438 MB** 时关机。`.part` 与 `fetch.log` 在 `/root/autodl-tmp/` 下，**开机后要么续传要么删除，不要信它**。
+- 明天的顺序：续传并**校验 sha256**（两个模型的期望值记在 `metadata.measured.compiler_gauge_plan.expected_sha256`）→ 2 条上下文冒烟 → 8 条全跑（约 3–4 min GPU）→ 按冻结规则**只报 Pareto，不选编译器**。
