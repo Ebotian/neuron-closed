@@ -16,9 +16,9 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.7.0` / `draft`（2026-10-28） |
-| 现役 | R2 paused — effect is hostility-directional within J2 (h↑, praise↓, 8/8, dose-monotone); specificity vs other traits untested |
-| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` preregistered, blocked · `R1` todo · `R3` todo · `R4` todo · `R5` todo |
+| 版本 / 状态 | `0.8.0` / `draft`（2026-10-28） |
+| 现役 | R6 active — control-cost metric settled: G = J'J on the readout's own output space (G=I refuted for combination synthesis; total-vs-collateral is an identity, not a choice). Next: verify on the real nonlinear model. R2 still paused — effect is hostility-directional within J2 (h↑, praise↓, 8/8, dose-monotone); specificity vs other traits untested |
+| 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` preregistered, not run · `R6` active · `R1` todo · `R3` todo · `R4` todo · `R5` todo |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
 | 结论 | J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回） |
 | 实测 | G1 r=0.693/J64=0.524（19 条 prompt） · G2 r=0.668–0.781 / J64=0.471–0.662（9v10 / 10v9） · verify 8/8 p=0.0078（6 reused probes -> replication, not confirmation） |
@@ -55,8 +55,13 @@ qwentest/
 ├── 03_unpacked/            上述包/归档的解包内容（便于直接查看）
 ├── 04_tools/               与远端交互的辅助脚本
 ├── tools/                  本目录的工程门禁：check.py、migrate_repo_packages.py、dedup_check.py、dedup_allow.json
-├── 05_plan-gradient-discovery.md  梯度发现的读数路线（R2 现役，R0/R1/R3/R4/R5 为 TODO）
-└── scripts/                本地统计脚本（stats_single.py、stats_timing.py、dedup_check.py）
+├── 05_plan-gradient-discovery.md  梯度发现的读数路线（R2 暂停、R6 现役，其余 TODO）
+├── 06_plan-specificity-dose.md    计划 06：特异性与剂量（已执行，含 §9 结论修正）
+├── 07_results/             GPU 运行的原始产物（JSON/MD，文本入仓）
+├── lexicons/               可复现词表（jibes_adj_verb_pools.json、bffm100_factors.json）
+├── probes/                 探针输入（contrasts_v3.jsonl）——冻结包之外
+├── metadata.json           数字与状态的唯一来源
+└── scripts/                本地统计脚本 + GPU 实验脚本（均带 --dry-run 与 [i/N]…eta）
 ```
 
 后续路线与预注册判据（G1–G5）见 **`05_plan-gradient-discovery.md`**：R2（token 上的正规语言精确边缘化）为现役工作，其余登记为 TODO；该文件先冻结判据、再跑实验。
@@ -171,6 +176,32 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `dedup_check.py` | 复核 `03_unpacked/rebuild-kit/` 里没有与别处逐字节相同的文件（默认只看不改，`--apply` 才删） |
 
 两个 stats 脚本的默认输入与输出都按脚本自身位置解析（输入 `../03_unpacked/persona-single-d0.5/out/results_626721938e67f4.jsonl`，输出同目录 `out/`），在任意工作目录下都能直接跑；`out/` 是派生结果，不入 git。
+
+### scripts — 需要 GPU 的实验脚本（用户手动在远端跑）
+
+全部支持 `--dry-run`（只打印计划与预算）并逐项打印 `[i/N] … elapsed, eta`。
+
+| 文件 | 回答的问题 | 依赖 |
+|---|---|---|
+| `dose_specificity.py` | 计划 06：剂量单调、镜像臂、同层随机对照、安慰剂 | 包 v6 + `probes/` |
+| `crosstrait_k.py` | “敌意从不第一”是 top-K 的性质还是单次抽样 | 包 v6 + 扫描产物 |
+| `j2_two_readouts.py` | 同一 J2 家族内两个读数（敌意 vs 赞美 / 赞美 vs 中性） | 包 v6 + 词表 |
+| `slot_census_bffm.py` | R2c 前置门槛：BFFM-100 有多少词过得了单 token 槽位过滤 | 仅 tokenizer（CPU） |
+| `g_feasibility.py` | 非对角 `G = JᵀJ` 存不存在、是否上下文稳定（成本建在单位置） | 包 engine + tokenizer |
+| `g_j2_space.py` | 把 G 重建在 **J2 自己的输出空间**后，控制律变不变 | 包 engine+semantic + 词表 |
+
+---
+
+## 07_results — GPU 运行的原始产物
+
+文本入仓（JSON 含完整矩阵与逐条统计，MD 是渲染表）；远端原件在 `/root/autodl-tmp/runs/` 下，租机释放即失，所以以仓内为准。
+
+| 文件 | 内容 |
+|---|---|
+| `g_feasibility_k32_m192_c3.{json,md}` | 单位置成本下的 Ĝ（3 上下文 × 32×32）、逐坐标表、折半信度、verdict A/B |
+| `g_j2_space_k32_m192_c3.{json,md}` | J2 匹配输出空间（916,480 维）下的 Ĝ、真实 g 向量、两种选对规则的联合 Q |
+
+结论与边界见 `05_plan-gradient-discovery.md` §2.15。
 
 ---
 
