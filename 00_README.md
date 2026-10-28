@@ -16,7 +16,7 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.26.0` / `draft`（2026-10-28） |
+| 版本 / 状态 | `0.27.0` / `draft`（2026-10-28） |
 | 现役 | R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. 2026-10-28 evening: external evidence consolidated into a MACHINE-CHECKED ledger (qwentest/evidence/ledger.json, 8 sources x 14 claims x 36 verdicts, rendered by tools/evidence_ledger.py and gated by make check). Result of the abstraction: every 'premises differ' case reduces to 7 axes with measured magnitudes - P1 dose normalisation (p50 differs 6-12% across quantisation), P2 dose range (behavioural usable band alpha~0.8-1.0, collapse >=1.2, community median 0.4), P3 outcome measure (readout monotone vs behaviour non-monotone), P4 support form (K=1->full is 5.78x internally; 0/16 and 0/6 vs 4/6 externally), P5 linearisation (6+1=7 but 16 measured, 2.3x superadditive), P6 layer (external peaks 0.25-0.33 relative depth vs our inherited 0.41-0.44), P7 judge (binary kappa 0.8913/0.9544, 5-way tone only 90.70%, category-vs-tag spread 11x). Strengthened: C1 (4 sources), C7 (indirect), C11. Weakened: C5, C8, C9, C13. No information on C2 and C4 - the two we are actually stuck on, so no amount of further external mining can resolve R2. |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE, with a measured envelope |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
@@ -204,6 +204,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `dense_optimal.py` | **R7**：稠密区里预算最优方向 `u ∝ M⁺g` 是否赢过 `u ∝ g`（含残差方向 / 最小范数代表 / 等价类） | 包 engine+semantic + 词表 |
 | `dense_optimal.py --transfer` | R7 的**迁移检验**：把方向建在一半上下文上、到另一半去测（in/out-of-sample + G2 门） | 同上 |
 | `dense_optimal.py --g1` | R7 的 **G1 检验**：把整套在两个不相交词半（`pos_A`/`pos_B`）上重建重测 | 同上 |
+| `lcb_rank.py` | 检验 RACE 的 CAM 思想：按上下文自助下界排序是否比按 \|mean g\| 排序更省坐标 | 包 engine+semantic + 词表 |
 | `behavior_check.py` | **行为端**（无判官）：R7 各臂的生成退化指标 + 中性参考文本 logP 的能力代理 | 包 engine+semantic + 词表 |
 
 ---
@@ -227,6 +228,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `dense_optimal_c8.{json,md}` | **R7 正面结果**：三臂 × 三预算的实测/预测 ΔJ2、每层残差范数、实际预算、各臂 top-64 坐标（层/神经元/符号/强度） |
 | `dense_transfer_c8.{json,md}` | **R7 迁移检验**：方向建在一半上下文、测在另一半；G2 门、跨半 cos、in/out-of-sample 全部 144 个测量 |
 | `dense_g1_c8.{json,md}` | **R7 的 G1 检验**：两个不相交词半 × 逐上下文/池化两种建向 × 3 预算 = 192 个测量，含两套一致性统计 |
+| `lcb_rank_c8.{json,md}` | **下界排序检验**（RACE 的 CAM 移植）：两个排序的完整捕获曲线；登记预测被否 |
 | `behavior_check_c8.{json,md}` | **行为端第一次测量**：逐上下文逐臂的生成指标、能力代理、生成文本前 240 字符、钩子逐位等价性 |
 | `behavior_envelope_c8.{json,md}` | 行为端 **7 档预算包络**（0.05→0.5）：冻结判据的逐档 PASS/FAIL |
 | `dense_optimal_envelope_c8.{json,md}` | 读数端同一 7 档网格的 ΔJ2 与代理预测 |
@@ -413,3 +415,10 @@ Steering Geometry（2609.06289）给了**带预期结构的多特质特异性设
 
 另外两条可直接用的：**未裁剪时 `|Δα|` 达 20.57 / 42.25**，而裁掉最多 **0.352%** 的神经元就够 ⇒ 我们的输出格式**缺少剂量上限字段**，
 应当补 box 约束（`C13×S9` 记 S，但只对这一项）；它的 **`λ = median(F)`** 是换用 `F` 前必须先定的阻尼。
+
+**§2.27 的第一个"外部思想移植"检验：预测被否。** 把 RACE 的 CAM 思想移植成"按上下文自助 5% 下界排序"，
+登记预测是"73% 捕获所需的 K 会小于 256"。**结果两个排序需要完全相同的 K（256 / 1024 / 4096）**，
+而且在**小 K 上更差**：K=1 时下界排序只拿到均值排序的 **69.6%**（差 −0.0154 = 均值误差的 **17 倍**）。
+原因可解释：我们均值排序的顶端**本来就是高置信区**（8 条上下文的共同分量很强，这正是 G1/G2 测到的），
+下界主要是**重新缩放**而非**重新排序**；它真改了成员时（`12663`、`18165` 进、`16976`、`18397` 出）就付代价。
+⇒ **不确定度不是我们的瓶颈**；`11_synthesis` 里 `C2×S10` 由 S 改为 **W**（检验的是移植，不是 RACE 自己的估计器）。

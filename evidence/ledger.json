@@ -614,9 +614,9 @@
   {
    "claim": "C2",
    "source": "S10",
-   "verdict": "S",
-   "basis": "they rank by a posterior with an uncertainty penalty (CAM) instead of a point estimate, and report forward-only scoring at about 1/100 of gradient cost",
-   "note": "borrow: rank by a lower confidence bound, not by the mean"
+   "verdict": "W",
+   "basis": "their CAM ranks by a posterior with an uncertainty penalty; I transplanted that idea as a context-bootstrap 5% lower bound on our gradient and TESTED it (plan 2.27): the registered prediction K@73%(lcb) < 256 was FALSIFIED - both rankings need K=256, and at K=1 the LCB ranking captures only 69.6% of the mean ranking (difference -0.0154 = 17x the 9e-04 mean error); K>=128 the two are indistinguishable",
+   "note": "this tests the TRANSPLANT onto our gradient, not RACE's own forward-pass / token-level posterior estimator; measured in 07_results/lcb_rank_c8.json"
   },
   {
    "claim": "C13",

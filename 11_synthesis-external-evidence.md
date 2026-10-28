@@ -81,7 +81,7 @@
 | 主张 | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 | S12 | 净结论 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `C1` 跨神经元的剂量归一化 dose*p50/||W_down[:,n]|| 是正确且可复用的约定 | S | S | S | · | S | · | · | · | X | · | · | · | S×4 为主，X×1 |
-| `C2` 坐标级效应可复现（换词半/换 prompt 半仍选到同一批坐标） | N | N | W | X | · | · | · | · | X | S | · | · | S/W 相抵，X×2 |
+| `C2` 坐标级效应可复现（换词半/换 prompt 半仍选到同一批坐标） | N | N | W | X | · | · | · | · | X | W | · | · | W×2 为主，X×2 |
 | `C3` 找到的坐标是真实、有方向、剂量单调的杠杆 | · | S | S | · | · | · | · | · | · | · | · | · | S×2 为主 |
 | `C4` 效应具有敌意特异性（vs 其他同语域特质） | N | N | N | · | · | · | · | · | · | · | · | X | 无增强，X×1 |
 | `C5` 少数稀疏坐标（top-K）能抓住该效应 | W | · | W | W | W | · | · | · | W | · | · | X | W×5 为主，X×1 |
@@ -123,7 +123,7 @@
 | C14 | S9 | **S** | it separates 2 explicit proxies (target-token log-prob for behaviour, output-distribution KL for capability), so the compiler's definition directly determines the optimised object — the compiler's definition directly determines the optimised object |
 | C15 | S9 | **W** | Prop. 1, verbatim: g_j = (1//D_steer/) sum sum_p h_pj dP_sigma/dh_pj, i.e. activation times gradient; multiplicative gain is proportional to the activation, so at h=0 it is 0 — the additive injection we use can open a silent neuron; confirmed in the TeX, not only the README |
 | C2 | S1 | **N** | 单个 prompt，对跨上下文可复现零信息 |
-| C2 | S10 | **S** | they rank by a posterior with an uncertainty penalty (CAM) instead of a point estimate, and report forward-only scoring at about 1/100 of gradient cost — borrow: rank by a lower confidence bound, not by the mean |
+| C2 | S10 | **W** | their CAM ranks by a posterior with an uncertainty penalty; I transplanted that idea as a context-bootstrap 5% lower bound on our gradient and TESTED it (plan 2.27): the registered prediction K@73%(lcb) < 256 was FALSIFIED - both rankings need K=256, and at K=1 the LCB ranking captures only 69.6% of the mean ranking (difference -0.0154 = 17x the 9e-04 mean error); K>=128 the two are indistinguishable — this tests the TRANSPLANT onto our gradient, not RACE's own forward-pass / token-level posterior estimator; measured in 07_results/lcb_rank_c8.json |
 | C2 | S2 | **N** | 同一批 20 提示，无分半设计 |
 | C2 | S3 | **W** | 其 L13-only 与 L14-only 的差异说明单坐标行为不稳，但无分半检验 |
 | C2 | S4 | **X** | 稠密方向 4-bit->8-bit 不重调即迁移，但那是方向级不是坐标级 |
