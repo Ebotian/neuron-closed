@@ -1,6 +1,6 @@
 {
  "schema": "qwentest-external-evidence-v1",
- "built": "2026-10-29a",
+ "built": "2026-10-29b",
  "purpose": "external sources vs our closed-form inverse-mapping claims, with numeric basis",
  "verdict_scale": {
   "S": "strengthens",
@@ -241,16 +241,16 @@
   },
   {
    "id": "S13",
-   "label": "two borrowed toxicity classifiers run on our own generation",
-   "record": "05_plan 2.28 + 07_results/compiler_pareto_c8.json",
+   "label": "two borrowed toxicity classifiers, staged: validity first, then steered generation",
+   "record": "05_plan 2.28 + 2.29; 07_results/{gauge_validity,compiler_pareto_hostility12}.json",
    "model": "unitary/toxic-bert (apache-2.0) + s-nlp/roberta_toxicity_classifier (openrail++)",
    "quant": "fp32 on GPU",
    "dose_def": "not a steering source: scores generated text",
    "dose_range": null,
    "outcome": "P(toxic) per generated reply",
    "unit": "reply",
-   "n_contexts": 8,
-   "judge": "two classifiers, agreement Pearson 0.9955",
+   "n_contexts": "25 probe rows (stage 0) + 12 English hostility prompts (stage 1)",
+   "judge": "two classifiers; agreement Pearson 0.9955 overall; stage 0 AUC on our own English probe continuations 0.986-1.000, on Chinese 0.438-0.688",
    "judge_kappa": null,
    "verifiable": "yes (models sha256-pinned, 07_results carries every text)",
    "licence": "apache-2.0 / openrail++",
@@ -317,6 +317,10 @@
   {
    "id": "C15",
    "claim": "Additive injection and multiplicative scaling are interchangeable at the same coordinate and dose axis"
+  },
+  {
+   "id": "C16",
+   "claim": "A toxicity classifier trained on English can score a hostile-register construct"
   }
  ],
  "verdicts": [
@@ -681,15 +685,15 @@
    "claim": "C14",
    "source": "S13",
    "verdict": "S",
-   "basis": "three compilers gave cos(caa_jibes, j2) = -0.0024 and top-64 overlap 0.047 for the SAME semantic definition, so 'one semantics -> one direction' is refuted; the family claim is now measured, not suspected",
-   "note": "record 2.28; also CAA vs BFFM words: cos 0.1767"
+   "basis": "at b=0.7, with a gauge whose stage-0 AUC on English probe material is 0.986-1.000, the same semantic definition compiled three ways differs by ~10x in mean P(toxic) (+0.9869 caa_bffm / +0.6280 caa_jibes / +0.1022 j2) at comparable capability cost (-1.44 / -2.30 / -1.25 nat), and their direction cos is -0.0024 to 0.4902",
+   "note": "compiler choice, not the solver, dominates the behavioural outcome"
   },
   {
    "claim": "C9",
    "source": "S13",
    "verdict": "W",
-   "basis": "at b=0.05 every compiler moved the toxicity gauge by 0.0000-0.0002 (max P(toxic) 0.0008-0.0016 over a 0.0005 base) while j2's own readout rose +0.50 at the same coordinate; the positive control reached only 0.0566 and only on 1 of 8 contexts while costing -0.6636 nat of reference logP",
-   "note": "readout != behaviour, now measured with a gauge that belongs to no compiler"
+   "basis": "two budgets, 12 English hostility prompts: at b=0.05 every compiler leaves P(toxic) at 0.0000-0.0003 (baseline 0.00057) while j2's own readout rises +0.50; at b=0.7 all three DO move it (+0.1022 / +0.6280 / +0.9869) but cost -1.25 to -2.30 nat. So readout != behaviour holds inside the certified band (b<=0.1) and fails outside it",
+   "note": "the earlier C9 verdict is now bounded rather than absolute"
   },
   {
    "claim": "C4",
@@ -697,6 +701,13 @@
    "verdict": "N",
    "basis": "the 8 heldout contexts contain only 2 hostility-eliciting prompts (hostility_04/05), and the control's single gauge hit was on hostility_05; so this run has almost no power for specificity",
    "note": "design flaw of mine, recorded; next run must use the 19 discovery hostility prompts"
+  },
+  {
+   "claim": "C16",
+   "source": "S13",
+   "verdict": "X",
+   "basis": "stage 0 AUC(pos>neg) = 0.986 (tox_bert) and 1.000 (s-nlp) on the 21 English probe continuations, but 0.688 / 0.438 on the 4 Chinese ones and 0.643 / 0.587 on the 14 verb-frame slot words",
+   "note": "usable for English adjective-frame material only; Chinese and the verb frame are blind"
   }
  ]
 }

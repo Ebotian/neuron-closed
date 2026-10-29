@@ -42,6 +42,15 @@ FROZEN reading, written before the run:
     P1  cos(u_caa_jibes, u_j2) < 0.8
     P2  the two borrowed gauges agree better with each other than either agrees with E_own
     P3  E_tox_bert(u_j2) > E_tox_bert(u_caa_jibes)
+  SECOND-ROUND PREDICTIONS (this run: --trait hostility --lang en, because stage 0 of plan 2.28.6
+  shows both classifiers are blind on Chinese and near-blind on the verb frame, while on English
+  probe continuations they separate hostile from neutral at AUC 0.986-1.000):
+    Q1  at b=0.05 the community control moves E_tox but no compiler does
+        (i.e. the readout's own direction stays behaviourally invisible at the certified budget)
+    Q2  at b=0.7 the j2 direction DOES move E_tox, i.e. the effect becomes visible only when the
+        budget leaves the certified band
+    Q3  E_tox ordering at b=0.7 satisfies control > j2 (the community recipe is still the strongest
+        single mover, consistent with plan 2.21's finding that L14N8949 is not the readout's top-1)
   Error discipline (plan 2.18.4): a single dJ2-scale difference below 1e-02 is not claimed; the
   gauges here are probabilities on 8 contexts, so their spread is reported as a paired range.
 
@@ -88,7 +97,13 @@ def main():
     ap.add_argument('--gauges', default='/root/autodl-tmp/gauges',
                     help='dir with unitary_toxic-bert/ and s-nlp_roberta_toxicity_classifier/')
     ap.add_argument('--layers', default='13-14')
-    ap.add_argument('--budget', type=float, default=0.05)
+    ap.add_argument('--budgets', default='0.05',
+                    help='comma list of physical budgets; 0.05 is our certified clean区, 0.7 is the '
+                         'community operating point')
+    ap.add_argument('--trait', default='hostility')
+    ap.add_argument('--lang', default='en', choices=['en', 'zh', 'all'],
+                    help='gauge_validity (plan 2.28.6 stage 0) shows both classifiers are blind on '
+                         'Chinese and near-blind on the verb frame, so the default is English only')
     ap.add_argument('--contexts', type=int, default=8)
     ap.add_argument('--split', default='heldout')
     ap.add_argument('--pool-variant', default='full', choices=['full', 'A', 'B'])
@@ -107,7 +122,13 @@ def main():
     lex, fams = load_pools(a.lexicon, a.pool_variant)
     bffm = json.loads(Path(a.bffm).read_text(encoding='utf8'))
     rows = [json.loads(l) for l in Path(a.probes).read_text(encoding='utf8').splitlines() if l.strip()]
-    ctx = [r for r in rows if r.get('split') == a.split][:a.contexts]
+    def _zh(s):
+        return any('\u4e00' <= ch <= '\u9fff' for ch in s)
+    sel = [r for r in rows if r.get('trait') == a.trait]
+    if a.lang != 'all':
+        sel = [r for r in sel if (_zh(r['prompt']) == (a.lang == 'zh'))]
+    ctx = sel[:a.contexts]
+    budgets = [float(x) for x in a.budgets.split(',')]
     if not ctx:
         raise SystemExit(f'no {a.split} contexts in {a.probes}')
     # BFFM: only single-token survivors are usable (plan 2.19 census: II+ 7, II- 5)
@@ -136,12 +157,14 @@ def main():
     print(f'  caa_bffm contrast: antagonism {len(ant)} words {ant}')
     print(f'                     vs warmth    {len(war)} words {war}')
     print(f'                     inside frame {frame!r} (same frame as caa_jibes; only the words differ)')
-    print(f'Solver   : one shared closed form, budget {a.budget} via M = What What\'')
+    print(f'Solver   : one shared closed form, budget(s) {budgets} via M = What What\'')
+    print(f'Filter   : trait {a.trait}, language {a.lang} -> {len(ctx)} contexts')
     print(f'Gauges   : toxic-bert + s-nlp roberta on greedy <= {a.max_new} tokens; R = REFERENCE_TEXT logP;'
           f' C = passes')
     print(f'Contexts : {len(ctx)} -> {[c["id"] for c in ctx]}')
+    n_arms = len(compilers) + (1 if a.control_known else 0)
     print(f'Work     : {n_grad} forward/backward passes for gradients + '
-          f'{len(compilers) * len(ctx)} generations + {len(compilers) * len(ctx)} capability forwards')
+          f'{n_arms * len(ctx) * (len(budgets) * 2 + 0)} (generation+capability) pairs + {len(ctx)} baselines')
     print('Frozen   : report the Pareto; do not select. Predictions P1/P2/P3 are registered in the '
           'docstring and will be reported as HELD or FALSIFIED.')
     if a.dry_run:
@@ -235,7 +258,7 @@ def main():
         u = {l: (What[l].double() @ torch.linalg.solve(B[l], d_star[l])) for l in layers}
         bu = math.sqrt(sum(float((u[l].float() @ What[l]).pow(2).sum()) for l in layers))
         assert bu > 0
-        dirs[c] = {l: u[l] * (a.budget / bu) for l in layers}
+        dirs[c] = {l: u[l] / bu for l in layers}      # unit M-norm; scaled per budget below
 
     def cos(d1, d2):
         x = torch.cat([d1[l].flatten() for l in layers]).double()
@@ -286,16 +309,45 @@ def main():
         arms.append('known_recipe')
         dirs['known_recipe'] = None          # handled as a literal dose list, not a solved direction
 
+    def iv_at(c, budget):
+        if c == 'known_recipe':
+            # the community recipe is a literal dose list, not a budget-normalised direction
+            return [{'layer': 14, 'neuron': 8949, 'dose': 0.7},
+                    {'layer': 13, 'neuron': 7956, 'dose': -0.7}]
+        return iv_of({l: dirs[c][l] * budget for l in layers})
+
+    # baseline first (independent of arm and budget), then every (arm, budget) steering pass
+    base = {}
+    prog_total = len(ctx) + len(arms) * len(budgets) * len(ctx)
+    for cx in ctx:
+        cid = cx['id']
+        rid, rpre, rsuf = candidate_ids(tok, cx['prompt'], REFERENCE_TEXT, dev, a.max_seq)
+        with torch.inference_mode():
+            lp = float(continuation_logp(model, rid, rpre, rsuf))
+            ids = torch.tensor([prompt_prefix(tok, cx['prompt'])], dtype=torch.long, device=dev)
+            out = model.generate(input_ids=ids, do_sample=False, max_new_tokens=a.max_new,
+                                 use_cache=True,
+                                 pad_token_id=tok.pad_token_id if tok.pad_token_id is not None
+                                 else tok.eos_token_id)
+            text = tok.decode(out[0, ids.shape[1]:], skip_special_tokens=True)
+        p = p_toxic(text)
+        base[cid] = {'ref_logp': lp, 'text_first_240': text[:240], **p,
+                     'own_hits': sum(text.lower().count(w) for w in own)}
+        prog.step(f'base {cid} p_tox={p["tox_bert"]:.4f}/{p["tox_snlp"]:.4f} ref={lp:+.4f}')
+
     res = {}
     for c in arms:
-        iv = ([{'layer': 14, 'neuron': 8949, 'dose': 0.7},
-               {'layer': 13, 'neuron': 7956, 'dose': -0.7}]
-              if c == 'known_recipe' else iv_of(dirs[c]))
-        for k, cx in enumerate(ctx):
-            cid = cx['id']
-            rid, rpre, rsuf = candidate_ids(tok, cx['prompt'], REFERENCE_TEXT, dev, a.max_seq)
-            for arm, use in (('base', []), ('steer', iv)):
-                with apply_steering(lm, use, p50, norms), torch.inference_mode():
+        for b in budgets:
+            if c == 'known_recipe' and b != budgets[0]:
+                # the community recipe is a fixed dose list; measuring it once is enough
+                for cx in ctx:
+                    res[(c, b, cx['id'])] = dict(res[(c, budgets[0], cx['id'])])
+                continue
+            iv = iv_at(c, b)
+            for cx in ctx:
+                cid = cx['id']
+                rid, rpre, rsuf = candidate_ids(tok, cx['prompt'], REFERENCE_TEXT, dev, a.max_seq)
+                with apply_steering(lm, iv, p50, norms), torch.inference_mode():
                     lp = float(continuation_logp(model, rid, rpre, rsuf))
                     ids = torch.tensor([prompt_prefix(tok, cx['prompt'])], dtype=torch.long, device=dev)
                     out = model.generate(input_ids=ids, do_sample=False, max_new_tokens=a.max_new,
@@ -304,25 +356,26 @@ def main():
                                          else tok.eos_token_id)
                     text = tok.decode(out[0, ids.shape[1]:], skip_special_tokens=True)
                 p = p_toxic(text)
-                res[(c, cid, arm)] = {'ref_logp': lp, 'text_first_240': text[:240],
-                                      **p, 'own_hits': sum(text.lower().count(w) for w in own)}
-                prog.step(f'{c} {cid} {arm} p_tox={p["tox_bert"]:.3f}/{p["tox_snlp"]:.3f} '
+                res[(c, b, cid)] = {'ref_logp': lp, 'text_first_240': text[:240], **p,
+                                    'own_hits': sum(text.lower().count(w) for w in own)}
+                prog.step(f'{c} b={b} {cid} p_tox={p["tox_bert"]:.4f}/{p["tox_snlp"]:.4f} '
                           f'ref={lp:+.4f}')
 
     # ---------------- frozen analysis ----------------
     cids = [c['id'] for c in ctx]
     an = {}
     for c in arms:
-        d = {}
-        for key in ('tox_bert', 'tox_snlp', 'own_hits', 'ref_logp'):
-            base = [res[(c, cid, 'base')][key] for cid in cids]
-            ste = [res[(c, cid, 'steer')][key] for cid in cids]
-            diffs = [s - b for s, b in zip(ste, base)]
-            d[key] = {'mean_base': statistics.fmean(base), 'mean_steer': statistics.fmean(ste),
-                      'mean_delta': statistics.fmean(diffs),
-                      'delta_range': [min(diffs), max(diffs)],
-                      'n_positive': sum(1 for x in diffs if x > 0), 'n': len(diffs)}
-        an[c] = d
+        for b in budgets:
+            d = {}
+            for key in ('tox_bert', 'tox_snlp', 'own_hits', 'ref_logp'):
+                mb = [base[cid][key] for cid in cids]
+                ste = [res[(c, b, cid)][key] for cid in cids]
+                diffs = [s - x for s, x in zip(ste, mb)]
+                d[key] = {'mean_base': statistics.fmean(mb), 'mean_steer': statistics.fmean(ste),
+                          'mean_delta': statistics.fmean(diffs),
+                          'delta_range': [min(diffs), max(diffs)],
+                          'n_positive': sum(1 for x in diffs if x > 0), 'n': len(diffs)}
+            an[f'{c}|b={b}'] = d
     pairs = {}
     solved = [c for c in arms if dirs.get(c) is not None]
     for i, c1 in enumerate(solved):
@@ -334,9 +387,10 @@ def main():
             pairs[f'{c1}|{c2}'] = {'cos': cos(dirs[c1], dirs[c2]),
                                    'top64_overlap': len(t1 & t2) / 64}
     # gauge agreement on the same texts
-    g1 = [res[k]['tox_bert'] for k in res]
-    g2 = [res[k]['tox_snlp'] for k in res]
-    g3 = [float(res[k]['own_hits']) for k in res]
+    allrows = list(base.values()) + [v for v in res.values()]
+    g1 = [v['tox_bert'] for v in allrows]
+    g2 = [v['tox_snlp'] for v in allrows]
+    g3 = [float(v['own_hits']) for v in allrows]
     def kappa(x, y, thr=0.5):
         a = [1 if v >= thr else 0 for v in x]
         b = [1 if v >= thr else 0 for v in y]
@@ -351,7 +405,8 @@ def main():
 
     rec = {'schema': 'qwentest-compiler-pareto-v1', 'machine': platform.node(),
            'gpu': torch.cuda.get_device_name(0), 'model': a.model, 'layers': layers,
-           'budget': a.budget, 'contexts': cids, 'compilers': compilers, 'arms': arms,
+           'budgets': budgets, 'contexts': cids, 'trait': a.trait, 'lang': a.lang,
+           'compilers': compilers, 'arms': arms,
            'bffm_antagonism_words': ant, 'bffm_warmth_words': war, 'bffm_frame': frame,
            'p50': {str(l): p50[l] for l in layers},
            'lexicon_sha256': hashlib.sha256(Path(a.lexicon).read_bytes()).hexdigest(),
@@ -361,33 +416,36 @@ def main():
                            'P2': 'the two borrowed gauges agree better with each other than with own',
                            'P3': 'E_tox_bert(j2) > E_tox_bert(caa_jibes)'},
            'analysis': an, 'direction_pairs': pairs, 'gauge_agreement': agree,
-           'per_context': {f'{c}|{cid}|{arm}': v for (c, cid, arm), v in res.items()}}
+           'baseline': base,
+           'per_context': {f'{c}|{b}|{cid}': v for (c, b, cid), v in res.items()}}
     if a.control_known:
         rec['positive_control'] = {
             'arm': 'known_recipe L14N8949+0.7 L13N7956-0.7',
             'reading': 'if this arm does not move the gauges, the gauge/prompt pair - not the compiler - is '
                        'the problem; if it does, the compilers are simply too weak at this budget'}
+    b0 = budgets[0]
     rec['prediction_outcome'] = {
         'P1': pairs.get('caa_jibes|j2', {}).get('cos') is not None and
               pairs['caa_jibes|j2']['cos'] < 0.8,
         'P2': (agree['pearson_bert_snlp'] is not None and agree['pearson_bert_own'] is not None
                and agree['pearson_snlp_own'] is not None and
                agree['pearson_bert_snlp'] > max(agree['pearson_bert_own'], agree['pearson_snlp_own'])),
-        'P3': an['j2']['tox_bert']['mean_steer'] > an['caa_jibes']['tox_bert']['mean_steer']}
+        'P3': an[f'j2|b={b0}']['tox_bert']['mean_steer'] > an[f'caa_jibes|b={b0}']['tox_bert']['mean_steer']}
 
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     (out / 'compiler_pareto.json').write_text(json.dumps(rec, ensure_ascii=False, indent=1),
                                               encoding='utf8')
     L = ['# Semantic compilers under an independent gauge (compare, do not choose)', '',
-         f'- machine `{rec["machine"]}` / {rec["gpu"]} · layers {layers} · budget {a.budget} · '
+         f'- machine `{rec["machine"]}` / {rec["gpu"]} · layers {layers} · budgets {budgets} · '
          f'{len(cids)} contexts · greedy <= {a.max_new} tokens',
          f'- compilers: {compilers}',
          f'- caa_bffm words: antagonism {len(ant)}, warmth {len(war)}, frame {frame!r}', '',
          '## Pareto table (all deltas are steer minus base, mean over contexts)', '',
-         '| compiler | E_tox_bert | E_tox_snlp | E_own (cross-check) | R (dlogP ref) |', '|---|---:|---:|---:|---:|']
-    for c in arms:
-        d = an[c]
-        L.append(f'| `{c}` | {d["tox_bert"]["mean_delta"]:+.4f} | {d["tox_snlp"]["mean_delta"]:+.4f} | '
+         '| arm | budget | E_tox_bert | E_tox_snlp | E_own | R (dlogP ref) |',
+         '|---|---|---:|---:|---:|---:|']
+    L = L[:-1] if False else L
+    for k_, d in an.items():
+        L.append(f'| `{k_}` | {d["tox_bert"]["mean_delta"]:+.4f} | {d["tox_snlp"]["mean_delta"]:+.4f} | '
                  f'{d["own_hits"]["mean_delta"]:+.3f} | {d["ref_logp"]["mean_delta"]:+.5f} |')
     L += ['', '## direction agreement (does the compiler change the vector?)', '',
           '| pair | cos | top-64 overlap |', '|---|---:|---:|']

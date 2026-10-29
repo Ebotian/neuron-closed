@@ -95,6 +95,7 @@
 | `C13` 输出形式应为『神经元+符号+强度』的短列表 | · | · | · | W | W | · | · | · | S | · | X | · | · | W×2 为主，X×1 |
 | `C14` 语义编译 tau -> J_tau 是整个映射的主要难点 | X | · | · | · | · | · | S | · | S | · | · | S | S | S×4 为主，X×1 |
 | `C15` Additive injection and multiplicative scaling are in | · | · | · | · | · | · | · | · | W | · | · | · | · | W×1 为主 |
+| `C16` A toxicity classifier trained on English can score a | · | · | · | · | · | · | · | · | · | · | · | · | X | 无增强，X×1 |
 
 ### 每条判定的数值依据（程序校验：S/W/X 必须含数字）
 
@@ -119,10 +120,11 @@
 | C13 | S9 | **S** | they clip alpha to [0.25, 1.75] (a=0.75) and rely on 'F is diagonal and positive definite, clipping cannot increase the quadratic preservation cost'; uncapped /delta alpha/ reaches 20.57 and 42.25 while at most 0.352% of neurons get clipped — so our output form needs a box constraint / dose ceiling field - we do not have one |
 | C14 | S1 | **X** | 其对 persona 的定义是 LLM 给的标签，不是可微目标，无法与我们 J2 的编译路径比较 |
 | C14 | S12 | **S** | it validates directions against a theory-specified structure (Schwartz 20 values, MFT 6 foundations) rather than isolated behaviours, which is exactly the compiler-level test we lack — supports C14 and gives the design |
-| C14 | S13 | **S** | three compilers gave cos(caa_jibes, j2) = -0.0024 and top-64 overlap 0.047 for the SAME semantic definition, so 'one semantics -> one direction' is refuted; the family claim is now measured, not suspected — record 2.28; also CAA vs BFFM words: cos 0.1767 |
+| C14 | S13 | **S** | at b=0.7, with a gauge whose stage-0 AUC on English probe material is 0.986-1.000, the same semantic definition compiled three ways differs by ~10x in mean P(toxic) (+0.9869 caa_bffm / +0.6280 caa_jibes / +0.1022 j2) at comparable capability cost (-1.44 / -2.30 / -1.25 nat), and their direction cos is -0.0024 to 0.4902 — compiler choice, not the solver, dominates the behavioural outcome |
 | C14 | S7 | **S** | 同一坐标在两个不同读数的结论相反（J1 vs J2），证明 tau->J 的定义支配结论 |
 | C14 | S9 | **S** | it separates 2 explicit proxies (target-token log-prob for behaviour, output-distribution KL for capability), so the compiler's definition directly determines the optimised object — the compiler's definition directly determines the optimised object |
 | C15 | S9 | **W** | Prop. 1, verbatim: g_j = (1//D_steer/) sum sum_p h_pj dP_sigma/dh_pj, i.e. activation times gradient; multiplicative gain is proportional to the activation, so at h=0 it is 0 — the additive injection we use can open a silent neuron; confirmed in the TeX, not only the README |
+| C16 | S13 | **X** | stage 0 AUC(pos>neg) = 0.986 (tox_bert) and 1.000 (s-nlp) on the 21 English probe continuations, but 0.688 / 0.438 on the 4 Chinese ones and 0.643 / 0.587 on the 14 verb-frame slot words — usable for English adjective-frame material only; Chinese and the verb frame are blind |
 | C2 | S1 | **N** | 单个 prompt，对跨上下文可复现零信息 |
 | C2 | S10 | **W** | their CAM ranks by a posterior with an uncertainty penalty; I transplanted that idea as a context-bootstrap 5% lower bound on our gradient and TESTED it (plan 2.27): the registered prediction K@73%(lcb) < 256 was FALSIFIED - both rankings need K=256, and at K=1 the LCB ranking captures only 69.6% of the mean ranking (difference -0.0154 = 17x the 9e-04 mean error); K>=128 the two are indistinguishable — this tests the TRANSPLANT onto our gradient, not RACE's own forward-pass / token-level posterior estimator; measured in 07_results/lcb_rank_c8.json |
 | C2 | S2 | **N** | 同一批 20 提示，无分半设计 |
@@ -150,7 +152,7 @@
 | C8 | S5 | **X** | 社区多坐标配方普遍给 overlap 效应描述（mashup 27 条），但无剂量-响应数据 |
 | C8 | S9 | **W** | their Limitations, verbatim: 'retains only the Fisher diagonal ..., omitting neuron interactions and their joint roles'; put beside our measured 6+1 -> 16 (2.3x superadditive), both frameworks are on the same boundary — now citable from the paper body, not just the README |
 | C9 | S12 | **W** | its central finding is that steering success on isolated behaviours can be a behaviour-specific shortcut; consistent with our b=0.5 result (+1.27 readout while the capability proxy collapses by 0.64 nat) — independent support for our readout != behaviour |
-| C9 | S13 | **W** | at b=0.05 every compiler moved the toxicity gauge by 0.0000-0.0002 (max P(toxic) 0.0008-0.0016 over a 0.0005 base) while j2's own readout rose +0.50 at the same coordinate; the positive control reached only 0.0566 and only on 1 of 8 contexts while costing -0.6636 nat of reference logP — readout != behaviour, now measured with a gauge that belongs to no compiler |
+| C9 | S13 | **W** | two budgets, 12 English hostility prompts: at b=0.05 every compiler leaves P(toxic) at 0.0000-0.0003 (baseline 0.00057) while j2's own readout rises +0.50; at b=0.7 all three DO move it (+0.1022 / +0.6280 / +0.9869) but cost -1.25 to -2.30 nat. So readout != behaviour holds inside the certified band (b<=0.1) and fails outside it — the earlier C9 verdict is now bounded rather than absolute |
 | C9 | S2 | **W** | 行为 hostile 峰在 0.75，2.0 时塌到 1/20，而 broken 到 20/20 => 读数式指标与行为不同步 |
 | C9 | S3 | **W** | 1.0 报『完全恶意』、1.2 已『不连贯』，可用窗很窄 |
 | C9 | S7 | **X** | 其读数是 logit 期望，且与 J2 不可混用 |
@@ -171,7 +173,7 @@
 | S10 | RACE (2608.24758 v2) + code | several including small LLMs | - | no dose: forward-pass statistics (RDA + Normal | domain-wide functional-consistency score | neuron x token (streaming) | domain-wide | — |
 | S11 | Sparsified MLPs vs Transcoders (2610.24521 v1) | 13 open-source transcoders | - | no dose: feature-neuron weight alignment analy | alignment of transcoder features with ML | feature x transcoder | — | — |
 | S12 | Steering Geometry (2609.06289 v1, EMNLP 2026) + code/dataset | several + Schwartz 20 values / MFT 6 foundations | - | contrastive vectors (CAA/SAS/Spherical/ODE/OPT | geometric alignment + behavioural effect | value x method | — | — |
-| S13 | two borrowed toxicity classifiers run on our own generation | unitary/toxic-bert (apache-2.0) + s-nlp/roberta_toxicity_classifier (openrail++) | fp32 on GPU | not a steering source: scores generated text | P(toxic) per generated reply | reply | 8 | — |
+| S13 | two borrowed toxicity classifiers, staged: validity first, then steered generation | unitary/toxic-bert (apache-2.0) + s-nlp/roberta_toxicity_classifier (openrail++) | fp32 on GPU | not a steering source: scores generated text | P(toxic) per generated reply | reply | 25 probe rows (stage 0) + 12 English hostility prompts (stage 1) | — |
 
 <!-- auto:evidence-matrix:end -->
 

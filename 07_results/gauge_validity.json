@@ -1,0 +1,103 @@
+{
+ "schema": "qwentest-gauge-validity-v1",
+ "machine": "autodl-container-ded147b554-4b263ae1",
+ "trait": "hostility",
+ "n_rows": 25,
+ "n_zh_prompts": 4,
+ "gauges": {
+  "tox_bert": "sigmoid0",
+  "tox_snlp": "softmax1"
+ },
+ "blocks": {
+  "probe_continuations_all": {
+   "tox_bert": {
+    "mean_pos": 0.5361878245673143,
+    "mean_neg": 0.0018577891471795737,
+    "auc_pos_gt_neg": 0.9728,
+    "n_pos_at_0.5+": 14,
+    "n_neg_at_0.5+": 0,
+    "n": 25
+   },
+   "tox_snlp": {
+    "mean_pos": 0.681392946184933,
+    "mean_neg": 4.475408917642198e-05,
+    "auc_pos_gt_neg": 0.9568,
+    "n_pos_at_0.5+": 17,
+    "n_neg_at_0.5+": 0,
+    "n": 25
+   }
+  },
+  "probe_continuations_zh": {
+   "tox_bert": {
+    "mean_pos": 0.01295061848941259,
+    "mean_neg": 0.007729566044872627,
+    "auc_pos_gt_neg": 0.6875,
+    "n_pos_at_0.5+": 0,
+    "n_neg_at_0.5+": 0,
+    "n": 4
+   },
+   "tox_snlp": {
+    "mean_pos": 4.877858464169549e-05,
+    "mean_neg": 5.0627881137188524e-05,
+    "auc_pos_gt_neg": 0.4375,
+    "n_pos_at_0.5+": 0,
+    "n_neg_at_0.5+": 0,
+    "n": 4
+   }
+  },
+  "probe_continuations_en": {
+   "tox_bert": {
+    "mean_pos": 0.6358520589253333,
+    "mean_neg": 0.0007393549867196097,
+    "auc_pos_gt_neg": 0.9863945578231292,
+    "n_pos_at_0.5+": 14,
+    "n_neg_at_0.5+": 0,
+    "n": 21
+   },
+   "tox_snlp": {
+    "mean_pos": 0.8111727950759121,
+    "mean_neg": 4.363527304598219e-05,
+    "auc_pos_gt_neg": 1.0,
+    "n_pos_at_0.5+": 17,
+    "n_neg_at_0.5+": 0,
+    "n": 21
+   }
+  },
+  "slot_words_adj": {
+   "tox_bert": {
+    "mean_pos": 0.7151400964511069,
+    "mean_neg": 0.0411245476785361,
+    "auc_pos_gt_neg": 0.9833795013850416,
+    "n_pos_at_0.5+": 14,
+    "n_neg_at_0.5+": 0,
+    "n": 19
+   },
+   "tox_snlp": {
+    "mean_pos": 0.5204790194852409,
+    "mean_neg": 7.987854960925975e-05,
+    "auc_pos_gt_neg": 0.9390581717451524,
+    "n_pos_at_0.5+": 10,
+    "n_neg_at_0.5+": 0,
+    "n": 19
+   }
+  },
+  "slot_words_verb": {
+   "tox_bert": {
+    "mean_pos": 0.061258101665381606,
+    "mean_neg": 0.017916195244262263,
+    "auc_pos_gt_neg": 0.6428571428571429,
+    "n_pos_at_0.5+": 0,
+    "n_neg_at_0.5+": 0,
+    "n": 14
+   },
+   "tox_snlp": {
+    "mean_pos": 0.00013204673684543065,
+    "mean_neg": 0.00017998247364760443,
+    "auc_pos_gt_neg": 0.5867346938775511,
+    "n_pos_at_0.5+": 0,
+    "n_neg_at_0.5+": 0,
+    "n": 14
+   }
+  }
+ }
+}
