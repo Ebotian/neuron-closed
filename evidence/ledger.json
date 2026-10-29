@@ -1,6 +1,6 @@
 {
  "schema": "qwentest-external-evidence-v1",
- "built": "2026-10-29c",
+ "built": "2026-10-29d",
  "purpose": "external sources vs our closed-form inverse-mapping claims, with numeric basis",
  "verdict_scale": {
   "S": "strengthens",
@@ -275,6 +275,26 @@
    "verifiable": "yes (07_results carries every text and every score)",
    "licence": "our own run",
    "rows_committed": true
+  },
+  {
+   "id": "S15",
+   "label": "32-layer sweep of the dense budget-optimal direction (our own experiment)",
+   "record": "05_plan 2.32 + 07_results/layer_sweep_all32.json",
+   "model": "Qwen3.5-4B bf16",
+   "quant": "bf16",
+   "dose_def": "one layer at a time, single shared closed-form solver, single budget 0.05",
+   "dose_range": [
+    0.05,
+    0.05
+   ],
+   "outcome": "J2 delta (log-mass readout)",
+   "unit": "layer x context",
+   "n_contexts": 8,
+   "judge": "none (readout only)",
+   "judge_kappa": null,
+   "verifiable": "yes (07_results carries per-layer, per-context values)",
+   "licence": "our own run",
+   "rows_committed": true
   }
  ],
  "claims": [
@@ -345,6 +365,10 @@
   {
    "id": "C17",
    "claim": "A hostility-compiled (antagonism) direction is behaviourally specific against other same-register negative pools"
+  },
+  {
+   "id": "C18",
+   "claim": "The choice of layer materially changes the achievable effect"
   }
  ],
  "verdicts": [
@@ -739,6 +763,20 @@
    "verdict": "S",
    "basis": "at b=0.7 on 12 English hostility prompts, II- (antagonism vs warmth) gives mean P(toxic) 0.9875 with 12/12 above 0.5, while I- / III- / IV- / V- give 0.0006 / 0.1655 / 0.0069 / 0.0340; per-context margin over the best other pool is +0.249 to +0.984, and the II- vs IV- paired exact sign test is p=0.00049 (n=12)",
    "note": "damage-matched control: all five directions cost -1.44 to -2.24 nat of reference logP and have comparable rep4 (II- is among the LOWEST at 0.013), so the toxicity is not a byproduct of general destruction or of looping. Scope: this is compiler-level specificity, NOT evidence that L14N8949 is hostility-specific (claim C4 unchanged)."
+  },
+  {
+   "claim": "C18",
+   "source": "S15",
+   "verdict": "W",
+   "basis": "across all 32 layers a single-layer budget-0.05 direction gives u_M dJ2 between 0.29510 (L2) and 0.38232 (L14): a total spread of 1.296x, sd 0.0243 over a median 0.3355, while u_M beats u_g in 8/8 contexts at EVERY layer. Compare the support-size axis, which buys 5.78x",
+   "note": "so layer is a first-order-irrelevant knob and support size is the first-order one"
+  },
+  {
+   "claim": "C10",
+   "source": "S15",
+   "verdict": "S",
+   "basis": "L14 is rank 1 of 32 (0.38232) and L13 rank 4 (0.37481), so the inherited pair is at or near the top; but L31 is rank 2 at 0.37972 (0.7% behind) and the plateau spans 1.30x",
+   "note": "the inherited choice is defensible, but it was not measurably chosen - being anywhere on the plateau would have been nearly as good"
   }
  ]
 }

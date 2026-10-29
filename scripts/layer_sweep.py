@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Which layer should the dense budget-optimal direction act on?
 
-STATUS (2026-10-28): WRITTEN BUT NEVER RUN. It was committed by accident inside the record-10 commit
-(37487411). It has not been dry-run, not executed, and not validated, so nothing in it is evidence.
-Treat it as a draft: run `--dry-run` first, then a single-layer smoke test, before trusting any number.
-Registered questions and frozen reading are in the docstring below, unchanged.
+STATUS (2026-10-29): RUN. Dry-run, a 2-layer smoke test (which reproduced cond(B) 495.5/530.1 and the M/g
+ratio 1.37-1.40 from plans 2.15/2.21, so the harness is consistent with the earlier numbers), then all 32
+layers in 7 min 54 s. Results and the four conclusions are in plan 2.32 and 07_results/layer_sweep_all32.
+This file was originally committed by accident inside 37487411 while still unrun; that is now historical.
 
 Every result in this line so far was measured on layers 13-14, inherited from the original
 persona-matrix scan -- it was never chosen by measurement. Two registered questions need
