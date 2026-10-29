@@ -95,6 +95,10 @@ def main():
     ap.add_argument('--max-seq', type=int, default=384)
     ap.add_argument('--max-new', type=int, default=96)
     ap.add_argument('--out', default='out/compiler_pareto')
+    ap.add_argument('--control-known', action='store_true',
+                    help='add a POSITIVE CONTROL arm: the community recipe L14N8949+0.7 / L13N7956-0.7, '
+                         'which two independent reports show produces hostile text. Without it a flat '
+                         'gauge cannot be distinguished from a broken gauge.')
     ap.add_argument('--dry-run', action='store_true')
     a = ap.parse_args()
 
@@ -107,11 +111,17 @@ def main():
     if not ctx:
         raise SystemExit(f'no {a.split} contexts in {a.probes}')
     # BFFM: only single-token survivors are usable (plan 2.19 census: II+ 7, II- 5)
-    census = ROOT / '07_results/slot_census_bffm100.json'
+    # the single-token census (plan 2.19) may sit next to this script or under the repo root
+    cands = [Path(__file__).resolve().parent / '07_results/slot_census_bffm100.json',
+             ROOT / '07_results/slot_census_bffm100.json']
+    census = next((c for c in cands if c.is_file()), None)
     single = set()
-    if census.is_file():
+    if census is not None:
         cs = json.loads(census.read_text(encoding='utf8'))
         single = {t for pool in cs['pools'].values() for t in pool['survivors']}
+        print(f'census : {census} -> {len(single)} single-token survivors known', flush=True)
+    else:
+        print('census : NOT FOUND - the BFFM words are NOT filtered to single tokens', flush=True)
     ant = [w for w in bffm['pools']['II-'] if not single or w in single]
     war = [w for w in bffm['pools']['II+'] if not single or w in single]
     if not ant or not war:
@@ -222,7 +232,7 @@ def main():
         g = G[c]
         e = {l: What[l].T.double().to(dev) @ g[l].to(dev) for l in layers}
         d_star = {l: torch.linalg.solve(B[l], e[l]) for l in layers}
-        u = {l: (What[l] @ torch.linalg.solve(B[l], d_star[l])) for l in layers}
+        u = {l: (What[l].double() @ torch.linalg.solve(B[l], d_star[l])) for l in layers}
         bu = math.sqrt(sum(float((u[l].float() @ What[l]).pow(2).sum()) for l in layers))
         assert bu > 0
         dirs[c] = {l: u[l] * (a.budget / bu) for l in layers}
@@ -247,7 +257,7 @@ def main():
         d = Path(a.gauges) / sub
         if not d.is_dir():
             raise SystemExit(f'gauge model missing: {d}')
-        m = AutoModelForSequenceClassification.from_pretrained(d, local_files_only=True).eval()
+        m = AutoModelForSequenceClassification.from_pretrained(d, local_files_only=True).to(dev).eval()
         tk = AutoTokenizer.from_pretrained(d, local_files_only=True)
         gauges[name] = (tk, m)
 
@@ -271,9 +281,16 @@ def main():
 
     own = [w.lower() for f in fams.values() for w in f['pos']]
 
+    arms = list(compilers)
+    if a.control_known:
+        arms.append('known_recipe')
+        dirs['known_recipe'] = None          # handled as a literal dose list, not a solved direction
+
     res = {}
-    for c in compilers:
-        iv = iv_of(dirs[c])
+    for c in arms:
+        iv = ([{'layer': 14, 'neuron': 8949, 'dose': 0.7},
+               {'layer': 13, 'neuron': 7956, 'dose': -0.7}]
+              if c == 'known_recipe' else iv_of(dirs[c]))
         for k, cx in enumerate(ctx):
             cid = cx['id']
             rid, rpre, rsuf = candidate_ids(tok, cx['prompt'], REFERENCE_TEXT, dev, a.max_seq)
@@ -295,7 +312,7 @@ def main():
     # ---------------- frozen analysis ----------------
     cids = [c['id'] for c in ctx]
     an = {}
-    for c in compilers:
+    for c in arms:
         d = {}
         for key in ('tox_bert', 'tox_snlp', 'own_hits', 'ref_logp'):
             base = [res[(c, cid, 'base')][key] for cid in cids]
@@ -307,8 +324,9 @@ def main():
                       'n_positive': sum(1 for x in diffs if x > 0), 'n': len(diffs)}
         an[c] = d
     pairs = {}
-    for i, c1 in enumerate(compilers):
-        for c2 in compilers[i + 1:]:
+    solved = [c for c in arms if dirs.get(c) is not None]
+    for i, c1 in enumerate(solved):
+        for c2 in solved[i + 1:]:
             flat1 = torch.cat([dirs[c1][l].flatten() for l in layers]).double()
             flat2 = torch.cat([dirs[c2][l].flatten() for l in layers]).double()
             t1 = set(torch.topk(flat1.abs(), 64).indices.tolist())
@@ -333,7 +351,7 @@ def main():
 
     rec = {'schema': 'qwentest-compiler-pareto-v1', 'machine': platform.node(),
            'gpu': torch.cuda.get_device_name(0), 'model': a.model, 'layers': layers,
-           'budget': a.budget, 'contexts': cids, 'compilers': compilers,
+           'budget': a.budget, 'contexts': cids, 'compilers': compilers, 'arms': arms,
            'bffm_antagonism_words': ant, 'bffm_warmth_words': war, 'bffm_frame': frame,
            'p50': {str(l): p50[l] for l in layers},
            'lexicon_sha256': hashlib.sha256(Path(a.lexicon).read_bytes()).hexdigest(),
@@ -344,6 +362,11 @@ def main():
                            'P3': 'E_tox_bert(j2) > E_tox_bert(caa_jibes)'},
            'analysis': an, 'direction_pairs': pairs, 'gauge_agreement': agree,
            'per_context': {f'{c}|{cid}|{arm}': v for (c, cid, arm), v in res.items()}}
+    if a.control_known:
+        rec['positive_control'] = {
+            'arm': 'known_recipe L14N8949+0.7 L13N7956-0.7',
+            'reading': 'if this arm does not move the gauges, the gauge/prompt pair - not the compiler - is '
+                       'the problem; if it does, the compilers are simply too weak at this budget'}
     rec['prediction_outcome'] = {
         'P1': pairs.get('caa_jibes|j2', {}).get('cos') is not None and
               pairs['caa_jibes|j2']['cos'] < 0.8,
@@ -362,7 +385,7 @@ def main():
          f'- caa_bffm words: antagonism {len(ant)}, warmth {len(war)}, frame {frame!r}', '',
          '## Pareto table (all deltas are steer minus base, mean over contexts)', '',
          '| compiler | E_tox_bert | E_tox_snlp | E_own (cross-check) | R (dlogP ref) |', '|---|---:|---:|---:|---:|']
-    for c in compilers:
+    for c in arms:
         d = an[c]
         L.append(f'| `{c}` | {d["tox_bert"]["mean_delta"]:+.4f} | {d["tox_snlp"]["mean_delta"]:+.4f} | '
                  f'{d["own_hits"]["mean_delta"]:+.3f} | {d["ref_logp"]["mean_delta"]:+.5f} |')

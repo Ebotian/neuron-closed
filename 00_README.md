@@ -16,8 +16,8 @@
 | 项 | 值 |
 |---|---|
 | 工作流 | `qwentest` |
-| 版本 / 状态 | `0.28.0` / `draft`（2026-10-28） |
-| 现役 | R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. 2026-10-28 evening: external evidence consolidated into a MACHINE-CHECKED ledger (qwentest/evidence/ledger.json, 8 sources x 14 claims x 36 verdicts, rendered by tools/evidence_ledger.py and gated by make check). Result of the abstraction: every 'premises differ' case reduces to 7 axes with measured magnitudes - P1 dose normalisation (p50 differs 6-12% across quantisation), P2 dose range (behavioural usable band alpha~0.8-1.0, collapse >=1.2, community median 0.4), P3 outcome measure (readout monotone vs behaviour non-monotone), P4 support form (K=1->full is 5.78x internally; 0/16 and 0/6 vs 4/6 externally), P5 linearisation (6+1=7 but 16 measured, 2.3x superadditive), P6 layer (external peaks 0.25-0.33 relative depth vs our inherited 0.41-0.44), P7 judge (binary kappa 0.8913/0.9544, 5-way tone only 90.70%, category-vs-tag spread 11x). Strengthened: C1 (4 sources), C7 (indirect), C11. Weakened: C5, C8, C9, C13. No information on C2 and C4 - the two we are actually stuck on, so no amount of further external mining can resolve R2. |
+| 版本 / 状态 | `0.29.0` / `draft`（2026-10-28） |
+| 现役 | R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. 2026-10-28 evening: external evidence consolidated into a MACHINE-CHECKED ledger (qwentest/evidence/ledger.json, 8 sources x 14 claims x 36 verdicts, rendered by tools/evidence_ledger.py and gated by make check). Result of the abstraction: every 'premises differ' case reduces to 7 axes with measured magnitudes - P1 dose normalisation (p50 differs 6-12% across quantisation), P2 dose range (behavioural usable band alpha~0.8-1.0, collapse >=1.2, community median 0.4), P3 outcome measure (readout monotone vs behaviour non-monotone), P4 support form (K=1->full is 5.78x internally; 0/16 and 0/6 vs 4/6 externally), P5 linearisation (6+1=7 but 16 measured, 2.3x superadditive), P6 layer (external peaks 0.25-0.33 relative depth vs our inherited 0.41-0.44), P7 judge (binary kappa 0.8913/0.9544, 5-way tone only 90.70%, category-vs-tag spread 11x). Strengthened: C1 (4 sources), C7 (indirect), C11. Weakened: C5, C8, C9, C13. No information on C2 and C4 - the two we are actually stuck on, so no amount of further external mining can resolve R2. 2026-10-29: plan 2.28 executed the ledger rule (no compiler scores itself). At b=0.05 none of the three compilers - including J2, whose own readout rises +0.50 - moves either borrowed toxicity classifier (max P(toxic) 0.0008-0.0016 over a 0.0005 base); the community recipe as a positive control reaches 0.0566 on 1 of 8 contexts while costing -0.66 nat. The same semantics compiled as CAA vs slot-log-mass gives cos = -0.0024, so F is a family, not a function. |
 | 路线 | `R0` done · `R2a` done · `R2b` done, minimal · `R2` paused · `R2c` GATE FAILED, not executable as preregistered · `R6` done, NEGATIVE · `R1` todo · `R3` largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget · `R4` todo · `R5` todo · `R7` done, POSITIVE, with a measured envelope |
 | 判据 | `G1` · `G2` · `G3` · `G4` · `G5`（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |
 | 结论 | J2 判据下该坐标把敌意端相对赞美端推高（8/8 top 坐标，随剂量单调，h−n +0.018 / c−n −0.017）；J1 五特质矩阵是「评判性 vs 中性」仪器，用它判特异性属用错仪器（§8 结论二/三撤回） |
@@ -205,7 +205,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `dense_optimal.py --transfer` | R7 的**迁移检验**：把方向建在一半上下文上、到另一半去测（in/out-of-sample + G2 门） | 同上 |
 | `dense_optimal.py --g1` | R7 的 **G1 检验**：把整套在两个不相交词半（`pos_A`/`pos_B`）上重建重测 | 同上 |
 | `lcb_rank.py` | 检验 RACE 的 CAM 思想：按上下文自助下界排序是否比按 \|mean g\| 排序更省坐标 | 包 engine+semantic + 词表 |
-| `compiler_pareto.py` | **编译器 vs 独立尺子**：3 个编译器 × 同一求解器 × 两个借来的毒性分类器（**DRY-RUN OK，未执行**） | 包 engine+semantic + 词表 + 两个分类器 |
+| `compiler_pareto.py` | **编译器 vs 独立尺子**：3 编译器 + 阳性对照 × 同一求解器 × 两个借来的毒性分类器（**已跑，§2.28**） | 包 engine+semantic + 词表 + 两个分类器 |
 | `fetch_models.py` | 给**连不上 huggingface.co** 的机器用的分块下载器（range + 重试 + sha256 校验 + manifest） | 仅 curl |
 | `behavior_check.py` | **行为端**（无判官）：R7 各臂的生成退化指标 + 中性参考文本 logP 的能力代理 | 包 engine+semantic + 词表 |
 
@@ -231,6 +231,7 @@ p08 椅子那一侧），且跨任务复用同一短语 "face the problem/challe
 | `dense_transfer_c8.{json,md}` | **R7 迁移检验**：方向建在一半上下文、测在另一半；G2 门、跨半 cos、in/out-of-sample 全部 144 个测量 |
 | `dense_g1_c8.{json,md}` | **R7 的 G1 检验**：两个不相交词半 × 逐上下文/池化两种建向 × 3 预算 = 192 个测量，含两套一致性统计 |
 | `lcb_rank_c8.{json,md}` | **下界排序检验**（RACE 的 CAM 移植）：两个排序的完整捕获曲线；登记预测被否 |
+| `compiler_pareto_c8.{json,md}` | **编译器 × 独立尺子**：4 臂 × 8 上下文的 E_tox/ΔlogP/逐条生成文本；三个登记预测的判定 |
 | `behavior_check_c8.{json,md}` | **行为端第一次测量**：逐上下文逐臂的生成指标、能力代理、生成文本前 240 字符、钩子逐位等价性 |
 | `behavior_envelope_c8.{json,md}` | 行为端 **7 档预算包络**（0.05→0.5）：冻结判据的逐档 PASS/FAIL |
 | `dense_optimal_envelope_c8.{json,md}` | 读数端同一 7 档网格的 ΔJ2 与代理预测 |
@@ -431,3 +432,17 @@ Steering Geometry（2609.06289）给了**带预期结构的多特质特异性设
 - **未跑（明天第一件事）**：`compiler_pareto.py` —— 3 个编译器（CAA-Jibes / CAA-BFFM / J2）× 同一求解器 × 两个**借来的**毒性分类器（toxic-bert 6 输出 sigmoid 取 `toxic`；s-nlp 二元 softmax 取 `toxic`，后者是 CANS 引的那条 ParaDetox 线）。脚本 `--dry-run` 通过，**从未执行**。
 - **阻塞原因**：远端**连不上 huggingface.co**（curl 000），但能连 **hf-mirror.com**（200，1.3 MB/s）。已写 `fetch_models.py`（range 分块 + 重试 + sha256），跑到 **280/438 MB** 时关机。`.part` 与 `fetch.log` 在 `/root/autodl-tmp/` 下，**开机后要么续传要么删除，不要信它**。
 - 明天的顺序：续传并**校验 sha256**（两个模型的期望值记在 `metadata.measured.compiler_gauge_plan.expected_sha256`）→ 2 条上下文冒烟 → 8 条全跑（约 3–4 min GPU）→ 按冻结规则**只报 Pareto，不选编译器**。
+
+**§2.28 编译器的第一次独立评分：结论不在编译器身上。**
+8 条上下文、预算 0.05、两个**借来的**毒性分类器（`toxic-bert` apache-2.0 取 sigmoid[0]=toxic；`s-nlp` openrail++ 取 softmax[1]=toxic，后者正是 CANS 引的 ParaDetox 线）：
+
+| 臂 | E_tox_bert | R（ΔlogP 参考） |
+|---|---:|---:|
+| `caa_jibes` | **+0.0000** | −0.0610 |
+| `caa_bffm` | +0.0002 | −0.0073 |
+| `j2`（我们一直用的） | **+0.0000** | **+0.0304** |
+| **阳性对照（社区配方 dose 0.7）** | **+0.0072**（**仅 1/8 上下文**跨阈值，0.0566） | **−0.6636** |
+
+⇒ **b=0.05 上三个编译器都不移动分类器**，而 J2 的自身读数在同一坐标上是 **+0.50** —— 这是"读数≠行为"用**不属于任何编译器的尺子**做的第二次确认。
+⇒ **同一语义编译成 CAA 与槽位 log-mass，方向 cos = −0.0024**（近乎正交，top-64 重叠 0.047）⇒ **F 是族，不是函数**，这条现在有数字。
+⇒ **我的设计缺陷**：8 条上下文里只有 2 条是敌意诱发型，对照臂唯一命中就在那一条上 ⇒ 下一轮必须用 19 条 discovery hostility 提示，并把尺子同时打在槽位续写上。

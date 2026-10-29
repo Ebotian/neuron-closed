@@ -1,14 +1,14 @@
 {
   "workstream": "qwentest",
-  "version": "0.28.0",
+  "version": "0.29.0",
   "status": "draft",
   "date": "2026-10-28",
-  "current": "R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. 2026-10-28 evening: external evidence consolidated into a MACHINE-CHECKED ledger (qwentest/evidence/ledger.json, 8 sources x 14 claims x 36 verdicts, rendered by tools/evidence_ledger.py and gated by make check). Result of the abstraction: every 'premises differ' case reduces to 7 axes with measured magnitudes - P1 dose normalisation (p50 differs 6-12% across quantisation), P2 dose range (behavioural usable band alpha~0.8-1.0, collapse >=1.2, community median 0.4), P3 outcome measure (readout monotone vs behaviour non-monotone), P4 support form (K=1->full is 5.78x internally; 0/16 and 0/6 vs 4/6 externally), P5 linearisation (6+1=7 but 16 measured, 2.3x superadditive), P6 layer (external peaks 0.25-0.33 relative depth vs our inherited 0.41-0.44), P7 judge (binary kappa 0.8913/0.9544, 5-way tone only 90.70%, category-vs-tag spread 11x). Strengthened: C1 (4 sources), C7 (indirect), C11. Weakened: C5, C8, C9, C13. No information on C2 and C4 - the two we are actually stuck on, so no amount of further external mining can resolve R2.",
+  "current": "R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. 2026-10-28 evening: external evidence consolidated into a MACHINE-CHECKED ledger (qwentest/evidence/ledger.json, 8 sources x 14 claims x 36 verdicts, rendered by tools/evidence_ledger.py and gated by make check). Result of the abstraction: every 'premises differ' case reduces to 7 axes with measured magnitudes - P1 dose normalisation (p50 differs 6-12% across quantisation), P2 dose range (behavioural usable band alpha~0.8-1.0, collapse >=1.2, community median 0.4), P3 outcome measure (readout monotone vs behaviour non-monotone), P4 support form (K=1->full is 5.78x internally; 0/16 and 0/6 vs 4/6 externally), P5 linearisation (6+1=7 but 16 measured, 2.3x superadditive), P6 layer (external peaks 0.25-0.33 relative depth vs our inherited 0.41-0.44), P7 judge (binary kappa 0.8913/0.9544, 5-way tone only 90.70%, category-vs-tag spread 11x). Strengthened: C1 (4 sources), C7 (indirect), C11. Weakened: C5, C8, C9, C13. No information on C2 and C4 - the two we are actually stuck on, so no amount of further external mining can resolve R2. 2026-10-29: plan 2.28 executed the ledger rule (no compiler scores itself). At b=0.05 none of the three compilers - including J2, whose own readout rises +0.50 - moves either borrowed toxicity classifier (max P(toxic) 0.0008-0.0016 over a 0.0005 base); the community recipe as a positive control reaches 0.0566 on 1 of 8 contexts while costing -0.66 nat. The same semantics compiled as CAA vs slot-log-mass gives cos = -0.0024, so F is a family, not a function.",
   "routes": {
     "R0": "done (sparsity: top-64 = 1.65%/2.13% of sum|g|)",
     "R2a": "done (slot census; Empath 1/20 vs HurtLex 13/20 coverage)",
     "R2b": "done, minimal (Jibes pool: adj 19/19, verb 14/14)",
-    "R2": "paused (hostility-vs-praise shift confirmed 8/8 + dose-monotone; next: same-register slot pools for a second trait; the SNAM probes are paired continuations, not a J2 slot pool, so they answer cross-trait on shared contexts only); external data is structurally unable to help here: no source has a second same-register trait or a split-half reproducibility design (record 11 claim C4/C2 verdicts are N). Only our own R2c (gate failed) or a new same-register pool can.",
+    "R2": "paused (hostility-vs-praise shift confirmed 8/8 + dose-monotone; next: same-register slot pools for a second trait; the SNAM probes are paired continuations, not a J2 slot pool, so they answer cross-trait on shared contexts only); external data is structurally unable to help here: no source has a second same-register trait or a split-half reproducibility design (record 11 claim C4/C2 verdicts are N). Only our own R2c (gate failed) or a new same-register pool can.; plan 2.28 also shows the current 8 heldout contexts have almost no power for a hostility gauge (only 2 of 8 are hostility-eliciting), so the next specificity run must use the 19 discovery hostility prompts",
     "R2c": "GATE FAILED, not executable as preregistered (2026-10-28, plan 2.19). The blocking census ran on the 4080 SUPER box with the frozen model's own tokenizer.json (vocab 248,070, CPU, 1.7 s): only 56/100 BFFM adjectives are single-token. The pools plan 2.14 needs are too thin - II- (the antagonism/hostility pole) 5 survivors, III- 5, V- 2, IV+ 1; the >=6 criterion is frozen so it is NOT relaxed post hoc (5 words would give 2/3 halves, meaningless for G1). Failure mode is systematic: 'un-' prefixed words split (unkind -> ['_un','kind']) and -ful/-ive/-ant endings split (distrustful, irritable, moody). Root cause is an implementation convenience, not a bad word list: build_batch asserts equal sequence length, but S(w) is per-word and J2 is a log-mean-exp over the pool, so grouping slots by suffix length is mathematically exact. Three routes are registered in plan 2.19.2; none chosen yet.",
     "R6": "done, NEGATIVE (analytic control synthesis: closed-form u* given G. G=J'J is real and replicable (+42..+57 SD over an isotropic null, split-half r 0.64..0.94) but it answers 'minimum output movement for a given gain', NOT 'maximum gain for a given dose budget'; on the frozen model at matched M-budget it loses to G=I in 0/8 contexts (median -26.6%, p=0.0078). Rule that survives: G must match the constraint you impose; M~=I so G=I is near-optimal for dose budgets. Surrogate calibration realized/predicted ~1.3-2.7 for every arm). Follow-ups 2.17/2.18: a SINGLE dJ2 carries +/-2.0e-03 (median) to 6.5e-03 (worst) of bf16 rounding, a MEAN over 8 contexts ~9e-04; the primary verdict survives at 9.1x, the density endpoint is restored (4.4% error, 8/8 in both precisions), the 1->2 coordinate step does not survive",
     "R1": "todo",
@@ -643,9 +643,64 @@
         "s-nlp/roberta_toxicity_classifier/pytorch_model.bin": "896f52af161757594994d1fefe85ac79cbb57c9a96b26fba8ab93139b6426b8c"
       },
       "cost_when_it_runs": "128 forward/backward passes for the gradients + 24 generations + 24 capability forwards, about 3-4 min GPU, plus CPU classifier inference on 48 texts"
+    },
+    "compiler_pareto_c8": {
+      "what": "first execution of the ledger rule \"no compiler may be scored by its own objective\" (plan 2.28): 3 compilers + a positive control, one shared solver, budget 0.05, two borrowed toxicity classifiers",
+      "arms": [
+        "caa_jibes",
+        "caa_bffm",
+        "j2",
+        "known_recipe(positive control, dose 0.7)"
+      ],
+      "result_E_tox_bert": {
+        "caa_jibes": 0.0,
+        "caa_bffm": 0.0002,
+        "j2": 0.0,
+        "known_recipe": 0.0072
+      },
+      "absolute_gauge": "max P(toxic) after steering: 0.0008 / 0.0016 / 0.0008 / 0.0566 (base ~0.0005); the control crossed only on hostility_05 (0.0008 -> 0.0566, 3 hostile words) and on 1 of 8 contexts",
+      "result_R": {
+        "caa_jibes": -0.061,
+        "caa_bffm": -0.0073,
+        "j2": 0.0304,
+        "known_recipe": -0.6636,
+        "note": "j2 positive in 8/8 (the reference text is predicted BETTER after steering); the control costs 0.66 nat on 8/8"
+      },
+      "direction_disagreement": {
+        "cos(caa_jibes, j2)": -0.0024,
+        "cos(caa_bffm, j2)": 0.4902,
+        "cos(caa_jibes, caa_bffm)": 0.1767,
+        "top64_overlap": [
+          0.047,
+          0.281,
+          0.094
+        ],
+        "reading": "the same semantic definition compiled two ways gives nearly ORTHOGONAL directions, so F is a family, not a function - now measured rather than suspected"
+      },
+      "gauge_agreement": {
+        "pearson_bert_snlp": 0.9955,
+        "pearson_bert_own": 0.3318,
+        "pearson_snlp_own": 0.3747,
+        "kappa_at_0.5": null,
+        "note": "the two borrowed gauges agree with each other far better than with our own word count; kappa at 0.5 is undefined because 63 of 64 texts sit on the same side of the threshold"
+      },
+      "registered_predictions": {
+        "P1 cos(caa_jibes,j2)<0.8": "HELD (-0.0024)",
+        "P2 borrowed gauges agree more with each other": "HELD",
+        "P3 E_tox(j2) > E_tox(caa_jibes)": "HELD but vacuous (both ~0)"
+      },
+      "conclusion": "the problem is not the compiler but the CONTEXT SET and the gauge dynamic range: only 2 of the 8 heldout contexts are hostility-eliciting, and the control hit exactly one of them. At b=0.05 no compiler - including our own J2, whose readout rises +0.50 - is visible to a standard toxicity classifier. Community dose (0.6-0.8) IS visible but costs 0.66 nat.",
+      "design_flaw_mine": "using 8 mixed-trait contexts to test a hostility gauge has almost no power; next run must use the 19 discovery hostility prompts, and should also apply the gauge to the SLOT CONTINUATIONS rather than only to free generation",
+      "bugs_fixed_during_the_run": [
+        "What[l] @ float64 dtype mismatch",
+        "--size was never passed into fetch(), so a short chunk was taken as EOF (two sha256 failures at 21 MB and 206 MB)",
+        "gauge models loaded on CPU while the batch was on GPU",
+        "an empty chunk was treated as end-of-file"
+      ],
+      "model_verification": "both gauge files verified against the publisher sha256: toxic-bert model.safetensors 2c272885d24138df70bff1b3cd944a999bd6b41dad33209730aa8ba074f6ad09 (437,975,136 B), s-nlp pytorch_model.bin 896f52af161757594994d1fefe85ac79cbb57c9a96b26fba8ab93139b6426b8c (501,037,970 B); manifest /root/autodl-tmp/gauges/fetch_manifest.jsonl"
     }
   },
-  "notes": "Numbers are copied from the runs recorded in qwentest/05_plan-gradient-discovery.md; the doc renders them, so they must be edited here first. 08_reference-*.md records an external dataset's statistics with a fixed taxonomy: S strengthens / W weakens / X intersects-but-different-premises / M methodological transfer / N unusable, applied per claim in its section 11. 0.22.1: qwentest/scripts/layer_sweep.py was committed by accident inside 37487411; it is a DRAFT - never dry-run, never executed, never validated - and its status header now says so. Do not cite it. 0.23.0: corrected two of my own retrieval failures - neuronary is reachable with curl -4 and needs offset pagination to see all 141 recipes; its cloneable index.json really is count:0, so the repo and the backend disagree. 0.24.0: record 11 is generated, not written. tools/check.py gained an item `ledger`; a hand-edited matrix is caught, and every S/W/X verdict must carry a digit. 0.26.0: read the CANS TeX source and found that my own earlier note misreported its calibration numbers (one panel of two, and R(y=x) called R^2). Ledger C6xS9 downgraded S -> X. The exact parameterisation equivalence delta = sqrt(2*eps*g'F^-1*g) is now written down. 0.27.0: first tested claim from a new preprint. The registered prediction failed, and the transplant idea in ledger C2xS10 was downgraded S -> W by my own measurement. 0.28.0 (end of day, remote box shut down): compiler_pareto.py is DRY-RUN OK but never executed; fetch_models.py worked up to 280/438 MB with zero chunk failures but never reached its sha256 verification step. Both carry STATUS headers saying exactly that. next_session: resume or delete the .part, verify sha256, smoke 2 contexts, then the full run.",
+  "notes": "Numbers are copied from the runs recorded in qwentest/05_plan-gradient-discovery.md; the doc renders them, so they must be edited here first. 08_reference-*.md records an external dataset's statistics with a fixed taxonomy: S strengthens / W weakens / X intersects-but-different-premises / M methodological transfer / N unusable, applied per claim in its section 11. 0.22.1: qwentest/scripts/layer_sweep.py was committed by accident inside 37487411; it is a DRAFT - never dry-run, never executed, never validated - and its status header now says so. Do not cite it. 0.23.0: corrected two of my own retrieval failures - neuronary is reachable with curl -4 and needs offset pagination to see all 141 recipes; its cloneable index.json really is count:0, so the repo and the backend disagree. 0.24.0: record 11 is generated, not written. tools/check.py gained an item `ledger`; a hand-edited matrix is caught, and every S/W/X verdict must carry a digit. 0.26.0: read the CANS TeX source and found that my own earlier note misreported its calibration numbers (one panel of two, and R(y=x) called R^2). Ledger C6xS9 downgraded S -> X. The exact parameterisation equivalence delta = sqrt(2*eps*g'F^-1*g) is now written down. 0.27.0: first tested claim from a new preprint. The registered prediction failed, and the transplant idea in ledger C2xS10 was downgraded S -> W by my own measurement. 0.28.0 (end of day, remote box shut down): compiler_pareto.py is DRY-RUN OK but never executed; fetch_models.py worked up to 280/438 MB with zero chunk failures but never reached its sha256 verification step. Both carry STATUS headers saying exactly that. next_session: resume or delete the .part, verify sha256, smoke 2 contexts, then the full run. 0.29.0: compiler_pareto.py RAN (8 contexts, 4 arms). Its conclusion is about the CONTEXT SET and gauge range, not about compilers; and cos(caa_jibes, j2) = -0.0024 settles the family question with a number.",
   "sources": {
     "g1_g2_runs": "AutoDL /root/autodl-tmp/runs/v7/j2_19p_full|_A|_B (package v6 tree, probes/contrasts_v3.jsonl, 19 discovery prompts)",
     "verify_run": "AutoDL /root/autodl-tmp/runs/v7/verify_j2_19p (6 reused held-out probes, dose 0.02)",

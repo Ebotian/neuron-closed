@@ -78,23 +78,23 @@
 
 格内符号：**S** 增强 · **W** 弱化 · **X** 前提不同 · **N** 无信息 · `·` 未评。
 
-| 主张 | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 | S12 | 净结论 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `C1` 跨神经元的剂量归一化 dose*p50/||W_down[:,n]|| 是正确且可复用的约定 | S | S | S | · | S | · | · | · | X | · | · | · | S×4 为主，X×1 |
-| `C2` 坐标级效应可复现（换词半/换 prompt 半仍选到同一批坐标） | N | N | W | X | · | · | · | · | X | W | · | · | W×2 为主，X×2 |
-| `C3` 找到的坐标是真实、有方向、剂量单调的杠杆 | · | S | S | · | · | · | · | · | · | · | · | · | S×2 为主 |
-| `C4` 效应具有敌意特异性（vs 其他同语域特质） | N | N | N | · | · | · | · | · | · | · | · | X | 无增强，X×1 |
-| `C5` 少数稀疏坐标（top-K）能抓住该效应 | W | · | W | W | W | · | · | · | W | · | · | X | W×5 为主，X×1 |
-| `C6` 线性代理能预测效应幅度（calibration） | · | · | X | X | · | · | · | · | X | · | · | · | 无增强，X×3 |
-| `C7` 闭式最优控制 u ~ M^+g 在稠密区优于 u ~ g | · | · | · | X | · | · | · | · | · | · | · | · | 无增强，X×1 |
-| `C8` 解析组合 Q(S)=g_S' G_SS^-1 g_S 能表达多坐标的交互 | · | · | W | · | X | · | · | · | W | · | · | · | W×2 为主，X×1 |
-| `C9` 读数改善等价于行为改善 | · | W | W | · | · | · | X | · | · | · | · | W | W×3 为主，X×1 |
-| `C10` 层 13-14 是对的作用层 | X | · | · | X | X | · | · | · | X | · | · | · | 无增强，X×4 |
-| `C11` 读数数值误差可控（可跨 run 比较 1e-03 级差异） | · | · | · | · | · | W | · | S | · | · | · | · | S/W 相抵 |
-| `C12` 读数/标签可由 LLM 判官可靠给出 | W | S | · | · | · | · | · | · | · | · | · | · | S/W 相抵 |
-| `C13` 输出形式应为『神经元+符号+强度』的短列表 | · | · | · | W | W | · | · | · | S | · | X | · | W×2 为主，X×1 |
-| `C14` 语义编译 tau -> J_tau 是整个映射的主要难点 | X | · | · | · | · | · | S | · | S | · | · | S | S×3 为主，X×1 |
-| `C15` Additive injection and multiplicative scaling are in | · | · | · | · | · | · | · | · | W | · | · | · | W×1 为主 |
+| 主张 | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 | S12 | S13 | 净结论 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `C1` 跨神经元的剂量归一化 dose*p50/||W_down[:,n]|| 是正确且可复用的约定 | S | S | S | · | S | · | · | · | X | · | · | · | · | S×4 为主，X×1 |
+| `C2` 坐标级效应可复现（换词半/换 prompt 半仍选到同一批坐标） | N | N | W | X | · | · | · | · | X | W | · | · | · | W×2 为主，X×2 |
+| `C3` 找到的坐标是真实、有方向、剂量单调的杠杆 | · | S | S | · | · | · | · | · | · | · | · | · | · | S×2 为主 |
+| `C4` 效应具有敌意特异性（vs 其他同语域特质） | N | N | N | · | · | · | · | · | · | · | · | X | N | 无增强，X×1 |
+| `C5` 少数稀疏坐标（top-K）能抓住该效应 | W | · | W | W | W | · | · | · | W | · | · | X | · | W×5 为主，X×1 |
+| `C6` 线性代理能预测效应幅度（calibration） | · | · | X | X | · | · | · | · | X | · | · | · | · | 无增强，X×3 |
+| `C7` 闭式最优控制 u ~ M^+g 在稠密区优于 u ~ g | · | · | · | X | · | · | · | · | · | · | · | · | · | 无增强，X×1 |
+| `C8` 解析组合 Q(S)=g_S' G_SS^-1 g_S 能表达多坐标的交互 | · | · | W | · | X | · | · | · | W | · | · | · | · | W×2 为主，X×1 |
+| `C9` 读数改善等价于行为改善 | · | W | W | · | · | · | X | · | · | · | · | W | W | W×4 为主，X×1 |
+| `C10` 层 13-14 是对的作用层 | X | · | · | X | X | · | · | · | X | · | · | · | · | 无增强，X×4 |
+| `C11` 读数数值误差可控（可跨 run 比较 1e-03 级差异） | · | · | · | · | · | W | · | S | · | · | · | · | · | S/W 相抵 |
+| `C12` 读数/标签可由 LLM 判官可靠给出 | W | S | · | · | · | · | · | · | · | · | · | · | · | S/W 相抵 |
+| `C13` 输出形式应为『神经元+符号+强度』的短列表 | · | · | · | W | W | · | · | · | S | · | X | · | · | W×2 为主，X×1 |
+| `C14` 语义编译 tau -> J_tau 是整个映射的主要难点 | X | · | · | · | · | · | S | · | S | · | · | S | S | S×4 为主，X×1 |
+| `C15` Additive injection and multiplicative scaling are in | · | · | · | · | · | · | · | · | W | · | · | · | · | W×1 为主 |
 
 ### 每条判定的数值依据（程序校验：S/W/X 必须含数字）
 
@@ -119,6 +119,7 @@
 | C13 | S9 | **S** | they clip alpha to [0.25, 1.75] (a=0.75) and rely on 'F is diagonal and positive definite, clipping cannot increase the quadratic preservation cost'; uncapped /delta alpha/ reaches 20.57 and 42.25 while at most 0.352% of neurons get clipped — so our output form needs a box constraint / dose ceiling field - we do not have one |
 | C14 | S1 | **X** | 其对 persona 的定义是 LLM 给的标签，不是可微目标，无法与我们 J2 的编译路径比较 |
 | C14 | S12 | **S** | it validates directions against a theory-specified structure (Schwartz 20 values, MFT 6 foundations) rather than isolated behaviours, which is exactly the compiler-level test we lack — supports C14 and gives the design |
+| C14 | S13 | **S** | three compilers gave cos(caa_jibes, j2) = -0.0024 and top-64 overlap 0.047 for the SAME semantic definition, so 'one semantics -> one direction' is refuted; the family claim is now measured, not suspected — record 2.28; also CAA vs BFFM words: cos 0.1767 |
 | C14 | S7 | **S** | 同一坐标在两个不同读数的结论相反（J1 vs J2），证明 tau->J 的定义支配结论 |
 | C14 | S9 | **S** | it separates 2 explicit proxies (target-token log-prob for behaviour, output-distribution KL for capability), so the compiler's definition directly determines the optimised object — the compiler's definition directly determines the optimised object |
 | C15 | S9 | **W** | Prop. 1, verbatim: g_j = (1//D_steer/) sum sum_p h_pj dP_sigma/dh_pj, i.e. activation times gradient; multiplicative gain is proportional to the activation, so at h=0 it is 0 — the additive injection we use can open a silent neuron; confirmed in the TeX, not only the README |
@@ -132,6 +133,7 @@
 | C3 | S3 | **S** | 同一坐标 L14-only 6 个 violent terms vs 无干预 0；剂量 0.4-0.6 安静 / 1.0 恶意 |
 | C4 | S1 | **N** | 只有『是否 persona』，不是敌意 vs 其他特质 |
 | C4 | S12 | **X** | they test specificity with Schwartz 20-value and MFT 6-foundation compatible/opposing structure, but not a same-register semantic trait on our J2 readout — its design (many traits + predicted relations) is what our R2c lacks |
+| C4 | S13 | **N** | the 8 heldout contexts contain only 2 hostility-eliciting prompts (hostility_04/05), and the control's single gauge hit was on hostility_05; so this run has almost no power for specificity — design flaw of mine, recorded; next run must use the 19 discovery hostility prompts |
 | C4 | S2 | **N** | 只有敌意一个轴，无同语域对照 |
 | C4 | S3 | **N** | 无对照特质 |
 | C5 | S1 | **W** | 884,736 对里 persona 仅 3.87%，且干净 persona 只有 0.2405%（1/16） |
@@ -148,6 +150,7 @@
 | C8 | S5 | **X** | 社区多坐标配方普遍给 overlap 效应描述（mashup 27 条），但无剂量-响应数据 |
 | C8 | S9 | **W** | their Limitations, verbatim: 'retains only the Fisher diagonal ..., omitting neuron interactions and their joint roles'; put beside our measured 6+1 -> 16 (2.3x superadditive), both frameworks are on the same boundary — now citable from the paper body, not just the README |
 | C9 | S12 | **W** | its central finding is that steering success on isolated behaviours can be a behaviour-specific shortcut; consistent with our b=0.5 result (+1.27 readout while the capability proxy collapses by 0.64 nat) — independent support for our readout != behaviour |
+| C9 | S13 | **W** | at b=0.05 every compiler moved the toxicity gauge by 0.0000-0.0002 (max P(toxic) 0.0008-0.0016 over a 0.0005 base) while j2's own readout rose +0.50 at the same coordinate; the positive control reached only 0.0566 and only on 1 of 8 contexts while costing -0.6636 nat of reference logP — readout != behaviour, now measured with a gauge that belongs to no compiler |
 | C9 | S2 | **W** | 行为 hostile 峰在 0.75，2.0 时塌到 1/20，而 broken 到 20/20 => 读数式指标与行为不同步 |
 | C9 | S3 | **W** | 1.0 报『完全恶意』、1.2 已『不连贯』，可用窗很窄 |
 | C9 | S7 | **X** | 其读数是 logit 期望，且与 J2 不可混用 |
@@ -168,6 +171,7 @@
 | S10 | RACE (2608.24758 v2) + code | several including small LLMs | - | no dose: forward-pass statistics (RDA + Normal | domain-wide functional-consistency score | neuron x token (streaming) | domain-wide | — |
 | S11 | Sparsified MLPs vs Transcoders (2610.24521 v1) | 13 open-source transcoders | - | no dose: feature-neuron weight alignment analy | alignment of transcoder features with ML | feature x transcoder | — | — |
 | S12 | Steering Geometry (2609.06289 v1, EMNLP 2026) + code/dataset | several + Schwartz 20 values / MFT 6 foundations | - | contrastive vectors (CAA/SAS/Spherical/ODE/OPT | geometric alignment + behavioural effect | value x method | — | — |
+| S13 | two borrowed toxicity classifiers run on our own generation | unitary/toxic-bert (apache-2.0) + s-nlp/roberta_toxicity_classifier (openrail++) | fp32 on GPU | not a steering source: scores generated text | P(toxic) per generated reply | reply | 8 | — |
 
 <!-- auto:evidence-matrix:end -->
 

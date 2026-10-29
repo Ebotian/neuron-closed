@@ -1,6 +1,6 @@
 {
  "schema": "qwentest-external-evidence-v1",
- "built": "2026-10-28c",
+ "built": "2026-10-29a",
  "purpose": "external sources vs our closed-form inverse-mapping claims, with numeric basis",
  "verdict_scale": {
   "S": "strengthens",
@@ -237,6 +237,23 @@
    "judge_kappa": null,
    "verifiable": "partial (code+dataset public; paper body NOT read)",
    "licence": "repo licence",
+   "rows_committed": false
+  },
+  {
+   "id": "S13",
+   "label": "two borrowed toxicity classifiers run on our own generation",
+   "record": "05_plan 2.28 + 07_results/compiler_pareto_c8.json",
+   "model": "unitary/toxic-bert (apache-2.0) + s-nlp/roberta_toxicity_classifier (openrail++)",
+   "quant": "fp32 on GPU",
+   "dose_def": "not a steering source: scores generated text",
+   "dose_range": null,
+   "outcome": "P(toxic) per generated reply",
+   "unit": "reply",
+   "n_contexts": 8,
+   "judge": "two classifiers, agreement Pearson 0.9955",
+   "judge_kappa": null,
+   "verifiable": "yes (models sha256-pinned, 07_results carries every text)",
+   "licence": "apache-2.0 / openrail++",
    "rows_committed": false
   }
  ],
@@ -659,6 +676,27 @@
    "verdict": "S",
    "basis": "they clip alpha to [0.25, 1.75] (a=0.75) and rely on 'F is diagonal and positive definite, clipping cannot increase the quadratic preservation cost'; uncapped |delta alpha| reaches 20.57 and 42.25 while at most 0.352% of neurons get clipped",
    "note": "so our output form needs a box constraint / dose ceiling field - we do not have one"
+  },
+  {
+   "claim": "C14",
+   "source": "S13",
+   "verdict": "S",
+   "basis": "three compilers gave cos(caa_jibes, j2) = -0.0024 and top-64 overlap 0.047 for the SAME semantic definition, so 'one semantics -> one direction' is refuted; the family claim is now measured, not suspected",
+   "note": "record 2.28; also CAA vs BFFM words: cos 0.1767"
+  },
+  {
+   "claim": "C9",
+   "source": "S13",
+   "verdict": "W",
+   "basis": "at b=0.05 every compiler moved the toxicity gauge by 0.0000-0.0002 (max P(toxic) 0.0008-0.0016 over a 0.0005 base) while j2's own readout rose +0.50 at the same coordinate; the positive control reached only 0.0566 and only on 1 of 8 contexts while costing -0.6636 nat of reference logP",
+   "note": "readout != behaviour, now measured with a gauge that belongs to no compiler"
+  },
+  {
+   "claim": "C4",
+   "source": "S13",
+   "verdict": "N",
+   "basis": "the 8 heldout contexts contain only 2 hostility-eliciting prompts (hostility_04/05), and the control's single gauge hit was on hostility_05; so this run has almost no power for specificity",
+   "note": "design flaw of mine, recorded; next run must use the 19 discovery hostility prompts"
   }
  ]
 }

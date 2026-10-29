@@ -77,10 +77,18 @@ def fetch(url: str, dest: Path, size_hint: int | None, chunk: int, retries: int)
             total = f'{size_hint / 1e6:.0f}' if size_hint else '?'
             print(f'  [{dest.name}] {got / 1e6:7.1f}/{total} MB', flush=True)
             attempt = 0
-            # a short chunk means the server had nothing more to give: that is the end of file
-            if not size_hint and len(data) < (hi - lo + 1):
-                break
             if len(data) == 0:
+                # An EMPTY response is a transient failure, not end-of-file: the first version broke
+                # out of the loop here and then reported a SHA256 mismatch on a 21 MB fragment. When
+                # the total size is known we keep going until it is reached; only with no size hint
+                # do we accept an empty chunk as the end.
+                if size_hint:
+                    print(f'  [{dest.name}] empty chunk at {lo}, retrying', flush=True)
+                    time.sleep(2)
+                    continue
+                break
+            # a short chunk with no size hint means the server had nothing more: end of file
+            if not size_hint and len(data) < (hi - lo + 1):
                 break
             continue
         print(f'  [{dest.name}] chunk {lo}-{hi} failed (http={code or "?"}), '
@@ -89,6 +97,9 @@ def fetch(url: str, dest: Path, size_hint: int | None, chunk: int, retries: int)
         if attempt >= retries:
             raise SystemExit(f'give up on {dest} after {retries} attempts at offset {lo}')
         time.sleep(min(2 ** attempt, 30))
+    if size_hint and tmp.stat().st_size != size_hint:
+        raise SystemExit(f'{dest}: stopped at {tmp.stat().st_size} of {size_hint} bytes; '
+                         f'keeping {tmp} for a later resume')
     if dest.exists():
         dest.unlink()
     tmp.rename(dest)
@@ -110,10 +121,16 @@ def main():
     if not (len(a.model) == len(a.file) == len(a.sha256)):
         raise SystemExit('--model/--file/--sha256 must be given the same number of times')
 
+    sizes = a.size or []
+    if sizes and len(sizes) != len(a.model):
+        raise SystemExit('--size, when given, must be repeated once per --file (or omitted entirely)')
+    if not sizes:
+        sizes = [None] * len(a.model)
+
     dest_root = Path(a.dest)
     manifest = Path(a.manifest) if a.manifest else dest_root / 'fetch_manifest.jsonl'
     manifest.parent.mkdir(parents=True, exist_ok=True)
-    for repo, name, want in zip(a.model, a.file, a.sha256):
+    for repo, name, want, size in zip(a.model, a.file, a.sha256, sizes):
         dest = dest_root / repo.replace('/', '_') / name
         url = f'{a.endpoint}/{repo}/resolve/main/{name}'
         if dest.exists() and sha256_file(dest) == want:
@@ -121,7 +138,10 @@ def main():
         else:
             print(f'[get ] {repo}/{name} -> {dest}  (chunk {a.chunk >> 20} MiB)', flush=True)
             t0 = time.time()
-            fetch(url, dest, None, a.chunk, a.retries)
+            # NOTE: the first version hardcoded None here, so --size never reached fetch() and a short
+            # chunk was accepted as end-of-file; that produced two SHA256 mismatches on 21 MB and
+            # 206 MB fragments before the wiring bug was found.
+            fetch(url, dest, size, a.chunk, a.retries)
             got = sha256_file(dest)
             if got != want:
                 raise SystemExit(f'SHA256 MISMATCH for {dest}: got {got} want {want}')
