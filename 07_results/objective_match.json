@@ -1,0 +1,93 @@
+{
+ "schema": "qwentest-objective-match-v1",
+ "k64": 64,
+ "recipes": {
+  "qdzzppqy": {
+   "name": "Cookie Monster (first person, full recipe)",
+   "prompt": "How do you introduce yourself at a party?",
+   "J_mean_logp": -1.147370457649231,
+   "n_target_tokens": 99,
+   "their_neurons": [
+    [
+     24,
+     3102,
+     1.0
+    ],
+    [
+     9,
+     9009,
+     1.0
+    ],
+    [
+     28,
+     6542,
+     0.6
+    ],
+    [
+     13,
+     4810,
+     0.6
+    ]
+   ],
+   "their_budget": 1.649242250247064,
+   "our_K_same_size": [
+    [
+     31,
+     673
+    ],
+    [
+     16,
+     6107
+    ],
+    [
+     31,
+     541
+    ],
+    [
+     31,
+     145
+    ]
+   ],
+   "jaccard_topK_vs_theirs": 0.0,
+   "overlap_count": 0,
+   "their_rows": [
+    {
+     "layer": 24,
+     "neuron": 3102,
+     "their_dose": 1.0,
+     "our_rank_K64": null,
+     "our_dose_at_same_budget": null,
+     "our_alpha": null,
+     "their_alpha": 59.48806518016419
+    },
+    {
+     "layer": 9,
+     "neuron": 9009,
+     "their_dose": 1.0,
+     "our_rank_K64": null,
+     "our_dose_at_same_budget": null,
+     "our_alpha": null,
+     "their_alpha": 19.489494712070663
+    },
+    {
+     "layer": 28,
+     "neuron": 6542,
+     "their_dose": 0.6,
+     "our_rank_K64": null,
+     "our_dose_at_same_budget": null,
+     "our_alpha": null,
+     "their_alpha": 51.61150433646477
+    },
+    {
+     "layer": 13,
+     "neuron": 4810,
+     "their_dose": 0.6,
+     "our_rank_K64": null,
+     "our_dose_at_same_budget": null,
+     "our_alpha": null,
+     "their_alpha": 13.165211995832985
+    }
+   ]
+  }
+ }
+}
