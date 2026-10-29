@@ -38,13 +38,15 @@ ROOT = HERE.parent
 
 
 def build_M(lm, layers, dev):
+    """Keep the Gram blocks ON THE GPU: the greedy does millions of small gathers and matvecs, and
+    a single CPU thread costs ~0.15 s per step (measured) against ~0.01 s on the GPU."""
     M = {}
     for l in layers:
         Wt = lm.layers[l].mlp.down_proj.weight.detach().float().T.to(dev)
         Wt = Wt / Wt.norm(dim=1, keepdim=True).clamp(min=1e-12)
-        M[l] = (Wt @ Wt.T).cpu()
+        M[l] = Wt @ Wt.T
         del Wt
-        torch.cuda.empty_cache()
+    torch.cuda.empty_cache()
     return M
 
 
@@ -52,9 +54,10 @@ def greedy_trace(M, g, layers, dims, K, log_every=512):
     """Global greedy; also returns each layer's OWN marginal curve (valid because M is
     block-diagonal: picking a coordinate in layer l never changes another layer's marginals)."""
     S = {l: [] for l in layers}
-    P = {l: torch.zeros(0, 0, dtype=torch.float64) for l in layers}
-    y = {l: torch.zeros(0, dtype=torch.float64) for l in layers}
+    P = {l: torch.zeros(0, 0, dtype=torch.float64, device=g[l].device) for l in layers}
+    y = {l: torch.zeros(0, dtype=torch.float64, device=g[l].device) for l in layers}
     diag = {l: torch.diagonal(M[l]).double() for l in layers}
+    ar = {l: torch.arange(dims[l], device=diag[l].device) for l in layers}
     lmarg = {l: [] for l in layers}
     order = []
     for step in range(K):
@@ -64,9 +67,9 @@ def greedy_trace(M, g, layers, dims, K, log_every=512):
             if k >= dims[l]:
                 continue
             if k:
-                v = M[l][:, S[l]].double()
+                v = M[l].index_select(1, torch.tensor(S[l], device=M[l].device)).double()
                 gain = (g[l] - v @ y[l]) ** 2 / (diag[l] - ((v @ P[l]) * v).sum(1)).clamp(min=1e-12)
-                gain[torch.tensor(S[l])] = -float('inf')
+                gain[torch.tensor(S[l], device=gain.device)] = -float('inf')
             else:
                 gain = g[l] ** 2 / diag[l]
             j = int(torch.argmax(gain))
@@ -75,10 +78,10 @@ def greedy_trace(M, g, layers, dims, K, log_every=512):
         _, (l, j) = best
         k = len(S[l])
         if k:
-            vj = M[l][S[l], j].double()
+            vj = M[l].index_select(0, torch.tensor(S[l], device=M[l].device))[:, j].double()
             Pv = P[l] @ vj
             dj = float(diag[l][j] - vj @ Pv)
-            newP = torch.zeros(k + 1, k + 1, dtype=torch.float64)
+            newP = torch.zeros(k + 1, k + 1, dtype=torch.float64, device=g[l].device)
             newP[:k, :k] = P[l] + torch.outer(Pv, Pv) / dj
             newP[:k, k] = -Pv / dj
             newP[k, :k] = -Pv / dj
@@ -116,9 +119,10 @@ def Qof(M, g, S, layers):
     for l in layers:
         js = S[l]
         if js:
-            idx = torch.tensor(js)
-            Ms = M[l][idx][:, idx].double()
-            tot += float(g[l][idx] @ torch.linalg.solve(Ms, g[l][idx]))
+            idx = torch.tensor(js, device=M[l].device)
+            Ms = M[l].index_select(0, idx).index_select(1, idx).double()
+            gl = g[l].index_select(0, idx)
+            tot += float(gl @ torch.linalg.solve(Ms, gl))
     return tot
 
 
@@ -143,32 +147,47 @@ def main():
     dims = {l: int(lm.layers[l].mlp.down_proj.weight.shape[1]) for l in layers}
     torch.set_num_threads(int(__import__('os').environ.get('CPU_THREADS', '1')))
     M = build_M(lm, layers, dev)
-    print(f'M: {sum(m.numel() * 4 for m in M.values()) / 1e9:.1f} GB CPU, threads={torch.get_num_threads()}',
-          flush=True)
+    print(f'M: {sum(m.numel() * 4 for m in M.values()) / 1e9:.1f} GB on {dev}; '
+          f'gpu mem {torch.cuda.memory_allocated() / 1e9:.1f} GB', flush=True)
 
     G = np.load(a.g)
-    g = {l: torch.tensor(G['pooled'][l], dtype=torch.float64) for l in layers}
+    g = {l: torch.tensor(G['pooled'][l], dtype=torch.float64, device=dev) for l in layers}
 
     rules = {}
-    rules['absg'] = {l: torch.argsort(g[l].abs(), descending=True)[:K].tolist() for l in layers}
+    abs_order = []
+    gl = torch.cat([g[l].abs() for l in layers])
+    top = torch.argsort(gl, descending=True)[:K]
+    off = 0
+    for l in layers:
+        abs_order += [(l, int(i - off)) for i in top.tolist() if off <= i < off + dims[l]]
+        off += dims[l]
+    rules['absg'] = list(abs_order)
     print('absg done', flush=True)
 
     order, S_g, lmarg = greedy_trace(M, g, layers, dims, K)
-    rules['greedy'] = {l: list(v) for l, v in S_g.items()}
+    rules['greedy'] = [list(t) for t in order]
     print('greedy done', flush=True)
 
     # ---- umag: |u| with u = M^+ g, via the plan-2.21 identity (B is 2,560^2, not 9,216^2) ----
-    umag = {}
+    umag_flat = []
     for l in layers:
-        Wl = lm.layers[l].mlp.down_proj.weight.detach().double().T.cpu()      # 9216 x 2560
+        Wl = lm.layers[l].mlp.down_proj.weight.detach().double().T.to(dev)    # 9216 x 2560
         Wl = Wl / Wl.norm(dim=1, keepdim=True).clamp(min=1e-12)
         B = Wl.T @ Wl
         e = Wl.T @ g[l]
         dstar = torch.linalg.solve(B, e)
         u = Wl @ torch.linalg.solve(B, dstar)
-        umag[l] = torch.argsort(u.abs(), descending=True)[:K].tolist()
+        umag_flat.append(u.abs())
         del Wl, B
-    rules['umag'] = umag
+        torch.cuda.empty_cache()
+    gu = torch.cat(umag_flat)
+    umag_order = []
+    off = 0
+    for l in layers:
+        umag_order += [(l, int(i - off)) for i in torch.argsort(gu, descending=True)[:K].tolist()
+                       if off <= i < off + dims[l]]
+        off += dims[l]
+    rules['umag'] = umag_order
     print('umag done', flush=True)
 
     # ---- waterfill: per-layer concave curves, equal-slope allocation, greedy prefix inside ----
@@ -187,31 +206,42 @@ def main():
             take[l] = k + 1
     alloc = {l: take.get(l, 0) for l in layers}
     print('waterfill allocation: ' + ', '.join(f'L{l}:{alloc[l]}' for l in layers if alloc[l]), flush=True)
-    rules['waterfill'] = {l: rules['greedy'][l][:alloc[l]] for l in layers}
+    # waterfill keeps the greedy order but truncates each layer at its allocated count; the
+    # induced global order is the greedy order filtered to the allocated prefix per layer.
+    keep = {l: set(rules['greedy'][i][1] for i in range(len(rules['greedy']))
+                   if rules['greedy'][i][0] == l) for l in layers}
+    wf = []
+    seen = {l: 0 for l in layers}
+    for (l, j) in rules['greedy']:
+        if seen[l] < alloc[l]:
+            wf.append([l, j]); seen[l] += 1
+    rules['waterfill'] = wf
 
     rng = np.random.default_rng(a.seed)
-    rules['random'] = {l: [int(x) for x in rng.choice(dims[l], size=min(K // len(layers) + 1, dims[l]),
-                                                    replace=False)] for l in layers}
+    rnd = []
+    for l in layers:
+        for n in rng.choice(dims[l], size=min(K // len(layers) + 1, dims[l]), replace=False):
+            rnd.append([l, int(n)])
+    rules['random'] = rnd
 
     out = {'schema': 'qwentest-select-rules-v1', 'machine': platform.node(),
            'ks': ks, 'K': K, 'layers': layers, 'dim_per_layer': dims,
            'scope': 'surrogate Q only, no readout measured; external judging happens separately',
            'waterfill_allocation': {str(l): alloc[l] for l in layers},
            'greedy_marginals_tail': {str(l): [round(x, 8) for x in lmarg[l][-3:]] for l in layers if lmarg[l]},
-           'Q_at_K': {}, 'layer_histogram': {}, 'lists': {}}
+           'Q_at_K': {}, 'layer_histogram': {}, 'order': {}}
     for name, S in rules.items():
         out['Q_at_K'][name] = {}
         for k in ks:
-            sub, left = {}, k
-            for l in layers:
-                take_n = min(left, len(S[l]))
-                sub[l] = S[l][:take_n]
-                left -= take_n
-                if left == 0:
-                    break
+            sub = {l: [] for l in layers}
+            for (l, j) in S[:k]:
+                sub[l].append(j)
             out['Q_at_K'][name][str(k)] = Qof(M, g, sub, layers)
-        out['layer_histogram'][name] = {str(l): len(S[l]) for l in layers if S[l]}
-        out['lists'][name] = {str(l): S[l] for l in layers}
+        hist = {}
+        for (l, j) in S:
+            hist[str(l)] = hist.get(str(l), 0) + 1
+        out['layer_histogram'][name] = hist
+        out['order'][name] = S
         print(f'{name}: Q ' + ', '.join(f'K={k}:{v:.3f}' for k, v in out['Q_at_K'][name].items()), flush=True)
 
     Path(a.out).write_text(json.dumps(out, ensure_ascii=False))
