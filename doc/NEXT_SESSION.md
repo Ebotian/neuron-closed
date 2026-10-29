@@ -30,6 +30,13 @@ State is in the repo, not in a chat log. Everything below is committed.
   Adding `--dense` first used coordinate indices as neuron ids; every budget moved 3–13% while all cosines stayed
   at 0.995 and the sign tests stayed plausible. After the fix the `u_I` arm reproduces bit-for-bit.
 
+## 本仓的边界与外部文件
+
+- **入 git**：`doc/`、`results/`、`scripts/`、`tools/`、`vendor/`（文本）、`lexicons/`、`probes/`、`evidence/`。
+- **不入 git**：`packages/*.zip`、`archives/*.zip`（原始压缩包，未跟踪；本地备份在 `~/neuron-closed-local/`）、
+  模型权重、社区数据快照（neuronary / neuron-explorer 缓存，只在 `doc/references/` 记统计量与 sha）。
+- 因此 `make check` 的 `ziptrees` 项在干净 clone 上遍历到 0 个 zip（通过）；原始压缩包只在本机。
+
 ## Remote
 `ssh -p 25785 root@connect.westc.seetacloud.com` (4080 SUPER, 32 GB). Caveats:
 - **cannot reach huggingface.co**; use `https://hf-mirror.com` (curl, ranged requests work).
