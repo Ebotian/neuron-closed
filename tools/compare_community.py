@@ -43,6 +43,11 @@ def pct(sorted_vals, v):
 
 g = np.load(sys.argv[1] if len(sys.argv) > 1 else '/tmp/g_all32.npz')
 gpool = np.abs(g['pooled']).reshape(-1)
+if not (CACHE / 'steer_index.npz').exists():
+    raise SystemExit(
+        f'community caches not found in {CACHE}\n'
+        f'  set NEURON_EXPLORER_CACHE to a clone of lyramakesmusic/neuron-explorer\n'
+        f'  (clone it OUTSIDE this repo: that data is MIT but is not redistributed here)')
 st = np.load(CACHE / 'steer_index.npz')
 kl_up = flat(np.maximum(st['up_kl'], 0)); kl_dn = flat(np.maximum(st['down_kl'], 0))
 kl_mean = 0.5 * (kl_up + kl_dn)
@@ -91,18 +96,25 @@ for K in (64, 256, 1024, 4096):
 # ---------------------------------------------------------------- B. their recipe coordinates
 cc_path = os.environ.get('NEURON_COMMUNITY_COORDS', '')
 comm = json.load(open(cc_path)) if cc_path and os.path.exists(cc_path) else None
-cc = [(int(c['layer']), int(c['neuron'])) for c in comm['coords']]
-print(f'\n=== B. their {len(cc)} recipe coordinates, scored by both instruments ===')
-pcts = [pct(sorted_kl, kl_mean[idx_of(l, n)]) for l, n in cc]
-print(f'  their KL_mean percentile: median {statistics.median(pcts):.3f} '
-      f'p90 {np.percentile(pcts, 90):.3f} max {max(pcts):.3f}')
-above = sum(1 for p in pcts if p > 0.90)
-print(f'  coordinates in their own top-10% by KL: {above}/{len(pcts)} ({above / len(pcts):.1%}; random 10%)')
-myrank = {}
-for r in ours32[:1024]:
-    myrank[(int(r['layer']), int(r['neuron']))] = int(r['rank'])
-inlist = [(c, myrank[c]) for c in cc if c in myrank]
-print(f'  coordinates inside our 32-layer top-1024: {len(inlist)} -> {inlist}')
+if comm:
+    cc = [(int(c['layer']), int(c['neuron'])) for c in comm['coords']]
+else:
+    cc = []
+    print('\n=== B. skipped: set NEURON_COMMUNITY_COORDS to their recipe snapshot ===')
+
+if cc:
+    print(f'\n=== B. their {len(cc)} recipe coordinates, scored by both instruments ===')
+    pcts = [pct(sorted_kl, kl_mean[idx_of(l, n)]) for l, n in cc]
+    print(f'  their KL_mean percentile: median {statistics.median(pcts):.3f} '
+          f'p90 {np.percentile(pcts, 90):.3f} max {max(pcts):.3f}')
+    above = sum(1 for p in pcts if p > 0.90)
+    print(f'  coordinates in their own top-10% by KL: {above}/{len(pcts)} '
+          f'({above / len(pcts):.1%}; random 10%)')
+    myrank = {}
+    for r in ours32[:1024]:
+        myrank[(int(r['layer']), int(r['neuron']))] = int(r['rank'])
+    inlist = [(c, myrank[c]) for c in cc if c in myrank]
+    print(f'  coordinates inside our 32-layer top-1024: {len(inlist)} -> {inlist}')
 
 # ---------------------------------------------------------------- C. semantics of our positions
 vocab = json.load(open(CACHE / 'vocab.json'))
