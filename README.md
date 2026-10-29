@@ -6,6 +6,19 @@
 这条工作线在 `rsi-dev` 单仓里原名 `qwentest`（2026-10 迁出，历史保留）。它属于仪器/方法层：
 **不**回答"开源世界获取能否改进通用搜索"，只回答"给定一个目标，位置与剂量能不能被算出来、算到什么精度、边界在哪"。
 
+## In one paragraph (English)
+
+A closed-form solver for **neuron-level steering** in Qwen3.5-4B: the direction is `u = ŴB⁻¹d*`
+with budget `√(uᵀMu)` (enforced to 5.55e-17), and the **positions** are chosen by greedy
+maximisation of `Q(S) = g_Sᵀ M_SS⁻¹ g_S` over all 32 layers. The deliverable is **(position, change)
+pairs** — layer, neuron, sign, dose `u`, raw activation delta `alpha`, residual displacement and the
+Q share — not a bare list. Every number in the docs is re-derived by `make check` (stdlib only, no
+GPU, no torch); the repo states its own boundaries: with the **same objective** as a behavioural
+search, our **direction** agrees to 93–99% but the exact 1–4 coordinate **list** is *not* recoverable
+(1.7%, invariant to prompt surfaces and to second order).
+
+**Cite as** `neuron-closed v0.47.0`, https://github.com/Ebotian/neuron-closed (see `CITATION.cff`).
+
 ## 索引
 
 | 路径 | 说明 |
