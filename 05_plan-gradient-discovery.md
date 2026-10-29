@@ -1897,3 +1897,37 @@ u_known 只有 2 个非零坐标；u_II− 的 top-64 命中其中 1 个
 
 每次实验只写三样东西：`scan` 的 manifest、`stability` 的 json、`verify/calibrate` 的 summary；**数字先进 `metadata.json`，再 `make -C qwentest meta && make -C qwentest check`**；把它们与本文件的 G1–G5 对照表抄进结论段，并注明**代码版本**（v6 起 `package_release` 会写进 manifest）。
 跨版本比较只允许比较「同一判据下的数字」，不允许跨版本比较绝对值。
+
+### 2.33 目标指向性：把启发式换成一个**声明的编码方案**（并修正我自己的两次错判）
+
+§2.31 用「`you` 在脏话 40 字符内」当"对目标敌意"的替身，有两处硬洞：只对**脏话**生效（可我们的探针本身的敌意续写常常不带动词脏话，如 "You are incompetent"、"Only a fool"），
+且不说"这是谁的侮辱"。`scripts/target_directedness.py` 把它换成**书面方案 + 机械编码 + 未决项照实上报**，并**重编码全部 252 条已存生成**（无 GPU）。
+
+**方案**：INSULT ∈ {手写脏话 17 词} ∪ {Jibes adj hostile 池（Apache-2.0）} ∪ {BFFM `II−`（CC0）} ∪ {手写侮辱名词 11 词}；
+referent ∈ {SELF, ADDRESSEE, THIRD, NONE, **UNRESOLVED**}；按**有序模式**判定（呼语 "you idiot"、系表 "you're <ins>"、"I'm <ins>"、
+冠词名词 "acting like an idiot" 取**最近前置主语**、定语修饰物体名词 → NONE、`<人> is <ins>` → THIRD）；
+**匹配不到就报 UNRESOLVED，不猜**。
+
+**我修掉的两次错判（都在报数之前）**：
+1. **v1 把 Jibes 的动词池当侮辱词** —— 该池是"You can't even {w}"框架选出来的（hold/wait/stop/read/tell/use），任何动词在那一框里都像贬损，**不是侮辱词**；
+2. **v2 仍用窗口内最近代词** —— "this stupid question … and I'm genuinely annoyed" 被判成 SELF，因为 `I'm` 更近；**跟在侮辱之后的代词不可能是它的主语**。
+
+**覆盖**：252 条里 **92.4% 可判定**（NONE 198 / SELF 39 / ADDRESSEE 18 / THIRD 0 / **UNRESOLVED 21**）。未决项全部进入盲审表。
+
+**重编码后的 `II−` 剖面**（target-directed = ADDRESSEE+THIRD）：
+
+| b | SELF | ADDRESSEE | NONE | UNRESOLVED | target-directed |
+|---:|---:|---:|---:|---:|---:|
+| 0.05 | 0 | 0 | 12 | 0 | **0** |
+| 0.2 | 0 | 2 | 10 | 0 | **2** |
+| 0.3 | 0 | 3 | 4 | 5 | **3** |
+| 0.4 | 2 | 2 | 4 | 4 | **2** |
+| 0.5 | 5 | 1 | 2 | 4 | **1** |
+| 0.7 | **10** | 2 | 0 | 0 | **2** |
+
+**对我自己两条结论的修正**：
+- **§2.31「峰值在 b=0.3–0.4（4/12）」→ 改为「峰值在 b=0.2–0.3（2–3/12），且 b=0.7 时 SELF=10/12」**。形状（先升后降、自贬上升）**不变**，但绝对值更低、峰更早。
+- **§2.30 的 CR2（`II−` 的"指向对方"高于其余四池）要降级**：v3 下 `II−` 2/12 vs `III−` 0/12、`I−` 0/12 —— 方向仍为正，但**差距只有 2 对 0**，不足以单独支撑"指向性特异"。CR1（毒性）与 CR3（IV− 未追平）**不受影响**。
+
+**未完成的那一步**：方案本身还不是量过的仪器。已生成 **48 条盲审表**（`07_results/target_directedness_audit_sheet.csv` + 私有映射），
+需要人按 `human_target_directed_0to1` / `human_self_abuse_0to1` 打分，才能报出编码者与人的一致率（κ）。在此之前它只是**代理**。

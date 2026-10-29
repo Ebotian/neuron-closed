@@ -1,0 +1,338 @@
+[
+ {
+  "item_id": "D0000",
+  "run": "pools_b07",
+  "arm": "II",
+  "context": "hostility_05",
+  "machine_label": "SELF"
+ },
+ {
+  "item_id": "D0001",
+  "run": "ii_budget",
+  "arm": "BASE",
+  "context": "hostility_08",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0002",
+  "run": "ii_budget",
+  "arm": "II-@b=0.2",
+  "context": "hostility_04",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0003",
+  "run": "ii_budget",
+  "arm": "II-@b=0.7",
+  "context": "hostility_03",
+  "machine_label": "ADDRESSEE"
+ },
+ {
+  "item_id": "D0004",
+  "run": "pools_b07",
+  "arm": "IV",
+  "context": "hostility_09",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0005",
+  "run": "compiler_h12",
+  "arm": "j2@b=0.7",
+  "context": "hostility_06",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0006",
+  "run": "pools_b07",
+  "arm": "BASE",
+  "context": "hostility_02",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0007",
+  "run": "pools_b07",
+  "arm": "IV",
+  "context": "hostility_11",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0008",
+  "run": "ii_budget",
+  "arm": "II-@b=0.5",
+  "context": "hostility_05",
+  "machine_label": "UNRESOLVED"
+ },
+ {
+  "item_id": "D0009",
+  "run": "ii_budget",
+  "arm": "known@0.7",
+  "context": "hostility_05",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0010",
+  "run": "ii_budget",
+  "arm": "II-@b=0.2",
+  "context": "hostility_01",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0011",
+  "run": "compiler_h12",
+  "arm": "j2@b=0.05",
+  "context": "hostility_08",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0012",
+  "run": "compiler_h12",
+  "arm": "caa_bffm@b=0.05",
+  "context": "hostility_01",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0013",
+  "run": "compiler_h12",
+  "arm": "caa_jibes@b=0.05",
+  "context": "hostility_11",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0014",
+  "run": "pools_b07",
+  "arm": "BASE",
+  "context": "hostility_03",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0015",
+  "run": "ii_budget",
+  "arm": "II-@b=0.4",
+  "context": "hostility_02",
+  "machine_label": "UNRESOLVED"
+ },
+ {
+  "item_id": "D0016",
+  "run": "compiler_h12",
+  "arm": "caa_jibes@b=0.05",
+  "context": "hostility_09",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0017",
+  "run": "ii_budget",
+  "arm": "II-@b=0.4",
+  "context": "hostility_11",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0018",
+  "run": "compiler_h12",
+  "arm": "caa_bffm@b=0.7",
+  "context": "hostility_06",
+  "machine_label": "SELF"
+ },
+ {
+  "item_id": "D0019",
+  "run": "ii_budget",
+  "arm": "II-@b=0.3",
+  "context": "hostility_05",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0020",
+  "run": "ii_budget",
+  "arm": "II-@b=0.05",
+  "context": "hostility_10",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0021",
+  "run": "ii_budget",
+  "arm": "II-@b=0.3",
+  "context": "hostility_06",
+  "machine_label": "UNRESOLVED"
+ },
+ {
+  "item_id": "D0022",
+  "run": "compiler_h12",
+  "arm": "known_recipe@b=0.05",
+  "context": "hostility_02",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0023",
+  "run": "ii_budget",
+  "arm": "II-@b=0.3",
+  "context": "hostility_04",
+  "machine_label": "UNRESOLVED"
+ },
+ {
+  "item_id": "D0024",
+  "run": "pools_b07",
+  "arm": "BASE",
+  "context": "hostility_11",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0025",
+  "run": "compiler_h12",
+  "arm": "BASE",
+  "context": "hostility_06",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0026",
+  "run": "ii_budget",
+  "arm": "II-@b=0.4",
+  "context": "hostility_06",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0027",
+  "run": "compiler_h12",
+  "arm": "j2@b=0.7",
+  "context": "hostility_02",
+  "machine_label": "SELF"
+ },
+ {
+  "item_id": "D0028",
+  "run": "compiler_h12",
+  "arm": "known_recipe@b=0.7",
+  "context": "hostility_09",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0029",
+  "run": "ii_budget",
+  "arm": "II-@b=0.4",
+  "context": "hostility_08",
+  "machine_label": "UNRESOLVED"
+ },
+ {
+  "item_id": "D0030",
+  "run": "pools_b07",
+  "arm": "II",
+  "context": "hostility_11",
+  "machine_label": "SELF"
+ },
+ {
+  "item_id": "D0031",
+  "run": "compiler_h12",
+  "arm": "known_recipe@b=0.7",
+  "context": "hostility_11",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0032",
+  "run": "compiler_h12",
+  "arm": "caa_bffm@b=0.05",
+  "context": "hostility_14",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0033",
+  "run": "pools_b07",
+  "arm": "BASE",
+  "context": "hostility_05",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0034",
+  "run": "compiler_h12",
+  "arm": "caa_jibes@b=0.7",
+  "context": "hostility_11",
+  "machine_label": "ADDRESSEE"
+ },
+ {
+  "item_id": "D0035",
+  "run": "compiler_h12",
+  "arm": "caa_jibes@b=0.05",
+  "context": "hostility_10",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0036",
+  "run": "ii_budget",
+  "arm": "known@0.7",
+  "context": "hostility_06",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0037",
+  "run": "ii_budget",
+  "arm": "II-@b=0.7",
+  "context": "hostility_05",
+  "machine_label": "SELF"
+ },
+ {
+  "item_id": "D0038",
+  "run": "compiler_h12",
+  "arm": "caa_bffm@b=0.7",
+  "context": "hostility_03",
+  "machine_label": "ADDRESSEE"
+ },
+ {
+  "item_id": "D0039",
+  "run": "compiler_h12",
+  "arm": "known_recipe@b=0.05",
+  "context": "hostility_09",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0040",
+  "run": "ii_budget",
+  "arm": "II-@b=0.5",
+  "context": "hostility_02",
+  "machine_label": "SELF"
+ },
+ {
+  "item_id": "D0041",
+  "run": "compiler_h12",
+  "arm": "known_recipe@b=0.05",
+  "context": "hostility_01",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0042",
+  "run": "ii_budget",
+  "arm": "II-@b=0.7",
+  "context": "hostility_06",
+  "machine_label": "SELF"
+ },
+ {
+  "item_id": "D0043",
+  "run": "compiler_h12",
+  "arm": "caa_jibes@b=0.7",
+  "context": "hostility_14",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0044",
+  "run": "compiler_h12",
+  "arm": "caa_jibes@b=0.7",
+  "context": "hostility_01",
+  "machine_label": "ADDRESSEE"
+ },
+ {
+  "item_id": "D0045",
+  "run": "pools_b07",
+  "arm": "IV",
+  "context": "hostility_12",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0046",
+  "run": "ii_budget",
+  "arm": "II-@b=0.05",
+  "context": "hostility_14",
+  "machine_label": "NONE"
+ },
+ {
+  "item_id": "D0047",
+  "run": "compiler_h12",
+  "arm": "known_recipe@b=0.05",
+  "context": "hostility_10",
+  "machine_label": "NONE"
+ }
+]
