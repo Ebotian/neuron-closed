@@ -335,3 +335,35 @@ for scientist identities in this test."
 **可直接借用、代价很低的两件**：
 - 他们的 `null_pct`（在本任务里就是"我们的列表质量 vs 随机方向列表"的分位数版）——我们已有 `random` 臂，可加这一列；
 - 他们的**逐剂量完整度曲线**与我们的能力代理包络（§2.26）是同一件事的两种口径，可并表报出。
+
+### 5.5 他们**发布了什么、没发布什么**（决定"能不能直接拿来比对"）
+
+同一个钉版（commit `6a6f0e9`）。**结论：坐标级"成果"只有两类可拿，而最想要的那一类（行为排序）被 `.gitignore` 排除了。**
+
+| 对象 | 内容 | 可用性 |
+|---|---|---|
+| `neuronary` 配方库（187 条 / **165 坐标** / 251 行） | 坐标 + 剂量（他们自己选出来的位置） | ✅ 已发布，已用于 §5.3/§2.37 的比对 |
+| `explorer/cache/lens_index.npz` | 每神经元的 logit-lens `up`/`down` top-k token id（`[layer, neuron, k]`） | ✅ **随仓**（MIT） |
+| `explorer/cache/steer_index.npz` | 每神经元的 steer-lens token（explorer 的 `lens` 视图用） | ✅ 随仓 |
+| `explorer/cache/connections.npz` | 每神经元 **24 条**最强直连（`k`=24） | ✅ 随仓 |
+| `explorer/cache/layout_writes.npz` | 每层 9,216 个神经元在 96×96 图上的格子（down 列余弦 → PCA50 → UMAP） | ✅ 随仓（只有排布，无效应） |
+| `explorer/cache/act_scale.npz` | 激活尺度缓存（生成脚本不在仓内，字段未核） | ✅ 随仓，字段待核 |
+| **`runs/<run>.units.jsonl`** | **行为排序**：distinctive words、`mass`（排序键）、`null_pct` | ❌ **未发布**（`.gitignore` 排除 `runs/`） |
+| **`stats/q35-4b_L{}.npz`** | 每神经元 `abs_max` 与 `resid_norm_q10_50_90`（剂量分母） | ❌ 未发布（`stats/` 被排除） |
+| **`stats/steer_lens_L{}.npz`** | 每神经元 ±0.8 推力的 **Δlogprob 与 KL**——他们最接近"逐坐标直接效应"的测量 | ❌ 未发布 |
+| `runs/depth_report.json` | 每层"超过对照的神经元比例"、一致性与 top units | ❌ 未发布 |
+
+**所以现在能做的直接比对只有三种**：
+
+1. **坐标 × 剂量（已完成）**：neuronary 的 165 个坐标 vs 我们的 Q 列表 —— §5.3（两层版 2/7）与 §2.37（全模型 K=1024 命中 4 个，含 1 个反号 `L20N1950`）。
+2. **语义对账（可做，需先把缓存取下来）**：把我们的 top-K 位置的 `lens_index` 词与我们的词表族（Jibes adj/verb、BFFM `II−`）对照。
+   若 Q 头部位置的 lens 词确实落在敌意/人格语义里，这是对 J2 代理的**独立外部支持**。
+3. **结构对账（可做，同上）**：用 `connections.npz` 的 24 条最强连接，检查我们 top-K 是否落在他们连接图的同一社区。
+
+**不能做**：直接 `Spearman(我们的 Q 排名, 他们的 mass 排名)` —— 缺 `units.jsonl`。
+两条路：请他们发布该文件；或自己跑他们的 sweep（要 vLLM steering fork + pod 环境，**9,216 神经元 × 10 rollout ≈ 9.5 万次生成 ≈ 1.4 h/层（4090）**）。
+另注：他们的整层全扫是**逐层**的（`research_log`：先 L22 全量、再 L8；跨层只用 `run_depth.sh` 抽子集），
+所以即使发布也不等于"全模型坐标排序"，只有 187 条配方是跨层的坐标数据集。
+
+**取数现状（照实写）**：本机与远端到 GitHub 的 `git clone` 与 `raw.githubusercontent.com` 通道都不通
+（只有 `github.com` 网页可读）。因此上表标 ✅ 的缓存**尚未取到本地**；要做得先解决取数（换网络/代理，或在能连的机器上 `git clone` 后 `scp`）。
