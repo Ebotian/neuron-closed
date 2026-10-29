@@ -3,7 +3,7 @@
 
 STATUS (2026-10-29): RUN. Dry-run, a 2-layer smoke test (which reproduced cond(B) 495.5/530.1 and the M/g
 ratio 1.37-1.40 from plans 2.15/2.21, so the harness is consistent with the earlier numbers), then all 32
-layers in 7 min 54 s. Results and the four conclusions are in plan 2.32 and 07_results/layer_sweep_all32.
+layers in 7 min 54 s. Results and the four conclusions are in plan 2.32 and results/layer_sweep_all32.
 This file was originally committed by accident inside 37487411 while still unrun; that is now historical.
 
 Every result in this line so far was measured on layers 13-14, inherited from the original

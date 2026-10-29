@@ -63,8 +63,8 @@ def _mean_logp(ids_p, ids_t):
     return lp.gather(1, torch.tensor(ids_t, device=dev)[:, None]).mean()
 
 
-def _g_of_scalar(obj):
-    grads = torch.autograd.grad(obj, [cap[l] for l in layers])
+def _g_of_scalar(obj, caps):
+    grads = torch.autograd.grad(obj, [caps[l] for l in layers])
     g = {}
     for l, gr in zip(layers, grads):
         sc = gr.detach().double().sum(dim=tuple(range(gr.ndim - 1)))
@@ -85,7 +85,7 @@ def gradient_of_J(prompt, target, max_tokens, base_target=None):
         if base_target is not None:
             ids_b = tok(base_target, add_special_tokens=False).input_ids[:max_tokens]
             J = J - _mean_logp(ids_p, ids_b)
-        g = _g_of_scalar(J)
+        g = _g_of_scalar(J, cap)
     return g, float(J.detach()), len(ids_t)
 
 

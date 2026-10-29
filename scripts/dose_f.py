@@ -286,7 +286,7 @@ def main():
     ap.add_argument('--model', default='/root/autodl-tmp/Qwen3.5-4B')
     ap.add_argument('--lexicon', default=str(ROOT / 'lexicons/jibes_adj_verb_pools.json'))
     ap.add_argument('--probes', default=str(ROOT / 'probes/contrasts_v3.jsonl'))
-    ap.add_argument('--g-from', default=str(ROOT / '07_results/g_j2_space_k32_m192_c8.json'),
+    ap.add_argument('--g-from', default=str(ROOT / 'results/g_j2_space_k32_m192_c8.json'),
                     help='32-coordinate mode only: g_j2_space.py result JSON supplying the '
                          'support S of plan 2.16 and the per-context gradient g')
     ap.add_argument('--dense', action='store_true',

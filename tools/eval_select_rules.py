@@ -2,7 +2,7 @@
 import json, statistics, sys
 import numpy as np
 CACHE='/home/ebt/neuronary-external/neuron-explorer/explorer/cache/'
-REPO='/home/ebt/rsi-dev/qwentest/'
+REPO='/home/ebt/neuron-closed/'
 D,L=9216,32
 J=json.load(open(sys.argv[1] if len(sys.argv)>1 else '/tmp/select_rules.json')); ks=J['ks']
 st=np.load(CACHE+'steer_index.npz')

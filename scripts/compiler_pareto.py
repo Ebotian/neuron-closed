@@ -133,8 +133,8 @@ def main():
         raise SystemExit(f'no {a.split} contexts in {a.probes}')
     # BFFM: only single-token survivors are usable (plan 2.19 census: II+ 7, II- 5)
     # the single-token census (plan 2.19) may sit next to this script or under the repo root
-    cands = [Path(__file__).resolve().parent / '07_results/slot_census_bffm100.json',
-             ROOT / '07_results/slot_census_bffm100.json']
+    cands = [Path(__file__).resolve().parent / 'results/slot_census_bffm100.json',
+             ROOT / 'results/slot_census_bffm100.json']
     census = next((c for c in cands if c.is_file()), None)
     single = set()
     if census is not None:

@@ -8,8 +8,8 @@ Inputs (all outside git except our own results):
   .../lens_index.npz      their per-neuron logit-lens top-12 (up/down)
   .../connections.npz     their 24 strongest direct-path links per neuron (up/down)
   .../vocab.json          token strings
-  07_results/positions_all32_K1024.csv     our closed-form list (32 layers)
-  07_results/positions_K256.csv            our closed-form list (layers 13-14)
+  results/positions_all32_K1024.csv     our closed-form list (32 layers)
+  results/positions_K256.csv            our closed-form list (layers 13-14)
   /home/ebt/neuronary-external/community_coords_all.json   their recipe coordinates
 
 Sections: A measured KL vs our Q/|g|; B the recipe coordinates under both instruments;
@@ -58,8 +58,8 @@ for l in range(LAYERS):
 print(f'  per-layer Spearman(|g|, KL_mean): median {statistics.median(per_layer):+.3f} '
       f'min {min(per_layer):+.3f} max {max(per_layer):+.3f}')
 
-ours32 = list(csv.DictReader(open(REPO / '07_results/positions_all32_K1024.csv')))
-ours2 = list(csv.DictReader(open(REPO / '07_results/positions_K256.csv')))
+ours32 = list(csv.DictReader(open(REPO / 'results/positions_all32_K1024.csv')))
+ours2 = list(csv.DictReader(open(REPO / 'results/positions_K256.csv')))
 sorted_kl = np.sort(kl_mean)
 
 

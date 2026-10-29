@@ -248,9 +248,9 @@ def main():
     print('  v1 mistake being corrected: it used the Jibes VERB pool (hold/wait/stop/read/tell) as insults')
 
     sources = {
-        'ii_budget': ROOT / '07_results/ii_budget_sweep.json',
-        'pools_b07': ROOT / '07_results/bffm_pools_b07.json',
-        'compiler_h12': ROOT / '07_results/compiler_pareto_hostility12.json',
+        'ii_budget': ROOT / 'results/ii_budget_sweep.json',
+        'pools_b07': ROOT / 'results/bffm_pools_b07.json',
+        'compiler_h12': ROOT / 'results/compiler_pareto_hostility12.json',
     }
     rec = {'scheme': {'insult_sources': ['hand-written profanity', 'Jibes hostile pool', 'BFFM negative pools'],
                       'referent_classes': ['SELF', 'ADDRESSEE', 'THIRD', 'NONE'],

@@ -92,8 +92,8 @@ def main():
 
     bffm = json.loads(Path(a.bffm).read_text(encoding='utf8'))
     cands = [Path(a.census)] if a.census else []
-    cands += [Path(__file__).resolve().parent / '07_results/slot_census_bffm100.json',
-              ROOT / '07_results/slot_census_bffm100.json']
+    cands += [Path(__file__).resolve().parent / 'results/slot_census_bffm100.json',
+              ROOT / 'results/slot_census_bffm100.json']
     cen = next((c for c in cands if c.is_file()), None)
     if cen is None:
         raise SystemExit('need the plan 2.19 census')
