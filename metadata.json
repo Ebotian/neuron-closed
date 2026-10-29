@@ -1,9 +1,9 @@
 {
   "workstream": "qwentest",
-  "version": "0.31.0",
+  "version": "0.32.0",
   "status": "draft",
   "date": "2026-10-28",
-  "current": "R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. 2026-10-28 evening: external evidence consolidated into a MACHINE-CHECKED ledger (qwentest/evidence/ledger.json, 8 sources x 14 claims x 36 verdicts, rendered by tools/evidence_ledger.py and gated by make check). Result of the abstraction: every 'premises differ' case reduces to 7 axes with measured magnitudes - P1 dose normalisation (p50 differs 6-12% across quantisation), P2 dose range (behavioural usable band alpha~0.8-1.0, collapse >=1.2, community median 0.4), P3 outcome measure (readout monotone vs behaviour non-monotone), P4 support form (K=1->full is 5.78x internally; 0/16 and 0/6 vs 4/6 externally), P5 linearisation (6+1=7 but 16 measured, 2.3x superadditive), P6 layer (external peaks 0.25-0.33 relative depth vs our inherited 0.41-0.44), P7 judge (binary kappa 0.8913/0.9544, 5-way tone only 90.70%, category-vs-tag spread 11x). Strengthened: C1 (4 sources), C7 (indirect), C11. Weakened: C5, C8, C9, C13. No information on C2 and C4 - the two we are actually stuck on, so no amount of further external mining can resolve R2. 2026-10-29: plan 2.28 executed the ledger rule (no compiler scores itself). At b=0.05 none of the three compilers - including J2, whose own readout rises +0.50 - moves either borrowed toxicity classifier (max P(toxic) 0.0008-0.0016 over a 0.0005 base); the community recipe as a positive control reaches 0.0566 on 1 of 8 contexts while costing -0.66 nat. The same semantics compiled as CAA vs slot-log-mass gives cos = -0.0024, so F is a family, not a function. 2026-10-29 (second round): stage 0 shows the borrowed classifiers DO see our construct on English adjective-frame material (AUC 0.986-1.000) but are blind on Chinese (0.438-0.688) and near-blind on the verb frame (0.587-0.643). Rerun on 12 English hostility prompts at two budgets: at b=0.05 no compiler is visible (<=0.0003 over a 0.00057 baseline) while the community control is (+0.0801); at b=0.7 all three are visible and differ by ~10x (caa_bffm +0.9869, caa_jibes +0.6280, j2 +0.1022), with J2 the weakest and the least efficient per nat of reference logP lost. So budget decides visibility and the compiler decides magnitude. 2026-10-29 (five pools): first same-register specificity evidence. At b=0.7 the antagonism direction (BFFM II- vs II+) reaches mean P(toxic) 0.9875 on 12/12 English hostility prompts while I-/III-/IV-/V- reach 0.0006/0.1655/0.0069/0.0340, margin over the best other pool +0.249..+0.984, paired sign p=0.00049. All five directions cost 1.44-2.24 nat and have comparable repetition, so this is not a destruction artifact. Scope: compiler-level specificity, not the specificity of L14N8949; and the toxicity is still mostly self-directed (2/12 address the target).",
+  "current": "R7 POSITIVE across the whole budget axis, with a measured usable envelope (plan 2.22-2.26). The budget-optimal dense direction u ~ M^+g beats u ~ g on the J2 readout by a factor of 1.360-1.433 at EVERY budget from 0.05 to 0.5, 8/8 contexts and exact sign p=0.0078 at every budget; it reproduced on both registered axes (G2 out-of-sample 8/8 per budget with no overfitting penalty; G1 pooled r=0.5469/J64=0.4375, and the advantage holds in 12/12 word-half x direction-rule cells). Judge-free behavioural measurement over the same 7-budget grid gives the envelope: capability proxy dlogP(REFERENCE_TEXT) degrades near-linearly (u_M +0.01125 at b=0.05 to -0.64223 at b=0.5) and u_M is LESS damaging than u_g for b <= 0.3 but MORE at b=0.4-0.5; efficiency (dJ2 per nat of reference logP lost) favours u_M at every budget (8.6x at b=0.1 down to 1.1x at b=0.5). Under the FROZEN criterion the usable ceiling is b=0.1; that ceiling is set by the low-signal rep4 component (0.001-0.055, 3-7 of 8 contexts tied), while the high-signal component still passes at b=0.15-0.2 - recorded as a prospective criterion fix, NOT re-judged. So: which direction to use is settled (u ~ M^+g); how large a dose is usable is a tolerance judgement the curve now makes explicit. R6 remains NEGATIVE for sparse supports; R2c gate FAILED; R2 still paused. 2026-10-28 evening: external evidence consolidated into a MACHINE-CHECKED ledger (qwentest/evidence/ledger.json, 8 sources x 14 claims x 36 verdicts, rendered by tools/evidence_ledger.py and gated by make check). Result of the abstraction: every 'premises differ' case reduces to 7 axes with measured magnitudes - P1 dose normalisation (p50 differs 6-12% across quantisation), P2 dose range (behavioural usable band alpha~0.8-1.0, collapse >=1.2, community median 0.4), P3 outcome measure (readout monotone vs behaviour non-monotone), P4 support form (K=1->full is 5.78x internally; 0/16 and 0/6 vs 4/6 externally), P5 linearisation (6+1=7 but 16 measured, 2.3x superadditive), P6 layer (external peaks 0.25-0.33 relative depth vs our inherited 0.41-0.44), P7 judge (binary kappa 0.8913/0.9544, 5-way tone only 90.70%, category-vs-tag spread 11x). Strengthened: C1 (4 sources), C7 (indirect), C11. Weakened: C5, C8, C9, C13. No information on C2 and C4 - the two we are actually stuck on, so no amount of further external mining can resolve R2. 2026-10-29: plan 2.28 executed the ledger rule (no compiler scores itself). At b=0.05 none of the three compilers - including J2, whose own readout rises +0.50 - moves either borrowed toxicity classifier (max P(toxic) 0.0008-0.0016 over a 0.0005 base); the community recipe as a positive control reaches 0.0566 on 1 of 8 contexts while costing -0.66 nat. The same semantics compiled as CAA vs slot-log-mass gives cos = -0.0024, so F is a family, not a function. 2026-10-29 (second round): stage 0 shows the borrowed classifiers DO see our construct on English adjective-frame material (AUC 0.986-1.000) but are blind on Chinese (0.438-0.688) and near-blind on the verb frame (0.587-0.643). Rerun on 12 English hostility prompts at two budgets: at b=0.05 no compiler is visible (<=0.0003 over a 0.00057 baseline) while the community control is (+0.0801); at b=0.7 all three are visible and differ by ~10x (caa_bffm +0.9869, caa_jibes +0.6280, j2 +0.1022), with J2 the weakest and the least efficient per nat of reference logP lost. So budget decides visibility and the compiler decides magnitude. 2026-10-29 (five pools): first same-register specificity evidence. At b=0.7 the antagonism direction (BFFM II- vs II+) reaches mean P(toxic) 0.9875 on 12/12 English hostility prompts while I-/III-/IV-/V- reach 0.0006/0.1655/0.0069/0.0340, margin over the best other pool +0.249..+0.984, paired sign p=0.00049. All five directions cost 1.44-2.24 nat and have comparable repetition, so this is not a destruction artifact. Scope: compiler-level specificity, not the specificity of L14N8949; and the toxicity is still mostly self-directed (2/12 address the target). 2026-10-31 (item 2-3): the specific antagonism direction has NO usable point - P(toxic) crosses 0.5 between b=0.2 and b=0.3 where the cost is already -0.587 nat against a frozen 0.3 nat tolerance; and target-directedness peaks at b=0.3-0.4 (4/12) then falls while self-abuse rises to 12/12, so the classifier and our construct diverge at high budget. cos(u_II-, u_known) = +0.0299: the community coordinate is essentially ORTHOGONAL to the specific direction and delivers 1/12 of its behavioural effect at 1/5 the efficiency.",
   "routes": {
     "R0": "done (sparsity: top-64 = 1.65%/2.13% of sum|g|)",
     "R2a": "done (slot census; Empath 1/20 vs HurtLex 13/20 coverage)",
@@ -15,7 +15,7 @@
     "R3": "largely answered by 2.20/2.21: the dense direction beats every sparse subset at fixed budget (5.78x two-layer, 4.41x within L14 alone; layer confound excluded by the single-layer control, 84.6% within-layer vs 14.8% second layer), the curve is near-logarithmic in K with no saturation before full support, and the linear surrogate stays within 16% on the top-K direction. Remaining: test u ~ M^+ g against u ~ g in the DENSE regime, where budget/||g|| = 2.757 so M is far from identity and the two directions differ; independently replicated BEHAVIOURALLY by martinbowling/qwen-celebrity-neurons on the same model: single neurons 0/16 and trios 0/6 vs dense contrastive direction 4/6 (record 10 section 3)",
     "R4": "todo",
     "R5": "todo (behavioural end) - but one prerequisite is now EXTERNALLY MEASURED: an LLM judge on hostile/broken '\n                   'replies reached kappa 0.8913 / 0.9544 on 129 blind re-judgements (I recomputed it from the raw '\n                   'labels; record 09 section 4), while a 5-way tone label only reproduced 90.70%. So R5 must report '\n                   'binary/falsifiable axes and must re-measure judge self-consistency on its own prompt set. '\n                   'Also from record 09: their behavioural dose curve is non-monotone (hostile peaks at alpha=0.75, '\n                   'collapses to 1/20 at alpha=2.0 while broken reaches 20/20), which is the shape our plan 2.25/2.26 '\n                   'envelope implies but never measured below b=0.5",
-    "R7": "done, POSITIVE, with a measured envelope (plan 2.22-2.26). Readout: u ~ M^+g beats u ~ g by 1.360-1.433x at every budget 0.05-0.5, 8/8 contexts and p=0.0078 at every budget; 96/96 wins across the 12 word-half x direction-rule cells; G2 out-of-sample 8/8 per budget with no overfitting penalty and a transferred u_M beating a locally built u_g in 6/6; G1 passes pooled. Behaviour (judge-free, same 7-budget grid): u_M is less damaging than u_g for b<=0.3 and more at b=0.4-0.5, and more efficient at every budget; frozen-criterion usable ceiling b=0.1 (set by the low-signal rep4 component - prospective criterion fix registered, not re-judged). Remaining: extend beyond layers 13-14, the cross-measurement (direction from word half A measured with half B's readout), and a task-level rather than reference-text capability measure; caveat from record 10: an external measurement on the same model shows the evil PAIR is superadditive (6+1 -> 16 violent terms), which no linear surrogate with G can express, so the analytic-combination claim stays bounded to the linear regime; the missing third curvature (Fisher F of an output-KL constraint) is now specified exactly, with the parameterisation mapping delta = sqrt(2*eps*g'F^-1*g) and the damping default lambda = median(F) taken from CANS 2610.35530 v1 (record 13); plan 2.27 tested RACE-style LCB ranking on our gradient and FALSIFIED the prediction that it shrinks the K needed - so uncertainty is not our bottleneck"
+    "R7": "done, POSITIVE, with a measured envelope (plan 2.22-2.26). Readout: u ~ M^+g beats u ~ g by 1.360-1.433x at every budget 0.05-0.5, 8/8 contexts and p=0.0078 at every budget; 96/96 wins across the 12 word-half x direction-rule cells; G2 out-of-sample 8/8 per budget with no overfitting penalty and a transferred u_M beating a locally built u_g in 6/6; G1 passes pooled. Behaviour (judge-free, same 7-budget grid): u_M is less damaging than u_g for b<=0.3 and more at b=0.4-0.5, and more efficient at every budget; frozen-criterion usable ceiling b=0.1 (set by the low-signal rep4 component - prospective criterion fix registered, not re-judged). Remaining: extend beyond layers 13-14, the cross-measurement (direction from word half A measured with half B's readout), and a task-level rather than reference-text capability measure; caveat from record 10: an external measurement on the same model shows the evil PAIR is superadditive (6+1 -> 16 violent terms), which no linear surrogate with G can express, so the analytic-combination claim stays bounded to the linear regime; the missing third curvature (Fisher F of an output-KL constraint) is now specified exactly, with the parameterisation mapping delta = sqrt(2*eps*g'F^-1*g) and the damping default lambda = median(F) taken from CANS 2610.35530 v1 (record 13); plan 2.27 tested RACE-style LCB ranking on our gradient and FALSIFIED the prediction that it shrinks the K needed - so uncertainty is not our bottleneck; plan 2.31: the specific direction has no budget that is both visible and affordable (P(tox) crosses 0.5 at -0.587 nat vs a 0.3 nat tolerance), so the deliverable still has no usable operating point"
   },
   "gates": {
     "G1": "readout reproducibility across disjoint word halves: J_top64 >= 0.30 and r(|g|) >= 0.50",
@@ -841,6 +841,75 @@
         "compare u_II- with u_known to measure how far the brute-force draw sits from this specific direction"
       ],
       "cost": "672 forward+backward passes, 72 generations, 12 min 55 s"
+    },
+    "ii_budget_sweep": {
+      "what": "budget sweep of the specific antagonism direction plus the comparison with the community coordinate (plan 2.30.4 items 1-3, first half)",
+      "frozen_rule": "a usable point exists iff P(toxic) > 0.5 AND |dlogP(REFERENCE_TEXT)| < 0.3 nat",
+      "curve": {
+        "b=0.05": {
+          "P_tox": 0.0006,
+          "n_pos": "0/12",
+          "dlogP": -0.0275,
+          "you": "0/12",
+          "self": "0/12"
+        },
+        "b=0.2": {
+          "P_tox": 0.1802,
+          "n_pos": "2/12",
+          "dlogP": -0.3746,
+          "you": "1/12",
+          "self": "1/12"
+        },
+        "b=0.3": {
+          "P_tox": 0.5818,
+          "n_pos": "7/12",
+          "dlogP": -0.5867,
+          "you": "4/12",
+          "self": "3/12"
+        },
+        "b=0.4": {
+          "P_tox": 0.6075,
+          "n_pos": "8/12",
+          "dlogP": -0.7454,
+          "you": "4/12",
+          "self": "4/12"
+        },
+        "b=0.5": {
+          "P_tox": 0.7602,
+          "n_pos": "9/12",
+          "dlogP": -0.9269,
+          "you": "3/12",
+          "self": "7/12"
+        },
+        "b=0.7": {
+          "P_tox": 0.9875,
+          "n_pos": "12/12",
+          "dlogP": -1.4416,
+          "you": "2/12",
+          "self": "12/12"
+        }
+      },
+      "usable_point_exists": false,
+      "why": "P(toxic) crosses 0.5 between b=0.2 and b=0.3, where the cost is already -0.587 nat, about twice the 0.3 nat tolerance. Visibility and affordability do not overlap",
+      "target_directedness_peaks_at": "b=0.3-0.4 (4/12 both), then declines (3/12 at 0.5, 2/12 at 0.7) while self-directed profanity rises monotonically to 12/12 - so at the budget where the classifier is happiest the model is mostly abusing itself, not the prompt target",
+      "cos_ii_vs_known": 0.0299,
+      "known_vs_ii_at_same_budget": {
+        "u_II- at b=0.7": {
+          "P_tox": 0.9875,
+          "n_pos": "12/12",
+          "dlogP": -1.4416,
+          "efficiency": 0.69
+        },
+        "u_known at its own 0.7": {
+          "P_tox": 0.0806,
+          "n_pos": "1/12",
+          "dlogP": -0.6215,
+          "efficiency": 0.13
+        },
+        "reading": "the community coordinate is not a rough approximation of the specific direction - it is essentially orthogonal to it (cos 0.03) and delivers 1/12 of the behavioural effect at 1/5 the efficiency"
+      },
+      "boundaries": "12 English prompts, layers 13-14, one model, greedy <=64; the 0.3 nat tolerance was set before the run and the conclusion depends on it entirely (at 0.6 there WOULD be a point at b=0.3); \"you-directed\" is a heuristic regex; u_known is used at its literal dose, so that row is an anchor, not an equal-budget comparison",
+      "cost": "144 forward+backward, 96 generation/capability pairs, 16 min 57 s"
     }
   },
   "notes": "Numbers are copied from the runs recorded in qwentest/05_plan-gradient-discovery.md; the doc renders them, so they must be edited here first. 08_reference-*.md records an external dataset's statistics with a fixed taxonomy: S strengthens / W weakens / X intersects-but-different-premises / M methodological transfer / N unusable, applied per claim in its section 11. 0.22.1: qwentest/scripts/layer_sweep.py was committed by accident inside 37487411; it is a DRAFT - never dry-run, never executed, never validated - and its status header now says so. Do not cite it. 0.23.0: corrected two of my own retrieval failures - neuronary is reachable with curl -4 and needs offset pagination to see all 141 recipes; its cloneable index.json really is count:0, so the repo and the backend disagree. 0.24.0: record 11 is generated, not written. tools/check.py gained an item `ledger`; a hand-edited matrix is caught, and every S/W/X verdict must carry a digit. 0.26.0: read the CANS TeX source and found that my own earlier note misreported its calibration numbers (one panel of two, and R(y=x) called R^2). Ledger C6xS9 downgraded S -> X. The exact parameterisation equivalence delta = sqrt(2*eps*g'F^-1*g) is now written down. 0.27.0: first tested claim from a new preprint. The registered prediction failed, and the transplant idea in ledger C2xS10 was downgraded S -> W by my own measurement. 0.28.0 (end of day, remote box shut down): compiler_pareto.py is DRY-RUN OK but never executed; fetch_models.py worked up to 280/438 MB with zero chunk failures but never reached its sha256 verification step. Both carry STATUS headers saying exactly that. next_session: resume or delete the .part, verify sha256, smoke 2 contexts, then the full run. 0.29.0: compiler_pareto.py RAN (8 contexts, 4 arms). Its conclusion is about the CONTEXT SET and gauge range, not about compilers; and cos(caa_jibes, j2) = -0.0024 settles the family question with a number. 0.30.0: the compiler comparison was redesigned after a stage-0 instrument check, and the redesign inverted the conclusion - at b=0.7 the compilers differ 10x and our own J2 is the weakest. 0.31.0: plan 2.30 is the first specificity PASS in this line, and it came from a different road than R2c (which stays blocked only in its J2-readout form).",
