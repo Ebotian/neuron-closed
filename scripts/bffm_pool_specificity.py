@@ -50,7 +50,7 @@ POOLS = [('II', 'II-', 'II+'), ('I', 'I-', 'I+'), ('III', 'III-', 'III+'),
 
 def resolve_pkg(given):
     cands = [Path(given)] if given else []
-    cands += [ROOT / '03_unpacked/qwen-gradient-discovery-v6/qwen-gradient-discovery-v6',
+    cands += [ROOT / 'vendor/qwen-gradient-discovery-v6/qwen-gradient-discovery-v6',
               Path('/root/autodl-tmp/scripts/j2space')]
     for c in cands:
         if (c / 'engine.py').is_file() and (c / 'semantic.py').is_file():

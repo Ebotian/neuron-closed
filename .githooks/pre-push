@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# A push publishes claims; run the full gate first.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+make -s check

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Remove files under 03_unpacked/rebuild-kit/ that are byte-identical to a file kept
+"""Remove files under vendor/rebuild-kit/ that are byte-identical to a file kept
 elsewhere in qwentest/. Dry run by default; --apply deletes and prints the map.
 
 Guard: a file is deleted only if at least one copy exists OUTSIDE rebuild-kit/, and
@@ -9,7 +9,7 @@ import hashlib, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-KIT = ROOT / '03_unpacked/rebuild-kit'
+KIT = ROOT / 'vendor/rebuild-kit'
 APPLY = '--apply' in sys.argv
 
 def md5(p):

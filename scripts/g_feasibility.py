@@ -37,7 +37,7 @@ ROOT = HERE.parent                                     # qwentest/
 
 def resolve_pkg(given):
     cands = [Path(given)] if given else []
-    cands += [ROOT / '03_unpacked/qwen-gradient-discovery-v6/qwen-gradient-discovery-v6',
+    cands += [ROOT / 'vendor/qwen-gradient-discovery-v6/qwen-gradient-discovery-v6',
               Path('/root/autodl-tmp/qwen-gradient-discovery-v6'),
               Path('/root/autodl-tmp/scripts/gfeas')]
     for c in cands:

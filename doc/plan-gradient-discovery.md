@@ -1,3 +1,5 @@
+> 本文件原名 `qwentest/05_plan-gradient-discovery.md`；2026-10-29 迁入独立仓 `neuron-closed`，路径已改为本仓结构，内容未改。
+
 # 梯度发现：读数的数学化路线（R0–R4）
 
 整理时间：2026-10-27。基线来自 `qwen-gradient-discovery-v5.1` 在 AutoDL RTX 4080 SUPER 上的首次实测。
@@ -319,7 +321,7 @@ VERB 敌意：`hold, wait, stop, run, handle, read, hide, grow, roast, spell, li
 ### 2.14 R2c（预注册，未跑）——同一仪器上的跨特质特异性
 
 §2.13 结论四的缺口是：J2 的负例是**中性槽位**，所以它分不开「敌意」与「其他评判性语言」。
-`06_plan-specificity-dose.md` §8/§9 又证明了 J1 那套五特质矩阵**不能**用来补这个缺口（五个 contrast 共享同一中性负例，
+`doc/plan-specificity-dose.md` §8/§9 又证明了 J1 那套五特质矩阵**不能**用来补这个缺口（五个 contrast 共享同一中性负例，
 它测的是「评判性 vs 中性」）。所以补对照必须是：**同一个词表源、同一个语域、同一套槽位规则**下的多个特质轴。
 
 **词表源（已入仓，不自己发明）**：`lexicons/bffm100_factors.json` —— Goldberg (1992) 的 100 个
@@ -467,7 +469,7 @@ J2 是多序列多位置读数：`build_batch` 每个槽位词一条序列，`ba
 - 一个已修的缺陷：第一版把“联合双坐标 Q”与“两个单坐标 Q 之和”相比，得到过 −15.1% 这种不可能的负值；
   改为联合对联合后重跑。非对角 G 下两者本来就不相等，交叉项 `c` 正是差别所在。
 
-产物：`07_results/g_feasibility_k32_m192_c3.{json,md}`、`07_results/g_j2_space_k32_m192_c3.{json,md}`
+产物：`results/g_feasibility_k32_m192_c3.{json,md}`、`results/g_j2_space_k32_m192_c3.{json,md}`
 （JSON 内含逐上下文的完整 32×32 Ĝ、坐标表、g 向量与全部派生统计）。
 远端原件：`/root/autodl-tmp/runs/gfeas/{k32_m192_c3,j2space/k32_m192_c3}`。
 
@@ -557,7 +559,7 @@ b=0.05 上，同一物理预算：1 坐标 `u_known` **+0.03649** < 2 坐标 `pa
 > 但**中间台阶 1→2（0.00525）仍未确立**：本次没测 2 坐标臂，而它低于单次测量误差（中位 2.0e-03、最坏 6.5e-03）。
 > 所以能写的只有“**单坐标 → 32 坐标，同物理预算下效应变大（+0.0197，约 +54%，误差 4.4%）**”，不能写逐步递增。
 
-**外部交叉证据（2026-10-28，详见 `08_reference-qwen3-8b-neuron-atlas.md` §7）**：
+**外部交叉证据（2026-10-28，详见 `doc/references/qwen3-8b-neuron-atlas.md` §7）**：
 第三方在 Qwen3-8B 上做了 167 个已验证父本的**全部 13,861 个双神经元组合**，结局分布是
 `assistant` 36.34% / `one` 32.44% / `new` 22.35% / `other` 5.17% / `incoherent` 3.00% / **`blend` 0.71%**；
 3,097 条 `new` 里两个父本 persona 浮现的情况全是 `(False, False)`。这是从**行为端**对 §2.16 负判决的独立支持。
@@ -581,8 +583,8 @@ b=0.05 上，同一物理预算：1 坐标 `u_known` **+0.03649** < 2 坐标 `pa
 - 本实验没有碰“G 应该保护什么”（能力保持）。那需要一个**第二读数** `J_ref`，未做。
 - `pair_J vs pair_I` 是 1/8、p=0.0703：方向与主判据一致但**未达 0.05**，只能写“趋势相同、未证明”。
 
-产物：`07_results/g_nonlinear_c8.{json,md}`（逐上下文、逐臂、逐预算的实测与预测值），
-输入 Ĝ 与 g：`07_results/g_j2_space_k32_m192_c8.{json,md}`。远端：`/root/autodl-tmp/runs/gfeas/nonlinear_c8`。
+产物：`results/g_nonlinear_c8.{json,md}`（逐上下文、逐臂、逐预算的实测与预测值），
+输入 Ĝ 与 g：`results/g_j2_space_k32_m192_c8.{json,md}`。远端：`/root/autodl-tmp/runs/gfeas/nonlinear_c8`。
 
 ### 2.17 J2 读数的数值误差标尺：batch 形状敏感性（已测）
 
@@ -670,7 +672,7 @@ drift ≪ 0.001 → 可忽略；drift ~ 0.01 → 真实误差条；drift ~ 效�
 2. **固定形状**下直接测舍入：同一输入分别用 bf16 与 fp32 前向，比 J2；
 3. 对所有边缘/未确立的量做**多上下文重复**，把均值的标准误压下去。
 
-产物：`07_results/j2_batch_sensitivity_c8.{json,md}`（逐上下文、逐变体、两种干预状态的 J2 与 ΔJ2）。
+产物：`results/j2_batch_sensitivity_c8.{json,md}`（逐上下文、逐变体、两种干预状态的 J2 与 ΔJ2）。
 远端：`/root/autodl-tmp/runs/gfeas/batch_sens`。脚本：`scripts/j2_batch_sensitivity.py`。
 
 ### 2.18 直接量 bf16 误差：与 float32 对比（修正 §2.17.4 的过度降级）
@@ -734,7 +736,7 @@ p50 与 W_down 列范数（只在 bf16 算一次）、稠密方向 u（从已冻
 3. **任何小于 1e-02 的新主张，必须带一个 fp32 对照**（本脚本就是；96 次前向、2.5 分钟、fp32 峰值 18.43 GiB）。
 4. batch 形状在全部生产路径上恒定（§2.17.5），所以不需要每次重测形状敏感性；但**改动池大小或模板就会改形状**，那时要重跑 §2.17。
 
-产物：`07_results/j2_precision_c8.{json,md}`。远端：`/root/autodl-tmp/runs/gfeas/precision`。
+产物：`results/j2_precision_c8.{json,md}`。远端：`/root/autodl-tmp/runs/gfeas/precision`。
 脚本：`scripts/j2_precision_check.py`。
 
 ### 2.19 R2c 的前置门槛：**未通过**（BFFM-100 槽位普查，2026-10-28）
@@ -789,7 +791,7 @@ p50 与 W_down 列范数（只在 bf16 算一次）、稠密方向 u（从已冻
   但**本次没有跨机比对**（4090 机仍不可达）。
 - “存活”只判单 token，**没判词频、没判与现有 Jibes 池的重叠、也没判语义适当性**——那些是 §2.14 后续步骤，门槛不过就不进入。
 
-产物：`07_results/slot_census_bffm100.{json,md}`（逐词 piece 分解与全 10 池统计）。
+产物：`results/slot_census_bffm100.{json,md}`（逐词 piece 分解与全 10 池统计）。
 远端：`/root/autodl-tmp/runs/spec/slot_census`。脚本：`scripts/slot_census_bffm.py`。
 
 ### 2.20 支撑集扫描：在同一物理预算下，效应随 K **单调增长到全支撑**
@@ -859,7 +861,7 @@ top-1024 **88.6%**。曲线在四个数量级上接近 **对数增长**（每翻
    `08_reference` §7 的教训正好在这里适用：**读数可加 ≠ 行为可组合/可用**。
 4. 只扫了 **层 13–14**（坐标空间 18,432），不是全模型 32×9,216；只用了 **J2-敌意** 一个读数；n=8 上下文。
 
-产物：`07_results/support_sweep_c8.{json,md}`（逐上下文、逐 K、逐预算的实测与预测值、实际预算、非零坐标数）。
+产物：`results/support_sweep_c8.{json,md}`（逐上下文、逐 K、逐预算的实测与预测值、实际预算、非零坐标数）。
 远端：`/root/autodl-tmp/runs/gfeas/sweep_c8`。脚本：`scripts/support_sweep.py`（`--fp32` 可重跑整条曲线）。
 未记录：top-K 的**坐标身份**（只记了统计量）——要输出“神经元 + 符号 + 强度”必须补录，成本一次重跑。
 
@@ -951,7 +953,7 @@ risk_aversion_05 → `L13N6540−`。top-1 的层分布：**L14 在 7/8、L13 �
   所以这一条只能当**待测候选**，不能当结论。
 - 坐标身份只录了 **top-64**；全支撑的 18,432 个坐标没存（要存就是 8×18432 条，可存但本轮没做）。
 
-产物：`07_results/support_sweep_L14_c8.{json,md}`（单层对照）、`07_results/support_sweep_topids_c8.json`（坐标身份）。
+产物：`results/support_sweep_L14_c8.{json,md}`（单层对照）、`results/support_sweep_topids_c8.json`（坐标身份）。
 远端：`/root/autodl-tmp/runs/gfeas/sweep_L14`、`/root/autodl-tmp/runs/gfeas/sweep_ids`。
 
 ### 2.22 R7 判决（**正面**）：稠密区里预算最优方向 `u ∝ M⁺g` 赢 `u ∝ g` 约 **36–43%**，8/8、p=0.0078
@@ -1050,7 +1052,7 @@ p=0.0078、中位相对增益 +36–43%**。这是整条 G 线上的**第一个�
    所以这不是“同一方案的微调”；但也意味着 u_M 的坐标身份与以往任何记录都不同，**需重新做可复现性检验**（G1/G2）。
 5. 只在 **J2-敌意**一个读数上测；n=8 上下文（其中 2 条是 hostility 提示）。
 
-产物：`07_results/dense_optimal_c8.{json,md}`（含逐上下文的预测/实测、每层残差范数、实际预算、
+产物：`results/dense_optimal_c8.{json,md}`（含逐上下文的预测/实测、每层残差范数、实际预算、
 以及三臂各自的 top-64 坐标 = 层/神经元/符号/强度）。远端：`/root/autodl-tmp/runs/gfeas/dense_opt`。
 脚本：`scripts/dense_optimal.py`。
 
@@ -1148,7 +1150,7 @@ A = {hostility_04, risk_aversion_04, greed_04, avoidance_04}，B = {hostility_05
   很可能对应退化文本（`08_reference` §7：读数可加 ≠ 行为可用）。
 - `ALL` 池（用全 8 条造方向）的行在表里是 in-sample，**不能**当泛化估计读；真正的泛化数只有 `out` 行。
 
-产物：`07_results/dense_transfer_c8.{json,md}`（含 288 个逐点测量、G2 统计、两个 cos）。
+产物：`results/dense_transfer_c8.{json,md}`（含 288 个逐点测量、G2 统计、两个 cos）。
 远端：`/root/autodl-tmp/runs/gfeas/transfer_c8`。入口：`scripts/dense_optimal.py --transfer`。
 
 ### 2.24 R7 的 G1 检验：优势在**两个不相交词半上 12/12 全复现**；G1 门（池化定义）**通过**
@@ -1249,7 +1251,7 @@ top-1 逐上下文变）是同一件事的不同侧面。
 - 本节**没测交叉情形**（用半池 A 建的方向、用半池 B 的读数测）。它能分开"变换有效"与"方向可跨读数复用"，
   已登记为未做。
 
-产物：`07_results/dense_g1_c8.{json,md}`（含 192 个逐点测量、逐上下文与池化两套一致性统计）。
+产物：`results/dense_g1_c8.{json,md}`（含 192 个逐点测量、逐上下文与池化两套一致性统计）。
 远端：`/root/autodl-tmp/runs/gfeas/g1_c8`。入口：`scripts/dense_optimal.py --g1`。
 
 ### 2.25 行为端第一次测量：R7 的优势**只在低预算成立**，b=0.5 时两个臂都在破坏模型
@@ -1352,7 +1354,7 @@ b=0.2 的行为端**未测**，交叉点在哪里不知道。
   两者的差别只可能在索引去重上，而本节的索引是唯一的。
 - 本节**没有**测 u_g64 / pair 臂的行为端，也没测 b=0.2。
 
-产物：`07_results/behavior_check_c8.{json,md}`（含逐上下文逐臂的生成文本前 240 字符、全部指标、钩子等价性）。
+产物：`results/behavior_check_c8.{json,md}`（含逐上下文逐臂的生成文本前 240 字符、全部指标、钩子等价性）。
 远端：`/root/autodl-tmp/runs/gfeas/behav_c8`。脚本：`scripts/behavior_check.py`。
 
 ### 2.26 可用预算包络：读数优势**不随预算衰减**，但能力代价近似线性增长，交叉点在 b≈0.3–0.4
@@ -1446,8 +1448,8 @@ b=0.2 的行为端**未测**，交叉点在哪里不知道。
   （那里 85.60% 的 persona 带 repetition 标签），因为它用的是 α 0.5–1.25 且只保留"最强连贯"档。
 - 效率比在 b=0.05 对 u_M 是 ∞（代价为负），这一档的比值不该与其它档并列比较。
 
-产物：`07_results/behavior_envelope_c8.{json,md}`（行为端 7 档）、
-`07_results/dense_optimal_envelope_c8.{json,md}`（读数端 7 档）。
+产物：`results/behavior_envelope_c8.{json,md}`（行为端 7 档）、
+`results/dense_optimal_envelope_c8.{json,md}`（读数端 7 档）。
 远端：`/root/autodl-tmp/runs/gfeas/{behav_envelope,dense_envelope}`。
 
 ### 2.27 下界排序（RACE 的 CAM 思想移植）：**预测被否**，对我们的梯度没有帮助
@@ -1507,7 +1509,7 @@ b=0.2 的行为端**未测**，交叉点在哪里不知道。
 **对下一步的含义**：既然排序顶部已经稳定，**不确定度不是我们的瓶颈**；瓶颈仍是
 "支撑集要多大"（§2.20 的曲线）与"读数的编译对不对"（C14）。⇒ 层扫描与特异性回到队列前两位。
 
-产物：`07_results/lcb_rank_c8.{json,md}`（两个排序的完整捕获曲线、逐上下文效应、两侧 top-32 坐标）。
+产物：`results/lcb_rank_c8.{json,md}`（两个排序的完整捕获曲线、逐上下文效应、两侧 top-32 坐标）。
 远端：`/root/autodl-tmp/runs/gfeas/lcb`。脚本：`scripts/lcb_rank.py`（`--dry-run` 可看计划与成本，240 次 J2 评估 / 2 分 37 秒）。
 
 ### 2.28 编译器 × 独立尺子：**三个编译器在 b=0.05 上完全不移动毒性尺子**，而外部配方只移动 1/8 且代价 13×
@@ -1663,8 +1665,8 @@ b=0.7 上 J2 的能力代价最小（−1.2547 vs −1.4416 / −2.3022），毒
 1. 第二轮脚本在**渲染 markdown 时**用了已删除的 `a.budget`（改成 `--budgets` 后忘了这一处），在写 JSON **之后**崩了 ⇒ 数据没丢，`.md` 由已保存的 JSON 重新渲染（文件末尾注明）。渲染器已修。
 2. 成本打印行把"代数对"算错了（写 192，实际 4 臂 × 2 预算 × 12 上下文 = 96 对）。不影响结果。
 
-产物：`07_results/compiler_pareto_hostility12.{json,md}`（含逐条生成文本与两个分类器的读数）、
-`07_results/gauge_validity.{json,md}`（阶段 0）。远端：`/root/autodl-tmp/runs/gfeas/{compiler_h12,gauge_validity}`。
+产物：`results/compiler_pareto_hostility12.{json,md}`（含逐条生成文本与两个分类器的读数）、
+`results/gauge_validity.{json,md}`（阶段 0）。远端：`/root/autodl-tmp/runs/gfeas/{compiler_h12,gauge_validity}`。
 
 ### 2.30 同语域五池特异性：**敌意方向是特异的**（4/4 池、12/12 上下文、p=0.00049），而且不是在"普遍破坏"里被看见的
 
@@ -1722,7 +1724,7 @@ b=0.7 上 J2 的能力代价最小（−1.2547 vs −1.4416 / −2.3022），毒
 3. **用这条通过了特异性的方向，去校准 `L14N8949`**：把 `u_II−` 与 `u_known` 的 cos 与效应并列，
    回答"暴力搜索那一次抽样离这个特异方向有多远"。
 
-产物：`07_results/bffm_pools_b07.{json,md}`（含逐池逐上下文的 P(tox)、逐条生成文本、指向性计数、rep4、ΔlogP）。
+产物：`results/bffm_pools_b07.{json,md}`（含逐池逐上下文的 P(tox)、逐条生成文本、指向性计数、rep4、ΔlogP）。
 远端：`/root/autodl-tmp/runs/gfeas/bffm_pools`。脚本：`scripts/bffm_pool_specificity.py`（12 分 55 秒，672 次前向+反向）。
 
 ### 2.31 特异方向的预算扫描 + 它与那个"著名坐标"的关系：**没有可用点；而且那对坐标与特异方向近乎正交**
@@ -1782,7 +1784,7 @@ u_known 只有 2 个非零坐标；u_II− 的 top-64 命中其中 1 个
 - "指向对方"仍是**启发式**（第二/三人称 + 脏话正则），不是人工/判官判定；
 - `u_known` 用它的**字面剂量**（0.7），没有按 M 预算归一化——它的 M 范数恰好接近 0.7，但两者并非同一标尺，所以表里那一行只作锚点，不作等预算比较。
 
-产物：`07_results/ii_budget_sweep.{json,md}`（逐预算逐上下文的 P(tox)、ΔlogP、指向性、文本前缀）。
+产物：`results/ii_budget_sweep.{json,md}`（逐预算逐上下文的 P(tox)、ΔlogP、指向性、文本前缀）。
 远端：`/root/autodl-tmp/runs/gfeas/ii_budget`。脚本：`scripts/ii_budget_sweep.py`（16 分 57 秒）。
 
 ### 2.32 层扫描（32 层全覆盖）：**L14 确实是第一名，但整条曲线是一片平台 —— 层选择几乎不影响效应量**
@@ -1826,7 +1828,7 @@ u_known 只有 2 个非零坐标；u_II− 的 top-64 命中其中 1 个
 - 层间差异 **0.7%–2%** 量级，而单次测量噪声约 **2.0e-03**（8 上下文均值 ~9e-04），所以"L14 第一"这个**排序**本身就在误差边缘，
   只有"整片平台"这个结论是稳的（1.30× 远大于噪声）。
 
-产物：`07_results/layer_sweep_all32.{json,md}`（32 层 × 2 臂 × 8 上下文的逐点 ΔJ2、`cond(B)`、`budget/‖g‖`、`M/g`）。
+产物：`results/layer_sweep_all32.{json,md}`（32 层 × 2 臂 × 8 上下文的逐点 ΔJ2、`cond(B)`、`budget/‖g‖`、`M/g`）。
 远端：`/root/autodl-tmp/runs/gfeas/layer_all`。
 
 ## 3. TODO（本文件登记，暂不动手）
@@ -1869,7 +1871,7 @@ u_known 只有 2 个非零坐标；u_II− 的 top-64 命中其中 1 个
 - [ ] `choices.py` 目前 3 任务/特质、单字母、n=3、明确不报 p。扩到 ≥12 任务并做任务级配对检验。
 - 说明：这条不改善 B1–B4，但它是唯一碰「行为」而非「似然」的一环；没有它，任何读数都只是语言代理。
 
-**两条新增前置要求（来自外部参考数据集的量化教训，详见 `08_reference-qwen3-8b-neuron-atlas.md` §4.4 与 §8）**：
+**两条新增前置要求（来自外部参考数据集的量化教训，详见 `doc/references/qwen3-8b-neuron-atlas.md` §4.4 与 §8）**：
 
 1. **判官自一致性必须先测**。同一个 Claude Haiku 5.5、同一批 884,736 条回复，
    “退化”可以是 **4.297%**（类别 `incoherent`）、**7.74%**（标签 `degenerate`）或 **48.156%**（标签 `repetition`）——
@@ -1910,7 +1912,7 @@ u_known 只有 2 个非零坐标；u_II− 的 top-64 命中其中 1 个
 
 ## 5. 记录方式
 
-每次实验只写三样东西：`scan` 的 manifest、`stability` 的 json、`verify/calibrate` 的 summary；**数字先进 `metadata.json`，再 `make -C qwentest meta && make -C qwentest check`**；把它们与本文件的 G1–G5 对照表抄进结论段，并注明**代码版本**（v6 起 `package_release` 会写进 manifest）。
+每次实验只写三样东西：`scan` 的 manifest、`stability` 的 json、`verify/calibrate` 的 summary；**数字先进 `doc/metadata.json`，再 `make -C qwentest meta && make -C qwentest check`**；把它们与本文件的 G1–G5 对照表抄进结论段，并注明**代码版本**（v6 起 `package_release` 会写进 manifest）。
 跨版本比较只允许比较「同一判据下的数字」，不允许跨版本比较绝对值。
 
 ### 2.33 目标指向性：把启发式换成一个**声明的编码方案**（并修正我自己的两次错判）
@@ -1944,7 +1946,7 @@ referent ∈ {SELF, ADDRESSEE, THIRD, NONE, **UNRESOLVED**}；按**有序模式*
 - **§2.31「峰值在 b=0.3–0.4（4/12）」→ 改为「峰值在 b=0.2–0.3（2–3/12），且 b=0.7 时 SELF=10/12」**。形状（先升后降、自贬上升）**不变**，但绝对值更低、峰更早。
 - **§2.30 的 CR2（`II−` 的"指向对方"高于其余四池）要降级**：v3 下 `II−` 2/12 vs `III−` 0/12、`I−` 0/12 —— 方向仍为正，但**差距只有 2 对 0**，不足以单独支撑"指向性特异"。CR1（毒性）与 CR3（IV− 未追平）**不受影响**。
 
-**未完成的那一步**：方案本身还不是量过的仪器。已生成 **48 条盲审表**（`07_results/target_directedness_audit_sheet.csv` + 私有映射），
+**未完成的那一步**：方案本身还不是量过的仪器。已生成 **48 条盲审表**（`results/target_directedness_audit_sheet.csv` + 私有映射），
 需要人按 `human_target_directed_0to1` / `human_self_abuse_0to1` 打分，才能报出编码者与人的一致率（κ）。在此之前它只是**代理**。
 
 ### 2.34 第三个 G：输出-KL 的 Fisher（CANS 的答案）——**在这个支撑集上它与 M、I 是同一个方向**
@@ -1953,7 +1955,7 @@ referent ∈ {SELF, ADDRESSEE, THIRD, NONE, **UNRESOLVED**}；按**有序模式*
 `13_paper-CANS-2610.35530-v1` §7 给出**第三种答案**：价格标签是**输出分布 KL 的曲率**，即 Fisher，
 `cost(u) = ½uᵀFu`（+ 阻尼 `½λ‖u‖²`，其默认 `λ = median(diag F)`）。这是扰动向量**唯一没有测过的维度**，
 所以本节把 `u_F` 放进同一个 32 坐标支撑、同一批 8 条上下文、同一预算网格、同一读数里。
-脚本 `scripts/dose_f.py`，产物 `07_results/dose_f.{json,md}`；远端原件 `/root/autodl-tmp/runs/dose_f/`。
+脚本 `scripts/dose_f.py`，产物 `results/dose_f.{json,md}`；远端原件 `/root/autodl-tmp/runs/dose_f/`。
 
 #### 2.34.1 设计（判据先冻结，写在运行之前）
 
@@ -2037,7 +2039,7 @@ referent ∈ {SELF, ADDRESSEE, THIRD, NONE, **UNRESOLVED**}；按**有序模式*
 本节把同一个问题搬到**唯一能判出差别的那一端**：全 18,432 坐标（13、14 两层 × 9,216）——
 那里 §2.22 已测到 `cos(u_g, u_M) = 0.588`、`budget/‖g‖ ≈ 2.65–2.96`。
 读数、预算网格、8 条上下文（逐 id 校验与 §2.34 相同：`contexts_match_support_run = true`）全部不变，
-变的是支撑集。脚本 `scripts/dose_f.py --dense`，产物 `07_results/dose_f_dense.{json,md}`。
+变的是支撑集。脚本 `scripts/dose_f.py --dense`，产物 `results/dose_f_dense.{json,md}`。
 
 **技术差别（全支撑上 M 是奇异的）**：`M = ŴŴᵀ` 秩 ≤ 2,560 < 9,216，所以 `u_M` 不能写 `M⁻¹g`，
 必须走 §2.21 的闭式解 `u_M = Ŵ B⁻¹ d*`、`d* = B⁻¹e`、`e = Ŵᵀg`、`B = ŴᵀŴ`；
@@ -2488,8 +2490,8 @@ K=64 +10.6%（7/8）、K=256 **+25.8%（8/8, p=0.0078）**。这是纯列表效�
 
 | 文件 | 内容 | 行数 |
 |---|---|---:|
-| `07_results/positions_all32_K1024_pairs.csv` | 规范列表（K=1024，b=0.05）的前 1024 个位置，每行带 `u_dose`、`alpha_raw`、`dresid_norm`、`p50`、`W_col_norm`、`q_share` | 1024 |
-| `07_results/query_pairs.csv` | 对**指定坐标**的三种口径（单点 / 必含该点的 K=64 最优组合 / 边际 ΔQ），同一批成对量 | 3 |
+| `results/positions_all32_K1024_pairs.csv` | 规范列表（K=1024，b=0.05）的前 1024 个位置，每行带 `u_dose`、`alpha_raw`、`dresid_norm`、`p50`、`W_col_norm`、`q_share` | 1024 |
+| `results/query_pairs.csv` | 对**指定坐标**的三种口径（单点 / 必含该点的 K=64 最优组合 / 边际 ΔQ），同一批成对量 | 3 |
 
 **同一点 `L14N8949` 的三种口径（我们算的，全部可复算）**：
 
@@ -2505,7 +2507,7 @@ K=64 +10.6%（7/8）、K=256 **+25.8%（8/8, p=0.0078）**。这是纯列表效�
 
 #### 2.38.6 把"位置–改变"核验扩到社区的 **165 个坐标**：重合是巧合
 
-数据：`neuronary` 快照里每个坐标都带剂量（中位取每坐标的配方剂量）⇒ 165 对可直接比对（`07_results/community_pairs.csv`）。
+数据：`neuronary` 快照里每个坐标都带剂量（中位取每坐标的配方剂量）⇒ 165 对可直接比对（`results/community_pairs.csv`）。
 
 | 检查 | 结果 |
 |---|---|
@@ -2539,7 +2541,7 @@ J_contrast = mean_t log p(their output_t | prompt) − mean_t' log p(their base_
 
 两者都 teacher-forced（**不生成**），`g = ∂J/∂u`，再跑我们的闭式解（`u = M⁺g`、贪心 `Q`），
 预算归一到**他们那条配方的 `√Σdose²`**（Cookie Monster = **1.649**）。
-脚本 `scripts/objective_match.py`，产物 `07_results/objective_match{,_contrast}.json`。
+脚本 `scripts/objective_match.py`，产物 `results/objective_match{,_contrast}.json`。
 
 **结果：两种目标都是 0/4**，且他们的 4 个坐标**都不在我们的 top-64**。
 
@@ -2564,7 +2566,7 @@ J_contrast = mean_t log p(their output_t | prompt) − mean_t' log p(their base_
 
 #### 2.39.1 扩到 178 条配方后：**方向可复现（93.4%），位置只在邻域（~1–4%）**
 
-同一批配方，四种设定一次跑完（`scripts/objective_match_batch.py`，`07_results/objective_match_batch.json`，GPU 5 分钟）：
+同一批配方，四种设定一次跑完（`scripts/objective_match_batch.py`，`results/objective_match_batch.json`，GPU 5 分钟）：
 
 | 设定 | n | 有任意重叠的配方 | 平均重叠（K=他们个数） | 平均 Jaccard | 他们进我们 top-64 的平均数 | 有坐标进 top-64 的配方 |
 |---|---:|---:|---:|---:|---:|---:|

@@ -4,7 +4,7 @@
     python3 stats_timing.py [RESULTS_JSONL] [--out DIR]
 
 Defaults are resolved from this file's own location, so the script runs from any
-working directory: RESULTS_JSONL is ../03_unpacked/persona-single-d0.5/out/
+working directory: RESULTS_JSONL is ../vendor/persona-single-d0.5/out/
 results_626721938e67f4.jsonl, DIR is ./out next to this script.
 
 Writes into --out:
@@ -32,7 +32,7 @@ from collections import defaultdict
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-DEFAULT_RESULTS = HERE.parent / '03_unpacked/persona-single-d0.5/out/results_626721938e67f4.jsonl'
+DEFAULT_RESULTS = HERE.parent / 'vendor/persona-single-d0.5/out/results_626721938e67f4.jsonl'
 
 def ols(X, y):
     """Tiny least squares, no numpy dependency. X: list of rows, y: list of floats."""

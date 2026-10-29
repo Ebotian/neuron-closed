@@ -17,7 +17,7 @@ Usage:
   python3 tools/evidence_ledger.py --check          # validate; exit 1 on any violation
   python3 tools/evidence_ledger.py --render         # print the matrices as markdown
   python3 tools/evidence_ledger.py --write          # rewrite the auto block in
-                                                    # 11_synthesis-external-evidence.md
+                                                    # doc/references/synthesis-external-evidence.md
 
 Stdlib only; no network, no GPU.
 """
@@ -25,9 +25,9 @@ from __future__ import annotations
 import argparse, json, re, sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]          # qwentest/
+ROOT = Path(__file__).resolve().parents[1]          # repo root
 LEDGER = ROOT / 'evidence/ledger.json'
-DOC = ROOT / '11_synthesis-external-evidence.md'
+DOC = ROOT / 'doc/references/synthesis-external-evidence.md'
 START = '<!-- auto:evidence-matrix:start -->'
 END = '<!-- auto:evidence-matrix:end -->'
 VERDICTS = {'S': 'strengthens', 'W': 'weakens', 'X': 'premises differ', 'N': 'no information'}

@@ -239,7 +239,7 @@ for scientist identities in this test."
 分布在 **7 个唯一坐标**上：`L13N3265 / L13N4810 / L13N6102 / L13N7956 / L14N4 / L14N7049 / L14N8949`；
 178 条配方里只有 **10 条**碰过这两层。⇒ **不是"重合少"，是绝大多数社区配方在我们的层空间之外**。
 
-#### 5.3.2 与我们的闭式解位置列表对照（`07_results/greedy_positions.json` / `positions_K256.csv`）
+#### 5.3.2 与我们的闭式解位置列表对照（`results/greedy_positions.json` / `positions_K256.csv`）
 
 | 社区坐标 | 在他们的配方里 | 我们的 pooled K=256 列表 | 8 条逐上下文列表里出现 | 我们的 `u`（b=0.05） | 比值（我们/他们） |
 |---|---:|---|---:|---:|---:|

@@ -62,7 +62,7 @@ def _retire_legacy_md5_table(text: str) -> tuple[str, bool]:
         rows=lines[j+1:k]
         if not rows:
             i=k; continue
-        if not any('01_packages/' in row or '.zip' in row.lower() for row in rows):
+        if not any('packages/' in row or '.zip' in row.lower() for row in rows):
             i=k; continue
         if not all('.zip' in row.lower() for row in rows):
             raise ValueError('Legacy MD5 table mixes ZIP packages and other files; '
@@ -81,7 +81,7 @@ def _clean_legacy_exception(ignore: str) -> str:
     """Remove a legacy exception and only its directly adjacent dedicated comments."""
     lines=ignore.splitlines()
     targets=[i for i,l in enumerate(lines)
-             if l.strip()=='!01_packages/qwen-persona-matrix.zip']
+             if l.strip()=='!packages/qwen-persona-matrix.zip']
     remove=set(targets)
     for i in targets:
         start=i
@@ -94,17 +94,17 @@ def _clean_legacy_exception(ignore: str) -> str:
                          lines[j],re.IGNORECASE):
                 remove.add(j)
     result=[x for i,x in enumerate(lines) if i not in remove]
-    if '01_packages/*.zip' not in [x.strip() for x in result]:
-        result.append('01_packages/*.zip')
+    if 'packages/*.zip' not in [x.strip() for x in result]:
+        result.append('packages/*.zip')
     return '\n'.join(result).rstrip()+'\n'
 
 def migrate(repo:Path,apply=False):
-    repo=repo.resolve();src=repo/'01_packages';dst=repo/'03_unpacked';readme=repo/'00_README.md'
+    repo=repo.resolve();src=repo/'packages';dst=repo/'vendor';readme=repo/'README.md'
     if not src.is_dir():raise FileNotFoundError(
-        f'Missing {src}; --repo must point to the workspace directly containing 01_packages/ '
-        f'(e.g. /path/to/research-repo/qwentest), not its parent.')
+        f'Missing {src}; --repo must point to the workspace directly containing packages/ '
+        f'(e.g. /path/to/repo), not its parent.')
     packages=sorted(src.glob('*.zip'))
-    if not packages:raise ValueError('No ZIP archives in 01_packages/')
+    if not packages:raise ValueError('No ZIP archives in packages/')
     items=[];planned=[]
     for archive in packages:
         with zipfile.ZipFile(archive) as zf:
@@ -127,7 +127,7 @@ def migrate(repo:Path,apply=False):
         table.append(f'| `{item["archive"]}` | `{item["md5"]}` | `{item["sha256"]}` | '
                      f'{item["extracted_text_files"]} |')
     section=START+'\n'+'## Unpacked package provenance (automatically maintained)\n\n'+\
-            'Binary ZIP files remain ignored; text versions are under `03_unpacked/`.\n\n'+\
+            'Binary ZIP files remain ignored; text versions are under `vendor/`.\n\n'+\
             '\n'.join(table)+'\n'+END
     old_readme=readme.read_text(encoding='utf8') if readme.exists() else ''
     # Exclude the managed section from legacy detection; re-run is idempotent.
@@ -165,7 +165,7 @@ def migrate(repo:Path,apply=False):
 def main():
     ap=argparse.ArgumentParser()
     ap.add_argument('--repo',required=True,type=Path,
-                    help='WORKSPACE root directly containing 01_packages/, e.g. /repo/qwentest')
+                    help='WORKSPACE root directly containing packages/, e.g. /repo/neuron-closed')
     ap.add_argument('--apply',action='store_true')
     args=ap.parse_args()
     print(json.dumps(migrate(args.repo,args.apply),indent=2,ensure_ascii=False))

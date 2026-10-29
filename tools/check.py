@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""qwentest gates: one command that re-derives every claim the docs make.
+"""neuron-closed gates: one command that re-derives every claim the docs make.
 
 Checks (each also runnable alone):
-  blocks      the two auto-managed blocks in 00_README.md equal their renders
-  ziptrees    every text member of 01_packages/*.zip equals its extracted file
-  checksums   every 03_unpacked/*/<root>/CHECKSUMS.sha256 verifies
+  blocks      the two auto-managed blocks in README.md equal their renders
+  ziptrees    every text member of packages/*.zip equals its extracted file
+  checksums   every vendor/*/<root>/CHECKSUMS.sha256 verifies
   compile     every tracked .py compiles
   tests       the torch-free unit tests pass (others are reported as skipped)
   dedup       no cross-version-family duplicate text, except the reviewed entries
-              in tools/dedup_allow.json (01_packages/02_archives excluded)
+              in tools/dedup_allow.json (packages/archives excluded)
   git         no binary/derived file is tracked
   ledger      evidence/ledger.json is valid and the rendered matrix in
-              11_synthesis-external-evidence.md matches it (tools/evidence_ledger.py)
+              doc/references/synthesis-external-evidence.md matches it (tools/evidence_ledger.py)
 
 Rendering:  render-status --write   /   render-provenance --write
 Stdlib only; no network, no GPU, no torch.
@@ -26,12 +26,12 @@ import sys
 import zipfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]          # qwentest/
+ROOT = Path(__file__).resolve().parents[1]          # repo root
 REPO = Path(subprocess.run(['git', 'rev-parse', '--show-toplevel'], cwd=ROOT,
                            capture_output=True, text=True).stdout.strip() or ROOT)
-PKG, UNP = ROOT / '01_packages', ROOT / '03_unpacked'
-README = ROOT / '00_README.md'
-META = ROOT / 'metadata.json'
+PKG, UNP = ROOT / 'packages', ROOT / 'vendor'
+README = ROOT / 'README.md'
+META = ROOT / 'doc' / 'metadata.json'
 STATUS = ('<!-- auto:workstream-status:start -->', '<!-- auto:workstream-status:end -->')
 PROV = ('<!-- auto:unpacked-packages:start -->', '<!-- auto:unpacked-packages:end -->')
 SKIP_EXT = {'.zip', '.tar', '.gz', '.zst', '.pt', '.pth', '.npy', '.npz', '.safetensors',
@@ -71,7 +71,7 @@ def render_status():
     routes = ' · '.join(f'`{k}` {v.split(" (")[0]}' for k, v in m['routes'].items())
     rows.append(f'| 路线 | {routes} |')
     rows.append('| 判据 | ' + ' · '.join(f'`{k}`' for k in m['gates']) +
-                '（定义见 `metadata.json`，说明见 `05_plan-gradient-discovery.md` §1） |')
+                '（定义见 `metadata.json`，说明见 `doc/plan-gradient-discovery.md` §1） |')
     if m.get('verdict_short'):
         rows.append(f'| 结论 | {m["verdict_short"]} |')
     rows.append('| 实测 | G1 r=%.3f/J64=%.3f（%d 条 prompt） · G2 r=%.3f–%.3f / J64=%.3f–%.3f（%s / %s） · verify %d/%d p=%.4f（%s） |' % (
@@ -112,7 +112,7 @@ def render_provenance():
         rows.append(f'| `{archive.name}` | `{md5(archive.read_bytes())}` | '
                     f'`{sha(archive.read_bytes())}` | {len(members)} |')
     return PROV[0] + '\n## Unpacked package provenance (automatically maintained)\n\n' \
-        'Binary ZIP files remain ignored; text versions are under `03_unpacked/`.\n\n' + \
+        'Binary ZIP files remain ignored; text versions are under `vendor/`.\n\n' + \
         '\n'.join(rows) + '\n' + PROV[1]
 
 
@@ -272,7 +272,7 @@ def main():
         for b in bad[:8]:
             print('        ' + b)
         fail += bool(bad)
-    print('qwentest check:', 'FAILED' if fail else 'OK')
+    print('neuron-closed check:', 'FAILED' if fail else 'OK')
     sys.exit(1 if fail else 0)
 
 

@@ -1,0 +1,32 @@
+neuron-closed — closed-form neuron selection and dose assignment for Qwen3.5-4B
+Copyright 2026 the neuron-closed authors
+
+Licensing of this repository
+----------------------------
+  * Code and experiment scripts ......... Apache License 2.0 (see LICENSE)
+  * Documentation and result reports .... CC BY 4.0 (see LICENSE-docs)
+
+Third-party material used, and what is redistributed here
+---------------------------------------------------------
+1. Jibes / Bryson Tang adjective and verb pools (Apache-2.0)
+   Used for lexicons/jibes_adj_verb_pools.json. Word lists are redistributed here
+   under Apache-2.0 with the attribution above. No other files from that project
+   are included.
+
+2. BFFM-100 factors (CC0-1.0 public-domain dedication)
+   Used for lexicons/bffm100_factors.json. Attribution is not required by the
+   licence; it is given for provenance.
+
+3. Qwen3.5-4B model weights (see the model card for its licence)
+   NOT redistributed. Every script takes the local model path as an argument.
+
+4. neuronary recipe library and neuron-explorer caches (public API / MIT)
+   NOT redistributed: no snapshot, no cache file, no recipe table is stored in this
+   repository. Only aggregate statistics and individual coordinates are cited, in
+   doc/references/. The pinned commit and snapshot date are recorded there.
+
+5. Frozen experiment packages under vendor/
+   Our own code, archived with CHECKSUMS.sha256. Do not edit them in place.
+
+No third-party dataset is required to run `make check`: it is stdlib-only and
+re-derives every claim from the files committed here.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit textual duplicate content in 03_unpacked; preserve complete version artifacts.
+"""Audit textual duplicate content in vendor; preserve complete version artifacts.
 
 Default policy: duplicates within a version family are allowed, cross-family
 identical text is a conflict (exit 2); the program never removes files.
@@ -113,7 +113,7 @@ def check_duplicates(unpacked: Path, allow_path: Path = None) -> dict:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--workspace-root', type=Path, required=True,
-                    help='Workspace directly containing 03_unpacked/, e.g. /repo/qwentest')
+                    help='Workspace directly containing vendor/, e.g. /repo/neuron-closed')
     ap.add_argument('--output', type=Path, default=None)
     ap.add_argument('--report-only', action='store_true',
                     help='Exit 0 even when cross-family duplicates exist; no file is removed')
@@ -121,7 +121,7 @@ def main():
                     help='Ignore tools/dedup_allow.json and report every cross-family duplicate')
     args = ap.parse_args()
     allow = None if args.no_allowlist else args.workspace_root / 'tools' / 'dedup_allow.json'
-    result = check_duplicates(args.workspace_root / '03_unpacked', allow)
+    result = check_duplicates(args.workspace_root / 'vendor', allow)
     report = json.dumps(result, indent=2, ensure_ascii=False) + '\n'
     if args.output:args.output.write_text(report, encoding='utf-8')
     print(report)

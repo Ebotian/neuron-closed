@@ -21,7 +21,7 @@ from pathlib import Path
 import numpy as np
 
 CACHE = Path('/home/ebt/neuronary-external/neuron-explorer/explorer/cache')
-REPO = Path('/home/ebt/rsi-dev/qwentest')
+REPO = Path(__file__).resolve().parents[1]
 D = 9216
 LAYERS = 32
 

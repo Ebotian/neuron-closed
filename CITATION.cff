@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this repository, cite it and the tag you used."
+title: "neuron-closed: closed-form selection of (layer, neuron) positions and their doses for Qwen3.5-4B"
+abstract: >-
+  A closed-form solver for neuron-level steering: u = W B^-1 d*, budget sqrt(u'Mu),
+  positions chosen by greedy maximisation of Q(S) = g_S' M_SS^-1 g_S, with every claim
+  re-derived by `make check`. Includes the measurement protocol, the agreement and the
+  stated boundaries (direction reproducible across objectives, but a behaviourally
+  searched short list is not recoverable from a local expansion).
+authors:
+  - name: "neuron-closed authors"
+version: 0.47.0
+date-released: "2026-10-29"
+license: Apache-2.0
+repository-code: "https://github.com/Ebotian/neuron-closed"
+keywords:
+  - mechanistic interpretability
+  - neuron steering
+  - closed-form control
+  - Qwen3.5-4B

@@ -1,6 +1,6 @@
 # 计划 06 — 特异性与剂量：`L14N8949` 到底是不是「敌意方向」
 
-状态：**待手动执行**（脚本已写好，命令见 §5）。上层目的见 `05_plan-gradient-discovery.md`，判据 ID 与数字的唯一来源是 `metadata.json`。
+状态：**待手动执行**（脚本已写好，命令见 §5）。上层目的见 `doc/plan-gradient-discovery.md`，判据 ID 与数字的唯一来源是 `doc/metadata.json`。
 
 ## 1. 要回答的问题
 
@@ -75,7 +75,7 @@ cd /root/autodl-tmp/qwen-gradient-discovery-v6
 
 - `manifest.json`：模型指纹（全量 SHA256）、runtime、扫描 manifest 哈希、probe 文件哈希、剂量、候选与对照、脚本 SHA256。
 - `dose.json` / `dose.md`：逐剂量数值、跨特质矩阵、安慰剂、通用似然、S1–S4 判定。
-- 数字定稿后：先进 `metadata.json`，再 `make -C qwentest meta && make -C qwentest check`。
+- 数字定稿后：先进 `doc/metadata.json`，再 `make -C qwentest meta && make -C qwentest check`。
 
 ## 8. 结果（2026-10-27，已执行；`runs/spec/dose_l14n8949`）
 

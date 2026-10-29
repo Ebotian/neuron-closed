@@ -1,4 +1,4 @@
-# Handover — read this first in a new session, then `00_README.md` + `metadata.json`
+# Handover — read this first in a new session, then `README.md` + `doc/metadata.json`
 
 State is in the repo, not in a chat log. Everything below is committed.
 
@@ -35,7 +35,7 @@ State is in the repo, not in a chat log. Everything below is committed.
 - `python3` is `/root/miniconda3/bin/python`; package mirror at `/root/autodl-tmp/scripts/j2space/`.
 
 ## Next actions, in the order the evidence supports
-1. **Score the audit sheet**: `07_results/target_directedness_audit_sheet.csv` (48 blind texts,
+1. **Score the audit sheet**: `results/target_directedness_audit_sheet.csv` (48 blind texts,
    private mapping next to it). Without human labels the target-directedness coder is a proxy.
 2. Optional: repeat the b-sweep with `caa_bffm` instead of `II−` (it was the strongest at b=0.7) and
    check whether its target-directedness peaks at the same budget.
@@ -44,7 +44,7 @@ State is in the repo, not in a chat log. Everything below is committed.
 - Never `cat` a file. Read a slice: `sed -n 'START,ENDp'`, or `grep -n` first.
 - Send big command output to a file and read the tail: `... > /tmp/x.log 2>&1; tail -6 /tmp/x.log`.
 - Use `codemode` to compute in the sandbox and return only a few numbers.
-- Record numbers in `metadata.json` first, then `make -C qwentest meta && make check`, then commit.
+- Record numbers in `doc/metadata.json` first, then `make -C qwentest meta && make check`, then commit.
 
 ## compaction headroom (arithmetic from the failed summary request)
 - failure: messages 688,978 + output 384,000 = 1,072,978 > 1,048,576

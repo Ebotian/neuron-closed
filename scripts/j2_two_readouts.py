@@ -21,7 +21,7 @@ from pathlib import Path
 def resolve_pkg(given):
     here = Path(__file__).resolve().parent
     cands = [Path(given)] if given else []
-    cands += [here.parent / '03_unpacked/qwen-gradient-discovery-v6/qwen-gradient-discovery-v6',
+    cands += [here.parent / 'vendor/qwen-gradient-discovery-v6/qwen-gradient-discovery-v6',
               Path('/root/autodl-tmp/qwen-gradient-discovery-v6')]
     for c in cands:
         if (c / 'engine.py').is_file():
