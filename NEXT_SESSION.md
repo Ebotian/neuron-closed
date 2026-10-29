@@ -2,7 +2,7 @@
 
 State is in the repo, not in a chat log. Everything below is committed.
 
-## Where the line stands (2026-10-31, metadata v0.34.0)
+## Where the line stands (2026-10-31, metadata v0.35.0)
 - **Closed form**: `u = ŴB⁻¹d*`, `d* ∝ B⁻¹e`, budget `sqrt(uᵀMu)` (M = Gram of unit W_down columns), delivered to 5.6e-17.
 - **u_M beats u_g** by 36–43% at b=0.05–0.5, 8/8 contexts, p=0.0078; transfers out-of-sample 8/8; word-half 12/12 cells.
 - **Dense beats sparse**: K=1 → 18432 is 5.78×; K=1 17.3%, K=256 73%, K=1024 89%.
@@ -12,6 +12,11 @@ State is in the repo, not in a chat log. Everything below is committed.
 - **No usable operating point**: P(tox) crosses 0.5 between b=0.2 and 0.3, where cost is already −0.587 nat (frozen tolerance 0.3).
 - **Target-directedness**: 92.4% coder coverage; II− peaks at b=0.2–0.3 (2–3/12), by b=0.7 it is 10/12 self-directed.
 - **Those coordinates are not the direction**: cos(u_II−, u_known) = 0.0299; `u_known` gives 1/12 of the effect at 1/5 efficiency.
+- **The third `G` adds nothing *on this support*** (plan 2.34, `dose_f`): the output-KL Fisher is a reproducible
+  instrument (split-half cos 0.9936) but nearly isotropic after `λ = median(F)` (`cond(diag F+λI)` 1.995, diag spread
+  3.547×), exactly as `M` already is — so `cos(u_M, u_F)` **0.9881**, `cos(u_I, u_F)` 0.9914, and the frozen primary
+  criterion **FAILS** (3/8, p=0.7266, −0.92%, below the 1e-02 claim threshold). At full support
+  `cos(u_g, u_M)` is only 0.588 — that is where "which G" can still be decided (plan §3 **R8**, not run).
 
 ## Remote
 `ssh -p 25785 root@connect.westc.seetacloud.com` (4080 SUPER, 32 GB). Caveats:
@@ -21,11 +26,11 @@ State is in the repo, not in a chat log. Everything below is committed.
 - `python3` is `/root/miniconda3/bin/python`; package mirror at `/root/autodl-tmp/scripts/j2space/`.
 
 ## Next actions, in the order the evidence supports
-1. **Item 4** (`dose_F`): estimate diagonal Fisher of an output-KL constraint on the same 32-coordinate set,
-   `λ = median(F)` (CANS default), and report `cos(u_M, u_F)` plus a three-way realised comparison
-   (`G = I` / `M` / `F`). ~30 min GPU. This is the only missing dimension of the perturbation vector.
-2. **Score the audit sheet**: `07_results/target_directedness_audit_sheet.csv` (48 blind texts,
+1. **Score the audit sheet**: `07_results/target_directedness_audit_sheet.csv` (48 blind texts,
    private mapping next to it). Without human labels the target-directedness coder is a proxy.
+2. **R8** (only if the G question still matters): `diag(F)` and the four-arm comparison at **full 18,432-coordinate
+   support**, where `cos(u_g, u_M)` is 0.588 rather than 0.995. J2 readout only — `apply_steering` cannot drive
+   generation at that width. Prediction is registered in plan §3 before the run.
 3. Optional: repeat the b-sweep with `caa_bffm` instead of `II−` (it was the strongest at b=0.7) and
    check whether its target-directedness peaks at the same budget.
 
