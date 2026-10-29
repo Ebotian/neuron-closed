@@ -1,8 +1,10 @@
 """External judging (numpy, seconds) using the GLOBAL order stored by select_rules.py."""
-import json, statistics, sys
+import json, os, statistics, sys
 import numpy as np
-CACHE='/home/ebt/neuronary-external/neuron-explorer/explorer/cache/'
-REPO='/home/ebt/neuron-closed/'
+from pathlib import Path
+CACHE=os.environ.get('NEURON_EXPLORER_CACHE', CACHE_DEFAULT)
+REPO=str(Path(__file__).resolve().parents[1])
+CACHE_DEFAULT='external/neuron-explorer/explorer/cache/'
 D,L=9216,32
 J=json.load(open(sys.argv[1] if len(sys.argv)>1 else '/tmp/select_rules.json')); ks=J['ks']
 st=np.load(CACHE+'steer_index.npz')

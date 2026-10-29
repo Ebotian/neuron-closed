@@ -2,7 +2,7 @@
 
 Inputs (all outside git except our own results):
   /tmp/g_all32.npz                                         our closed-form gradients, 32 x 9,216 (dose units)
-  /home/ebt/neuronary-external/neuron-explorer/explorer/cache/steer_index.npz
+  $NEURON_EXPLORER_CACHE/steer_index.npz     (default: external/neuron-explorer/explorer/cache)
         their per-coordinate next-token KL at +-0.8 x (median residual norm / ||W_down[:,n]||),
         i.e. the SAME dose formula we use, measured on 4 short contexts (last position)
   .../lens_index.npz      their per-neuron logit-lens top-12 (up/down)
@@ -10,17 +10,18 @@ Inputs (all outside git except our own results):
   .../vocab.json          token strings
   results/positions_all32_K1024.csv     our closed-form list (32 layers)
   results/positions_K256.csv            our closed-form list (layers 13-14)
-  /home/ebt/neuronary-external/community_coords_all.json   their recipe coordinates
+  $NEURON_COMMUNITY_COORDS                   optional: their recipe coordinates (not in git)
 
 Sections: A measured KL vs our Q/|g|; B the recipe coordinates under both instruments;
           C semantics of our top positions (their lens) vs random; D structure (their 24-link graph).
 """
-import csv, json, statistics, sys
+import csv, json, os, statistics, sys
 from pathlib import Path
 
 import numpy as np
 
-CACHE = Path('/home/ebt/neuronary-external/neuron-explorer/explorer/cache')
+CACHE = Path(os.environ.get('NEURON_EXPLORER_CACHE',
+                            'external/neuron-explorer/explorer/cache'))
 REPO = Path(__file__).resolve().parents[1]
 D = 9216
 LAYERS = 32
@@ -88,7 +89,8 @@ for K in (64, 256, 1024, 4096):
     print(f'    K={K:<5} |A&B| = {len(theirs & ours):<5} Jaccard {len(theirs & ours) / len(theirs | ours):.3f}')
 
 # ---------------------------------------------------------------- B. their recipe coordinates
-comm = json.load(open('/home/ebt/neuronary-external/community_coords_all.json'))
+cc_path = os.environ.get('NEURON_COMMUNITY_COORDS', '')
+comm = json.load(open(cc_path)) if cc_path and os.path.exists(cc_path) else None
 cc = [(int(c['layer']), int(c['neuron'])) for c in comm['coords']]
 print(f'\n=== B. their {len(cc)} recipe coordinates, scored by both instruments ===')
 pcts = [pct(sorted_kl, kl_mean[idx_of(l, n)]) for l, n in cc]

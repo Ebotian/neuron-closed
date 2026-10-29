@@ -139,8 +139,10 @@ def main():
     ap.add_argument('--model', default='/root/autodl-tmp/Qwen3.5-4B')
     ap.add_argument('--lexicon', default=str(ROOT / 'lexicons/jibes_adj_verb_pools.json'))
     ap.add_argument('--probes', default=str(ROOT / 'probes/contrasts_v3.jsonl'))
-    ap.add_argument('--community', default='/home/ebt/neuronary-external/community_coords_all.json',
-                    help='community coordinate snapshot (NOT in git): {coords:[{layer,neuron,doses}]}')
+    ap.add_argument('--community', default='',
+                    help='optional community coordinate snapshot, NOT in this repo '
+                         '({coords:[{layer,neuron,doses}]}); without it the run still produces '
+                         'positions, it only skips the comparison')
     ap.add_argument('--layers', default='0-31')
     ap.add_argument('--contexts', type=int, default=8)
     ap.add_argument('--split', default='heldout')

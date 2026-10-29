@@ -221,7 +221,7 @@ for scientist identities in this test."
 
 **§5.1 的 141 是 2026-10-2x 的快照，现在过期了。** 同一条取法（`curl -4 --http1.1` + `offset` 分页；
 `--noproxy '*'` 会反而失败）重拉：`Content-Range: 0-0/187`，两页 100 + 87 = **187 条、id 全不重复**。
-**原始快照不入仓**（许可未声明），只留在本机 `/home/ebt/neuronary-external/neuronary_141.json`；仓内只记统计量。
+**原始快照不入仓**（许可未声明），只留在本机 `neuronary_141.json`（本机，不在本仓）；仓内只记统计量。
 
 | 量 | 141 条时（§5.1） | **187 条时（本节）** |
 |---|---|---|
