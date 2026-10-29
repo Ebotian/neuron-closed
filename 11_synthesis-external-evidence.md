@@ -78,24 +78,25 @@
 
 格内符号：**S** 增强 · **W** 弱化 · **X** 前提不同 · **N** 无信息 · `·` 未评。
 
-| 主张 | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 | S12 | S13 | 净结论 |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `C1` 跨神经元的剂量归一化 dose*p50/||W_down[:,n]|| 是正确且可复用的约定 | S | S | S | · | S | · | · | · | X | · | · | · | · | S×4 为主，X×1 |
-| `C2` 坐标级效应可复现（换词半/换 prompt 半仍选到同一批坐标） | N | N | W | X | · | · | · | · | X | W | · | · | · | W×2 为主，X×2 |
-| `C3` 找到的坐标是真实、有方向、剂量单调的杠杆 | · | S | S | · | · | · | · | · | · | · | · | · | · | S×2 为主 |
-| `C4` 效应具有敌意特异性（vs 其他同语域特质） | N | N | N | · | · | · | · | · | · | · | · | X | N | 无增强，X×1 |
-| `C5` 少数稀疏坐标（top-K）能抓住该效应 | W | · | W | W | W | · | · | · | W | · | · | X | · | W×5 为主，X×1 |
-| `C6` 线性代理能预测效应幅度（calibration） | · | · | X | X | · | · | · | · | X | · | · | · | · | 无增强，X×3 |
-| `C7` 闭式最优控制 u ~ M^+g 在稠密区优于 u ~ g | · | · | · | X | · | · | · | · | · | · | · | · | · | 无增强，X×1 |
-| `C8` 解析组合 Q(S)=g_S' G_SS^-1 g_S 能表达多坐标的交互 | · | · | W | · | X | · | · | · | W | · | · | · | · | W×2 为主，X×1 |
-| `C9` 读数改善等价于行为改善 | · | W | W | · | · | · | X | · | · | · | · | W | W | W×4 为主，X×1 |
-| `C10` 层 13-14 是对的作用层 | X | · | · | X | X | · | · | · | X | · | · | · | · | 无增强，X×4 |
-| `C11` 读数数值误差可控（可跨 run 比较 1e-03 级差异） | · | · | · | · | · | W | · | S | · | · | · | · | · | S/W 相抵 |
-| `C12` 读数/标签可由 LLM 判官可靠给出 | W | S | · | · | · | · | · | · | · | · | · | · | · | S/W 相抵 |
-| `C13` 输出形式应为『神经元+符号+强度』的短列表 | · | · | · | W | W | · | · | · | S | · | X | · | · | W×2 为主，X×1 |
-| `C14` 语义编译 tau -> J_tau 是整个映射的主要难点 | X | · | · | · | · | · | S | · | S | · | · | S | S | S×4 为主，X×1 |
-| `C15` Additive injection and multiplicative scaling are in | · | · | · | · | · | · | · | · | W | · | · | · | · | W×1 为主 |
-| `C16` A toxicity classifier trained on English can score a | · | · | · | · | · | · | · | · | · | · | · | · | X | 无增强，X×1 |
+| 主张 | S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9 | S10 | S11 | S12 | S13 | S14 | 净结论 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `C1` 跨神经元的剂量归一化 dose*p50/||W_down[:,n]|| 是正确且可复用的约定 | S | S | S | · | S | · | · | · | X | · | · | · | · | · | S×4 为主，X×1 |
+| `C2` 坐标级效应可复现（换词半/换 prompt 半仍选到同一批坐标） | N | N | W | X | · | · | · | · | X | W | · | · | · | · | W×2 为主，X×2 |
+| `C3` 找到的坐标是真实、有方向、剂量单调的杠杆 | · | S | S | · | · | · | · | · | · | · | · | · | · | · | S×2 为主 |
+| `C4` 效应具有敌意特异性（vs 其他同语域特质） | N | N | N | · | · | · | · | · | · | · | · | X | N | · | 无增强，X×1 |
+| `C5` 少数稀疏坐标（top-K）能抓住该效应 | W | · | W | W | W | · | · | · | W | · | · | X | · | · | W×5 为主，X×1 |
+| `C6` 线性代理能预测效应幅度（calibration） | · | · | X | X | · | · | · | · | X | · | · | · | · | · | 无增强，X×3 |
+| `C7` 闭式最优控制 u ~ M^+g 在稠密区优于 u ~ g | · | · | · | X | · | · | · | · | · | · | · | · | · | · | 无增强，X×1 |
+| `C8` 解析组合 Q(S)=g_S' G_SS^-1 g_S 能表达多坐标的交互 | · | · | W | · | X | · | · | · | W | · | · | · | · | · | W×2 为主，X×1 |
+| `C9` 读数改善等价于行为改善 | · | W | W | · | · | · | X | · | · | · | · | W | W | · | W×4 为主，X×1 |
+| `C10` 层 13-14 是对的作用层 | X | · | · | X | X | · | · | · | X | · | · | · | · | · | 无增强，X×4 |
+| `C11` 读数数值误差可控（可跨 run 比较 1e-03 级差异） | · | · | · | · | · | W | · | S | · | · | · | · | · | · | S/W 相抵 |
+| `C12` 读数/标签可由 LLM 判官可靠给出 | W | S | · | · | · | · | · | · | · | · | · | · | · | · | S/W 相抵 |
+| `C13` 输出形式应为『神经元+符号+强度』的短列表 | · | · | · | W | W | · | · | · | S | · | X | · | · | · | W×2 为主，X×1 |
+| `C14` 语义编译 tau -> J_tau 是整个映射的主要难点 | X | · | · | · | · | · | S | · | S | · | · | S | S | · | S×4 为主，X×1 |
+| `C15` Additive injection and multiplicative scaling are in | · | · | · | · | · | · | · | · | W | · | · | · | · | · | W×1 为主 |
+| `C16` A toxicity classifier trained on English can score a | · | · | · | · | · | · | · | · | · | · | · | · | X | · | 无增强，X×1 |
+| `C17` A hostility-compiled (antagonism) direction is behav | · | · | · | · | · | · | · | · | · | · | · | · | · | S | S×1 为主 |
 
 ### 每条判定的数值依据（程序校验：S/W/X 必须含数字）
 
@@ -125,6 +126,7 @@
 | C14 | S9 | **S** | it separates 2 explicit proxies (target-token log-prob for behaviour, output-distribution KL for capability), so the compiler's definition directly determines the optimised object — the compiler's definition directly determines the optimised object |
 | C15 | S9 | **W** | Prop. 1, verbatim: g_j = (1//D_steer/) sum sum_p h_pj dP_sigma/dh_pj, i.e. activation times gradient; multiplicative gain is proportional to the activation, so at h=0 it is 0 — the additive injection we use can open a silent neuron; confirmed in the TeX, not only the README |
 | C16 | S13 | **X** | stage 0 AUC(pos>neg) = 0.986 (tox_bert) and 1.000 (s-nlp) on the 21 English probe continuations, but 0.688 / 0.438 on the 4 Chinese ones and 0.643 / 0.587 on the 14 verb-frame slot words — usable for English adjective-frame material only; Chinese and the verb frame are blind |
+| C17 | S14 | **S** | at b=0.7 on 12 English hostility prompts, II- (antagonism vs warmth) gives mean P(toxic) 0.9875 with 12/12 above 0.5, while I- / III- / IV- / V- give 0.0006 / 0.1655 / 0.0069 / 0.0340; per-context margin over the best other pool is +0.249 to +0.984, and the II- vs IV- paired exact sign test is p=0.00049 (n=12) — damage-matched control: all five directions cost -1.44 to -2.24 nat of reference logP and have comparable rep4 (II- is among the LOWEST at 0.013), so the toxicity is not a byproduct of general destruction or of looping. Scope: this is compiler-level specificity, NOT evidence that L14N8949 is hostility-specific (claim C4 unchanged). |
 | C2 | S1 | **N** | 单个 prompt，对跨上下文可复现零信息 |
 | C2 | S10 | **W** | their CAM ranks by a posterior with an uncertainty penalty; I transplanted that idea as a context-bootstrap 5% lower bound on our gradient and TESTED it (plan 2.27): the registered prediction K@73%(lcb) < 256 was FALSIFIED - both rankings need K=256, and at K=1 the LCB ranking captures only 69.6% of the mean ranking (difference -0.0154 = 17x the 9e-04 mean error); K>=128 the two are indistinguishable — this tests the TRANSPLANT onto our gradient, not RACE's own forward-pass / token-level posterior estimator; measured in 07_results/lcb_rank_c8.json |
 | C2 | S2 | **N** | 同一批 20 提示，无分半设计 |
@@ -174,6 +176,7 @@
 | S11 | Sparsified MLPs vs Transcoders (2610.24521 v1) | 13 open-source transcoders | - | no dose: feature-neuron weight alignment analy | alignment of transcoder features with ML | feature x transcoder | — | — |
 | S12 | Steering Geometry (2609.06289 v1, EMNLP 2026) + code/dataset | several + Schwartz 20 values / MFT 6 foundations | - | contrastive vectors (CAA/SAS/Spherical/ODE/OPT | geometric alignment + behavioural effect | value x method | — | — |
 | S13 | two borrowed toxicity classifiers, staged: validity first, then steered generation | unitary/toxic-bert (apache-2.0) + s-nlp/roberta_toxicity_classifier (openrail++) | fp32 on GPU | not a steering source: scores generated text | P(toxic) per generated reply | reply | 25 probe rows (stage 0) + 12 English hostility prompts (stage 1) | — |
+| S14 | BFFM five-pool specificity run at b=0.7 (our own experiment, recorded as evidence) | Qwen3.5-4B bf16 | bf16 | CAA-style contrast within a pool (X- vs X+), o | P(toxic) from two borrowed classifiers o | pool x context | 12 | — |
 
 <!-- auto:evidence-matrix:end -->
 

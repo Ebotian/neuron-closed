@@ -1,6 +1,6 @@
 {
  "schema": "qwentest-external-evidence-v1",
- "built": "2026-10-29b",
+ "built": "2026-10-29c",
  "purpose": "external sources vs our closed-form inverse-mapping claims, with numeric basis",
  "verdict_scale": {
   "S": "strengthens",
@@ -255,6 +255,26 @@
    "verifiable": "yes (models sha256-pinned, 07_results carries every text)",
    "licence": "apache-2.0 / openrail++",
    "rows_committed": false
+  },
+  {
+   "id": "S14",
+   "label": "BFFM five-pool specificity run at b=0.7 (our own experiment, recorded as evidence)",
+   "record": "05_plan 2.30 + 07_results/bffm_pools_b07.json",
+   "model": "Qwen3.5-4B bf16",
+   "quant": "bf16",
+   "dose_def": "CAA-style contrast within a pool (X- vs X+), one shared closed-form solver, budget 0.7",
+   "dose_range": [
+    0.7,
+    0.7
+   ],
+   "outcome": "P(toxic) from two borrowed classifiers on greedy generations, plus you-directed / self-directed profanity counts, rep4, and dlogP of REFERENCE_TEXT",
+   "unit": "pool x context",
+   "n_contexts": 12,
+   "judge": "two classifiers (stage-0 AUC 0.986-1.000 on English)",
+   "judge_kappa": null,
+   "verifiable": "yes (07_results carries every text and every score)",
+   "licence": "our own run",
+   "rows_committed": true
   }
  ],
  "claims": [
@@ -321,6 +341,10 @@
   {
    "id": "C16",
    "claim": "A toxicity classifier trained on English can score a hostile-register construct"
+  },
+  {
+   "id": "C17",
+   "claim": "A hostility-compiled (antagonism) direction is behaviourally specific against other same-register negative pools"
   }
  ],
  "verdicts": [
@@ -708,6 +732,13 @@
    "verdict": "X",
    "basis": "stage 0 AUC(pos>neg) = 0.986 (tox_bert) and 1.000 (s-nlp) on the 21 English probe continuations, but 0.688 / 0.438 on the 4 Chinese ones and 0.643 / 0.587 on the 14 verb-frame slot words",
    "note": "usable for English adjective-frame material only; Chinese and the verb frame are blind"
+  },
+  {
+   "claim": "C17",
+   "source": "S14",
+   "verdict": "S",
+   "basis": "at b=0.7 on 12 English hostility prompts, II- (antagonism vs warmth) gives mean P(toxic) 0.9875 with 12/12 above 0.5, while I- / III- / IV- / V- give 0.0006 / 0.1655 / 0.0069 / 0.0340; per-context margin over the best other pool is +0.249 to +0.984, and the II- vs IV- paired exact sign test is p=0.00049 (n=12)",
+   "note": "damage-matched control: all five directions cost -1.44 to -2.24 nat of reference logP and have comparable rep4 (II- is among the LOWEST at 0.013), so the toxicity is not a byproduct of general destruction or of looping. Scope: this is compiler-level specificity, NOT evidence that L14N8949 is hostility-specific (claim C4 unchanged)."
   }
  ]
 }
