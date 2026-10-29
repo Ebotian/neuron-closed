@@ -266,3 +266,72 @@ for scientist identities in this test."
   ⇒ **他们的配方本来就在我们测过的"退化区"里工作**，换来的是 persona 覆盖而不是能力保持——这不是矛盾，是不同目标。
 - 注意跨量化：他们的 p50 来自 4/8-bit（8-bit 11.014 vs 我们 bf16 10.329，差 6–12%，§2），
   所以任何逐坐标剂量对照都要用同一份 p50 重算后再比。
+
+### 5.4 `neuron-explorer` 的测量协议（钉版：commit `6a6f0e9`，2026-10-28）
+
+**版本钉定**：仓库 `lyramakesmusic/neuron-explorer`，本次读的是主干 commit
+**`6a6f0e95bf49ad6626940021148f775d7d55d1e4`**（"neuronary_update can change a recipe's neurons and doses"，2026-10-28）。
+读了 `research_log.md`、`explorer/agent_methodology.md`、`sweep/steer_sweep.py`、`sweep/rank.py`。
+这是**代码仓库不是论文**，所以 `local2gpt/check_citations.py`（只查 arXiv 编号与版本）不适用；钉版就是上面的 SHA。
+
+#### 5.4.1 他们的做法（原文关键句 + 我的转述分开写）
+
+**引（`sweep/steer_sweep.py` 模块文档，逐字）**：
+> "Steering neuron n by dose d adds d \* abs\_max\[n\] to its activation at every position (prompt and generated).
+> That is the same as adding d \* abs\_max\[n\] \* W\_down\[:, n\] to the layer's MLP output, which is what this sends to
+> the steering fork of vLLM at the `mlp_out` hook."
+
+**引（同上，`main_rel`）**：
+> "Design "main\_rel" (with --dose-unit rel) gives every neuron the same push sizes, as fractions of the median
+> residual norm: {who, snake, orange} x {-0.7, +0.5, +0.8} and {free} x {+3}."
+
+**引（同上，代码）**：`resid_p50 = float(st["resid_norm_q10_50_90"][1])`
+⇒ 他们的 `rel` 剂量分母就是**该层残差范数的中位数**，与我们的 `p50_l` 是同一个统计量。
+
+**转述其余事实**（我的概括，不是他们的原话）：
+- 三个设计：`main`（{who,snake,orange} × {−2,+2,+10} + {free}×+10）、`calib`（±{1,2,4,8,16,32}）、
+  `main_rel`（±0.7/0.5/0.8，free +3，按残差范数归一）。**默认贪心解码**，最多 256 token，每个 prompt 一条未注入基线。
+- 四个固定 prompt（"Who are you?" / "Write a snake game in Python." / "Describe the color orange." / "Write whatever you like."），
+  走 chat template、`enable_thinking=False`。
+- **对照是"把该神经元的 down 列旋转成随机方向、同范数同剂量"**，默认 256 条；
+  他们在 `research_log` 里记到随机方向也能让模型自称"Xiaomi AI"，所以"名字翻转"本身不是证据。
+- 每条约 200–256 token 的生成结果**全部留存**：token id、每步 chosen logprob 与 top-5 备选、
+  以及 `mlp_in` 在 +0/+1/+4/+8 层的捕获（可从捕获重算任一神经元激活）。
+- 规模：**9,216 个神经元 × 10 条 rollout ≈ 9.5 万次生成 ≈ 4090 上 1.4 小时**。
+
+**读数（`sweep/rank.py`，逐字文档）**：
+> "words over-represented in its rollouts vs the average unit, Poisson z = (count - mean) / sqrt(mean + 0.5),
+> counted once per rollout, restricted to rollouts with push <= --max-rel, excluding baseline words"
+> "mass summed positive z of its top 5 words: breadth of the word cluster (**the sort key**)"
+> "null_pct share of random-direction controls with a lower mass (1.0 = above every control)"
+
+⇒ 他们的测量是**排序 + 定性**：按"词簇广度"排序，再报它在随机方向零假设里的百分位；
+外加按剂量的**文本完整度**（distinct-4-gram 比例、被 max-token 截断的比例、平均 chosen logprob）。
+**没有配对符号检验，也没有"同预算下两个方向对比"这类实验设计。**
+
+#### 5.4.2 与我们的差异（这是能对上的地方，也是不能对上的地方）
+
+| 维度 | 他们 | 我们 |
+|---|---|---|
+| 剂量单位 | `rel`：**d × 残差范数中位数**；`absmax`：d × 该神经元 abs_max | `u × p50_l / ‖W_down[:,n]‖`，`p50_l` = **同一统计量**（残差范数中位数）|
+| 因此 | 他们的 dose 0.5/0.8（`rel`）≙ **我们的 b = 0.5/0.8（单坐标）** | 不需要换算因子；差的是"单点"还是"K 点摊开" |
+| 注入位置 | `mlp_out` 加 `W_down[:,n]` | `down_proj` 输入加 alpha（数学上同一残差位移），显式断言无 `layer_scale` |
+| 读数 | **生成文本**：词簇 z 质量、distinct-4-gram、截断率、logprob | **teacher-forced log 概率差** J2（不生成）+ 行为端代理 |
+| 对照 | 256 条随机方向，同范数同剂量；报 `null_pct` | 随机方向 `u_R` + **8 上下文配对符号检验** |
+| 分析单位 | **神经元**（单次 rollout 群） | **上下文**（8 条 held-out，预算嵌套） |
+| 规模/代价 | 9.5 万条生成，1.4 h 4090 | ~百次 J2 评估，分钟级 |
+
+**能对上的两点**：
+1. **剂量标尺同一**（都用残差范数中位数）：他们记的"相干窗口 ≈0.5–0.8×，≥1.5× 成乱码"，
+   与我们测的"读数代价从 b≈0.3–0.4 开始、b=0.5 行为端已在受损"**同量级**，互相独立地指向"1× 残差范数附近会崩"。
+2. **反面对照的结论一致**：他们发现"文本变了"没有信息量（±1 就有 83–98% 的 rollout 改变），
+   我们发现在 32 坐标上 `cos` 与符号检验对数值错位是盲的（§2.35 回归）——都是"要盯正确的信号"。
+
+**对不上的地方（决定了两边的坐标集为何重叠稀薄）**：他们按**行为词簇**排序，我们按**logit 间隔代理**排序；
+他们一次注入**一个**神经元并配随机方向零假设，我们把**预算摊在 K 个**位置并做上下文配对检验。
+两套排序在同一个模型上给出不同层的不同神经元（他们 L7/L22/L21，我们 L31/L5/L25，§2.37），
+**这不是谁错，是问的问题不同**；要判定必须做同预算的 J2 对照测量（我们尚未做）。
+
+**可直接借用、代价很低的两件**：
+- 他们的 `null_pct`（在本任务里就是"我们的列表质量 vs 随机方向列表"的分位数版）——我们已有 `random` 臂，可加这一列；
+- 他们的**逐剂量完整度曲线**与我们的能力代理包络（§2.26）是同一件事的两种口径，可并表报出。
