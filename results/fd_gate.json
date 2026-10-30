@@ -181,6 +181,5 @@
  "topn": 2,
  "model": "/root/autodl-tmp/Qwen3.5-4B",
  "dtype": "float32",
- "criterion": "G1 rel_err_new<0.02 for every row; G2 some legacy rel_err>0.05; G3 conjunction",
- "status": "PASS"
+ "criterion": "G1 rel_err_new<0.02 for every row; G2 some legacy rel_err>0.05; G3 conjunction"
 }
