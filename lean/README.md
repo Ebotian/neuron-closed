@@ -14,17 +14,16 @@
 | **`Icc.lean`** | `icc_bounds` / `ssbU_nonneg` / `icc_bounds_from_sums` | **R2**：`ICC ∈ [−1/(n−1), 1]`；**R4**：`SS_b` **按构造非负** ⇒ R2 的前提 `MSb ≥ 0` 是推论而非假设 |
 | **`Witness.lean`** | `plug_in_cos_moves` | **R5**：公共平移下 plug-in 平方余弦 **0 → 1/2**，而 `SS_w` 不变——反面论断，此前只是文字 |
 | **`Mean.lean`** | `sum_sub_mean_eq_zero` | 组内偏差之和为零（ANOVA 分解所需的事实） |
-| **`SsDecomp.lean`** | `scatter_split` | **逐组 ANOVA 分解**：`Σ‖f−g‖² = Σ‖f−mean f‖² + K‖mean f−g‖²` |
+| **`SsDecomp.lean`** | `scatter_split` / `variance_identity` / `pooled_variance_identity` / **`ssb_is_between_scatter`** | **ANOVA 分解**：(a) 方差恒等式、(b) 池化层同一条、**(c) `Σ_cΣᵢ‖X_ci−x̄‖² − Σ_cΣᵢ‖X_ci−x̄_c‖² = K·Σ_c‖x̄_c−x̄‖²`**——即**代码那条减法**等于 `Icc.lean` 证明非负的那个量 |
 
 跑：`leanm lean/Icc.lean`（每个文件独立）。审计：`opl-leancheck --file lean/Icc.lean --decl NeuronClosed.icc_bounds`，
 记录在 `results/lean_audit.json`，`make check` 的 `instruments` 项校验 sha 一致。
 
 ## 仍未形式化（不得当作已证）
 
-- **`SS_b = SS_t − SS_w` 仍未闭合**。已证的是**逐组分解**（`scatter_split`），还缺三条桥接恒等式：
-  (a) `Σᵢ‖xᵢ‖² − ‖Σᵢxᵢ‖²/K = Σᵢ‖xᵢ − mean x‖²`（把 `SswNormalised.sswU` 与偏差形式接起来）；
-  (b) 池化层同一条，使 `ss_t` 的代码形式等于 `Σ_c Σᵢ‖x_ci − x̄‖²`；
-  (c) `ss_b` 的减法形式等于 `K Σ_c‖x̄_c − x̄‖²`。
-  三条齐了，把 `scatter_split` 对组求和（`g` = 总均值）即可得 `ss_t = ss_w + ss_b`。**在此之前，代码的 `ss_b` 在数值上可能为微小负值，没有定理禁止。**
+- **还缺一条算术桥**：代码把 `sswU` 写成 `Σ‖x‖² − ‖Σx‖²/K`，而 `SsDecomp` 用的是偏差形式。差的是
+  `K‖mean f‖² = ‖Σ f‖²/K`（由 `mean = K⁻¹ • Σf` + `norm_smul` + `abs_of_pos` 两行可得）；有了它，(a)+(c) 就能改写成
+  代码里字面的 `sswU` 形式。**在那之前，"代码的 `ss_b` 等于非负量"这句话严格说只对偏差形式成立。**
+- `_f_quantile` 的数值实现仍未验证。
 - `‖g‖² = (MS_b − MS_w)/k` 的换算未证。
 - `_f_quantile` 的数值实现未验证。

@@ -2,7 +2,7 @@
  "toolchain": "leanprover/lean4:v4.33.0-rc1",
  "mathlib_rev": "79d0395a1825a6264ad5d269e35e60537518955e",
  "mathlib_inputRev": "v4.33.0-rc1",
- "verdict": "PROVED for all twenty declarations across nine files (opl-leancheck without --evidence-out)",
+ "verdict": "PROVED for all twenty-two declarations across nine files (opl-leancheck without --evidence-out)",
  "already_in_mathlib": "ContinuousLinearMap.ker_adjoint_comp_self states (T\u2020 \u2218L T).ker = T.ker, i.e. ker_gram is textbook; the load-bearing statement is lift_maps_back",
  "boundary": "formalises the algebra (kernel is a gauge; a solution's residual image is exactly y). It does NOT formalise the model, the construct, or trait fidelity.",
  "files": {
@@ -151,19 +151,34 @@
    "role": "auxiliary: deviations from the group mean sum to zero (the fact the ANOVA decomposition needs)"
   },
   "lean/SsDecomp.lean": {
-   "sha256": "690c5ade4593e0d3a0cc6ae210e76a62688e881c78ffb6c74f5c1bf25acaba4c",
+   "sha256": "752c7344a988e5fdecbecd3f18c20fc5b94d24d9d159399e75153a7aff776cd0",
    "decls": {
     "NeuronClosed.scatter_split": [
      "propext",
      "Classical.choice",
      "Quot.sound"
+    ],
+    "NeuronClosed.variance_identity": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.pooled_variance_identity": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.ssb_is_between_scatter": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
     ]
    },
-   "role": "the per-group ANOVA split \u03a3\u2016f\u2212g\u2016\u00b2 = \u03a3\u2016f\u2212mean f\u2016\u00b2 + K\u2016mean f\u2212g\u2016\u00b2 \u2014 the mathematical heart of the decomposition. The three bridge identities (a)(b)(c) that tie the code's subtraction to it are NOT proved (listed in the file header)"
+   "role": "the ANOVA decomposition. scatter_split = per-group split; variance_identity = (a) scatter about the mean = raw SS \u2212 K\u2016mean\u2016\u00b2; pooled_variance_identity = (b) the same at the product index, i.e. exactly sswU on the flattened data; ssb_is_between_scatter = (c) \u03a3_c \u03a3_i\u2016X_ci \u2212 x\u0304\u2016\u00b2 \u2212 \u03a3_c \u03a3_i\u2016X_ci \u2212 x\u0304_c\u2016\u00b2 = K\u00b7\u03a3_c\u2016x\u0304_c \u2212 x\u0304\u2016\u00b2, which is the code's SUBTRACTION equalling the nonnegative quantity that Icc.lean proves nonnegative."
   }
  },
  "scope": "Gauge.lean = 2.44's algebra. Decomposition.lean = 2.42's pathwise+score identity on a finite outcome set. Dimension.lean = 2.42's algebra of split-half quantities (orthogonal families). NOT formalised: construct fidelity, any model claim, and the noise-scale relation itself (doc/references/isotropy-and-noise-scale.md records why isotropy is the wrong assumption).",
  "audit_date": "2026-10-30",
  "modularisation": "one theorem group per file (Ssw / Icc / Witness), each compiled independently, after three consecutive breakages came from editing a single 91-line file by string slicing. Reliability.lean is gone, superseded by these three.",
- "still_missing": "to close the code's subtraction: (a) \u03a3_i\u2016x_i\u2016\u00b2 \u2212 \u2016\u03a3_i x_i\u2016\u00b2/K = \u03a3_i\u2016x_i \u2212 mean x\u2016\u00b2, (b) the same at the pooled level for ss_t, (c) ss_b in subtraction form = K \u03a3_c\u2016x\u0304_c \u2212 x\u0304\u2016\u00b2. The per-group split itself (scatter_split) is proved, so summing it over groups with g = grand mean gives the decomposition ONCE (a)-(c) exist. Also unproved: the \u2016g\u2016\u00b2 = (MSb\u2212MSw)/k conversion and the F-quantile implementation."
+ "still_missing": "one arithmetic bridge: the code writes sswU as \u03a3\u2016x\u2016\u00b2 \u2212 \u2016\u03a3x\u2016\u00b2/K while SsDecomp works with deviations. The missing link is K\u2016mean f\u2016\u00b2 = \u2016\u03a3 f\u2016\u00b2/K (a two-line corollary of mean = K\u207b\u00b9 \u2022 \u03a3f plus norm_smul/abs_of_pos); with it, (a)+(c) rewrite into the code's literal sswU expressions. Also unproved: the F-quantile implementation used for the intervals."
 }

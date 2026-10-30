@@ -20,7 +20,7 @@ open scoped BigOperators InnerProductSpace
 
 namespace NeuronClosed
 
-variable {ι γ : Type*} [Fintype ι] [Fintype γ] [Nonempty ι]
+variable {ι γ : Type*} [Fintype ι] [Fintype γ] [Nonempty ι] [Nonempty γ]
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
 
 noncomputable def mean (x : ι → V) : V := ((Fintype.card ι : ℝ))⁻¹ • ∑ i, x i
@@ -53,6 +53,46 @@ theorem scatter_split (f : ι → V) (g : V) :
     rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
   rw [hcross, hconst, add_zero]
 
+/-- (a) The variance identity: scatter about the mean equals the raw sum of squares minus `K‖mean‖²`.
+This is `scatter_split` with `g = 0` and is the bridge between the code's `sswU` and the deviation form. -/
+theorem variance_identity (f : ι → V) :
+    (∑ i, ‖f i - mean f‖ ^ 2)
+      = (∑ i, ‖f i‖ ^ 2) - (Fintype.card ι : ℝ) * ‖mean f‖ ^ 2 := by
+  have h := scatter_split (V := V) f (0 : V)
+  simp only [sub_zero] at h
+  linarith
+
+/-- (a') The same at the POOLED level, i.e. exactly `sswU` applied to the flattened data `X : γ × ι → V`.
+So `ss_t` in the code's form equals the top-level scatter about the grand mean: this is (b). -/
+theorem pooled_variance_identity (X : γ × ι → V) :
+    (∑ p, ‖X p - mean X‖ ^ 2)
+      = (∑ p, ‖X p‖ ^ 2) - (Fintype.card (γ × ι) : ℝ) * ‖mean X‖ ^ 2 :=
+  variance_identity X
+
+/-- The grand mean of the two-level data, over the product index. -/
+noncomputable def gbar (X : γ → ι → V) : V := mean (fun p : γ × ι => X p.1 p.2)
+
+/-- (c) **The code's subtraction equals the nonnegative between-group quantity**, in deviation form:
+`Σ_c Σ_i ‖X_ci − x̄‖²  −  Σ_c Σ_i ‖X_ci − x̄_c‖²  =  K · Σ_c ‖x̄_c − x̄‖²`.
+
+The left-hand side is `ss_t − ss_w` once the two variance identities (a)/(a') are used to rewrite the code's
+`Σ‖x‖² − ‖Σx‖²/K` forms into deviations. The right-hand side is `ssbU`, which `Icc.lean` shows is nonnegative by
+construction — so this is the theorem that forbids the code's `ss_b` from being negative. -/
+theorem ssb_is_between_scatter (X : γ → ι → V) :
+    (∑ c, ∑ i, ‖X c i - gbar X‖ ^ 2) - (∑ c, ∑ i, ‖X c i - mean (X c)‖ ^ 2)
+      = (Fintype.card ι : ℝ) * ∑ c, ‖mean (X c) - gbar X‖ ^ 2 := by
+  have hper : ∀ c, (∑ i, ‖X c i - gbar X‖ ^ 2)
+      = (∑ i, ‖X c i - mean (X c)‖ ^ 2)
+        + (Fintype.card ι : ℝ) * ‖mean (X c) - gbar X‖ ^ 2 :=
+    fun c => scatter_split (X c) (gbar X)
+  have hsum : (∑ c, ((∑ i, ‖X c i - gbar X‖ ^ 2) - (∑ i, ‖X c i - mean (X c)‖ ^ 2)))
+      = ∑ c, (Fintype.card ι : ℝ) * ‖mean (X c) - gbar X‖ ^ 2 :=
+    Finset.sum_congr rfl (fun c (_ : c ∈ Finset.univ) => by rw [hper c]; ring)
+  rw [← Finset.sum_sub_distrib, hsum, Finset.mul_sum]
+
 end NeuronClosed
 
 #print axioms NeuronClosed.scatter_split
+#print axioms NeuronClosed.variance_identity
+#print axioms NeuronClosed.pooled_variance_identity
+#print axioms NeuronClosed.ssb_is_between_scatter
