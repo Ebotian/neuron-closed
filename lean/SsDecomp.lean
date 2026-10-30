@@ -99,15 +99,49 @@ theorem card_mul_mean_norm_sq (f : ι → V) :
   rw [norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hK)]
   field_simp
 
-/- (c*) STATUS: NOT PROVED - the composition that would put (c) in the code's literal form. The pieces are all
-in place (`card_mul_mean_norm_sq`, `variance_identity`, `pooled_variance_identity`, `ssb_is_between_scatter`) but the
-`linarith` steps that chain them did not go through in one pass, and I am not leaving a `sorry` in the tree. What is
-proved is: the bridge itself, and (c) in DEVIATION form. Concretely what remains is
-  `((Σ_p‖X_p‖² − ‖Σ_p X_p‖²/K') − Σ_c (Σ_i‖X_ci‖² − ‖Σ_i X_ci‖²/K))  =  K · Σ_c ‖x̄_c − x̄‖²`
-assembled by rewriting each `sswU`-shaped term into deviations with `variance_identity` + `card_mul_mean_norm_sq`. -/
+/-- Nested vs flattened summation over the product index, so the code's flat loop and the ANOVA statement
+can be written the same way. -/
+theorem sum_prod_nested (f : γ → ι → ℝ) : (∑ p : γ × ι, f p.1 p.2) = ∑ c, ∑ i, f c i :=
+  Fintype.sum_prod_type (f := fun p : γ × ι => f p.1 p.2)
+
+/-- (c) in the CODE's literal normalised form: the subtraction of the two `Σ‖x‖² − ‖Σx‖²/K` quantities equals
+`K·Σ_c‖x̄_c − x̄‖²`. This is what the estimator divides by `df_b`, so it is the statement that the code's `ss_b`
+cannot be negative. -/
+theorem ssb_code_form (X : γ → ι → V) :
+    ((∑ c, ∑ i, ‖X c i‖ ^ 2)
+        - ‖(∑ p : γ × ι, X p.1 p.2)‖ ^ 2 / (Fintype.card (γ × ι) : ℝ))
+      - (∑ c, ((∑ i, ‖X c i‖ ^ 2)
+        - ‖(∑ i, X c i)‖ ^ 2 / (Fintype.card ι : ℝ)))
+      = (Fintype.card ι : ℝ) * ∑ c, ‖mean (X c) - gbar X‖ ^ 2 := by
+  -- the pooled term, with the flattened family named so that `mean` matches syntactically
+  have hpool : (∑ c, ∑ i, ‖X c i‖ ^ 2)
+        - ‖(∑ p : γ × ι, X p.1 p.2)‖ ^ 2 / (Fintype.card (γ × ι) : ℝ)
+      = ∑ c, ∑ i, ‖X c i - gbar X‖ ^ 2 := by
+    let F : γ × ι → V := fun p => X p.1 p.2
+    have hb := card_mul_mean_norm_sq F
+    have hp := pooled_variance_identity F
+    have hg : gbar X = mean F := rfl
+    have hsum : (∑ p : γ × ι, ‖F p‖ ^ 2) = ∑ c, ∑ i, ‖X c i‖ ^ 2 :=
+      sum_prod_nested (fun c i => ‖X c i‖ ^ 2)
+    have hdev : (∑ p : γ × ι, ‖F p - mean F‖ ^ 2) = ∑ c, ∑ i, ‖X c i - gbar X‖ ^ 2 := by
+      rw [← hg]
+      exact sum_prod_nested (fun c i => ‖X c i - gbar X‖ ^ 2)
+    rw [← hsum, ← hdev]
+    linarith
+  -- the per-group term
+  have hgrp : (∑ c, ((∑ i, ‖X c i‖ ^ 2) - ‖(∑ i, X c i)‖ ^ 2 / (Fintype.card ι : ℝ)))
+      = ∑ c, ∑ i, ‖X c i - mean (X c)‖ ^ 2 := by
+    refine Finset.sum_congr rfl (fun c (_ : c ∈ Finset.univ) => ?_)
+    have hb := card_mul_mean_norm_sq (X c)
+    have hp := variance_identity (X c)
+    linarith
+  rw [hpool, hgrp]
+  exact ssb_is_between_scatter X
 
 end NeuronClosed
 
+#print axioms NeuronClosed.sum_prod_nested
+#print axioms NeuronClosed.ssb_code_form
 #print axioms NeuronClosed.card_mul_mean_norm_sq
 #print axioms NeuronClosed.ssb_is_between_scatter
 #print axioms NeuronClosed.scatter_split
