@@ -153,9 +153,10 @@ def check_checksums():
 def check_instruments():
     """Two gates the audit asked for (audit-response §12.8).
 
-    1. Every Lean audit record must match the CURRENT file: a docstring edit invalidates the record, which is how
-       lean/Dimension.lean's stale sha256 was found. The theorems are unaffected by a comment, but the record may not
-       claim to certify a file it never saw.
+    1. Every Lean audit record must match the CURRENT file, must record every declaration the file prints axioms for,
+       and must not contain a FAILED entry: a docstring edit invalidates the record (how lean/Dimension.lean's stale
+       sha256 was found), and a failed declaration invalidates the green light (how the auditor walked through the
+       previous version).
     2. The finite-difference calibration gate must exist, must have PASSED, and must pin the hash of the instrument it
        certified (scripts/mlp_capture.py). Without that pin the gate would keep certifying an old implementation.
     """
@@ -175,6 +176,27 @@ def check_instruments():
             if h != rec.get('sha256'):
                 bad.append(f'{f}: sha256 mismatch (record {str(rec.get("sha256"))[:12]}, file {h[:12]}) '
                            '-- re-audit or update the record')
+            # the record must also SAY what happened. Hashes alone let a failed declaration through: an auditor set one
+            # entry to ['FAILED'] with the file untouched and this gate stayed green, which made "make check OK" unable
+            # to distinguish a proved record from a failed one.
+            decls = rec.get('decls') or {}
+            allowed = {'propext', 'Classical.choice', 'Quot.sound'}
+            failed = [k for k, v in decls.items()
+                      if any('FAILED' in str(x) for x in (v or [])) or (set(v or []) - allowed)]
+            if failed:
+                shown = {k: decls[k] for k in sorted(failed)[:3]}
+                bad.append(f'{f}: declaration(s) not proved or using an axiom outside {sorted(allowed)}: {shown}'
+                           f'{" ..." if len(failed) > 3 else ""} -- rerun make certify')
+            # a declaration silently dropped from the file would otherwise leave a smaller, still-consistent record
+            on_disk = [l.split()[2] for l in fp.read_text(encoding='utf8').splitlines()
+                       if l.startswith('#print axioms ')]
+            # set comparison, not list: SsDecomp.lean prints one declaration twice, which is harmless to the record
+            if set(on_disk) != set(decls):
+                missing = sorted(set(on_disk) - set(decls))
+                extra = sorted(set(decls) - set(on_disk))
+                bad.append(f'{f}: record does not cover the file (missing {missing[:3]}, extra {extra[:3]})')
+        if 'PROVED for every declaration' not in str(d.get('verdict')):
+            bad.append(f'lean audit verdict is not all-proved: {d.get("verdict")}')
     gate = ROOT / 'results/fd_gate.json'
     if not gate.exists():
         bad.append('results/fd_gate.json missing: no calibration record, so no gradient number may be quoted')

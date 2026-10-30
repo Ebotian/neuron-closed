@@ -1,43 +1,94 @@
 #!/usr/bin/env bash
-# Re-derive the two certificates instead of trusting them: the fp32 finite-difference calibration of the gradient
-# instrument, and the Lean audit records. Both are written from their producers, so a stale record cannot survive.
+# Re-derive the two certificates from their producers instead of trusting them, and FAIL LOUDLY when a producer fails.
+#
+# WHY THE STRICTNESS. The first version of this script wrote the verdict string "PROVED for every declaration listed"
+# unconditionally, marked a failed declaration ['FAILED'], and still exited 0 - and check.py's instruments item only
+# compared file hashes, so a Lean failure in the record passed the gate. An auditor demonstrated it: edit one
+# declaration to ['FAILED'], run make check, get OK. A green light that survives its own failure is worse than no gate,
+# because everything downstream (and every earlier audit) rests on it. So now: every step checks its exit status, the
+# verdict is DERIVED from the results, and anything short of all-proved exits non-zero.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 HOST="${NEURON_BOX:-root@connect.westc.seetacloud.com}"
 PORT="${NEURON_PORT:-25785}"
-LEANDIR="${LEAN_MATHLIB:-/home/ebt/lean/mathlib-v4.33.0-rc1}"
 PLUGIN="${OPL_PLUGIN:-/home/ebt/Downloads/kimi-research/plugin}"
+SSH=(ssh -o BatchMode=yes -o ConnectTimeout=15 -p "$PORT" "$HOST")
+SCP=(scp -o BatchMode=yes -o ConnectTimeout=15 -q -P "$PORT")
+
+die() { echo "CERTIFY FAILED: $*" >&2; exit 1; }
 
 echo "== fd_gate on $HOST =="
-scp -q -P "$PORT" "$ROOT/scripts/mlp_capture.py" "$ROOT/scripts/fd_gate.py" "$ROOT/scripts/verify_units.py" \
-    "$HOST:/root/autodl-tmp/scripts/j2space/" 2>/dev/null || true
-scp -q -P "$PORT" "$ROOT/scripts/core/units.py" "$HOST:/root/autodl-tmp/scripts/j2space/core/" 2>/dev/null || true
-ssh -p "$PORT" "$HOST" 'cd /root/autodl-tmp/scripts/j2space && /root/miniconda3/bin/python fd_gate.py > /tmp/fd_certify.raw 2>&1; tail -2 /tmp/fd_certify.raw'
-scp -q -P "$PORT" "$HOST:/root/autodl-tmp/runs/fd_gate.json" "$ROOT/results/fd_gate.json"
+"${SCP[@]}" "$ROOT/scripts/mlp_capture.py" "$ROOT/scripts/fd_gate.py" "$ROOT/scripts/verify_units.py" \
+    "$ROOT/scripts/legacy_capture.py" "$HOST:/root/autodl-tmp/scripts/j2space/" \
+    || die "could not copy the instrument to $HOST (a copy failure used to be swallowed by '|| true')"
+"${SCP[@]}" "$ROOT/scripts/core/units.py" "$HOST:/root/autodl-tmp/scripts/j2space/core/" || die "could not copy core/units.py"
+"${SCP[@]}" "$ROOT/scripts/analysis/fd.py" "$HOST:/root/autodl-tmp/scripts/j2space/analysis/" || die "could not copy analysis/fd.py"
+# the exit status must be the GATE's, not a trailing `tail`'s: `python x.py; tail -2 log` reports tail's status
+"${SSH[@]}" 'cd /root/autodl-tmp/scripts/j2space && /root/miniconda3/bin/python fd_gate.py > /tmp/fd_certify.raw 2>&1' \
+    || { "${SSH[@]}" 'tail -20 /tmp/fd_certify.raw' >&2 || true; die "fd_gate exited non-zero on the remote box"; }
+"${SSH[@]}" 'tail -2 /tmp/fd_certify.raw'
+"${SCP[@]}" "$HOST:/root/autodl-tmp/runs/fd_gate.json" "$ROOT/results/fd_gate.json" || die "could not fetch the fd_gate record"
+python3 - "$ROOT" <<'PY' || exit 1
+import hashlib, json, sys
+from pathlib import Path
+root = Path(sys.argv[1])
+g = json.loads((root / 'results/fd_gate.json').read_text())
+if not (g.get('verdict') or {}).get('gate_passes'):
+    sys.exit(f'fd_gate record does not pass: {g.get("verdict")}')
+h = hashlib.sha256((root / 'scripts/mlp_capture.py').read_bytes()).hexdigest()
+if g.get('instrument_sha256') != h:
+    sys.exit('the fetched record certifies a DIFFERENT instrument than the one in this tree')
+print(f'  record pins instrument {h[:12]} and passes')
+PY
 
 echo "== Lean audit =="
-python3 - "$ROOT" "$PLUGIN" <<'PY'
-import hashlib, json, subprocess, sys
+python3 - "$ROOT" "$PLUGIN" <<'PY' || exit 1
+"""Audit every declaration and DERIVE the verdict. Non-zero exit if anything is not proved.
+
+Checked per declaration: the tool's exit status AND the presence of PROVED in its output, and the axiom list it
+reports. `sorryAx` in that list means the proof has a hole, which is a failure whatever the verdict line says.
+"""
+import hashlib, json, re, subprocess, sys
 from pathlib import Path
+
 root, plugin = Path(sys.argv[1]), Path(sys.argv[2])
 lean = root / 'lean'
-recs = json.loads((root / 'results/lean_audit.json').read_text())
-files = sorted(p for p in lean.glob('*.lean'))
-out = {'verdict': 'PROVED for every declaration listed', 'files': {}}
+ALLOWED = {'propext', 'Classical.choice', 'Quot.sound'}
+files = sorted(lean.glob('*.lean'))
+out = {'files': {}, 'checked_at': None, 'allowed_axioms': sorted(ALLOWED)}
+failures = []
 for f in files:
-    txt = f.read_text()
-    decls = [l.split()[2] for l in txt.splitlines() if l.startswith('#print axioms ')]
+    decls = [l.split()[2] for l in f.read_text().splitlines() if l.startswith('#print axioms ')]
     entry = {'sha256': hashlib.sha256(f.read_bytes()).hexdigest(), 'decls': {}}
     for d in decls:
         r = subprocess.run([str(plugin / 'bin/opl-leancheck'), '--file', str(f), '--decl', d],
                            capture_output=True, text=True)
-        ok = 'PROVED' in r.stdout
-        entry['decls'][d] = ['propext', 'Classical.choice', 'Quot.sound'] if ok else ['FAILED']
-        print(f'  {"PROVED" if ok else "FAILED"}  {f.name}  {d}')
+        ok = r.returncode == 0 and 'PROVED' in r.stdout
+        ax = sorted(set(re.findall(r'\b(propext|Classical\.choice|Quot\.sound|sorryAx)\b', r.stdout)))
+        if not ok:
+            entry['decls'][d], status = ['FAILED'], 'FAILED'
+            failures.append(f'{f.name}:{d} did not prove (rc={r.returncode})')
+        elif 'sorryAx' in ax:
+            entry['decls'][d], status = ['FAILED'], 'FAILED'
+            failures.append(f'{f.name}:{d} proved but uses sorryAx - a hole, not a proof')
+        elif set(ax) - ALLOWED:
+            entry['decls'][d], status = sorted(ax), 'FAILED'
+            failures.append(f'{f.name}:{d} uses non-standard axioms {sorted(set(ax) - ALLOWED)}')
+        else:
+            entry['decls'][d], status = (sorted(ax) if ax else sorted(ALLOWED)), 'PROVED'
+        print(f'  {status}  {f.name}  {d}')
     out['files'][str(f.relative_to(root))] = entry
-out['still_missing'] = recs.get('still_missing')
+n = sum(len(v['decls']) for v in out['files'].values())
+out['decl_counts'] = {'files': len(out['files']), 'declarations': n,
+                      'proved': n - len(failures), 'failed': len(failures)}
+out['verdict'] = ('PROVED for every declaration listed' if not failures
+                  else f'INCOMPLETE: {len(failures)} of {n} declarations not proved')
+out['failures'] = failures
 (root / 'results/lean_audit.json').write_text(json.dumps(out, indent=1))
+print(f'  {out["verdict"]}')
+sys.exit(0 if not failures else 1)
 PY
 
 echo "== make check (instruments) =="
-python3 "$ROOT/tools/check.py" instruments
+python3 "$ROOT/tools/check.py" instruments || die "the instruments gate rejected the freshly written records"
+echo "CERTIFY OK: instrument calibrated, every declaration proved"
