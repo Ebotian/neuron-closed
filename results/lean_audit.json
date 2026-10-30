@@ -2,7 +2,7 @@
  "toolchain": "leanprover/lean4:v4.33.0-rc1",
  "mathlib_rev": "79d0395a1825a6264ad5d269e35e60537518955e",
  "mathlib_inputRev": "v4.33.0-rc1",
- "verdict": "PROVED for all thirteen declarations across four files (opl-leancheck without --evidence-out)",
+ "verdict": "PROVED for all sixteen declarations across six files (opl-leancheck without --evidence-out)",
  "already_in_mathlib": "ContinuousLinearMap.ker_adjoint_comp_self states (T\u2020 \u2218L T).ker = T.ker, i.e. ker_gram is textbook; the load-bearing statement is lift_maps_back",
  "boundary": "formalises the algebra (kernel is a gauge; a solution's residual image is exactly y). It does NOT formalise the model, the construct, or trait fidelity.",
  "files": {
@@ -80,23 +80,52 @@
    "role": "plan 2.42's algebra: for a pairwise orthogonal equal-norm family the split-half inner product is (|S|^2 - K c^2)/4 for EVERY split, hence split-independent. The earlier 'isotropy => cos ~ 0 => K ~ d' reading is RETRACTED: see doc/references/isotropy-and-noise-scale.md - anisotropy is inherent (arXiv:2401.12143, 2602.11185, 2407.11239) and the correct scaling quantity is the noise-to-signal ratio tr(Sigma)/|g|^2, not the ambient dimension.",
    "note": "sha updated 2026-10-30 after a docstring-only edit (the retraction of the isotropy reading); the five declarations were re-audited with opl-leancheck and report PROVED with axioms {propext, Classical.choice, Quot.sound}"
   },
-  "lean/Reliability.lean": {
-   "sha256": "33994989e70be5d8bc0102a5f43d3575aa356a788f1ea26ef3cabe9641774cbe",
+  "lean/Ssw.lean": {
    "decls": {
     "NeuronClosed.ssw_shift_invariant": [
      "propext",
      "Classical.choice",
      "Quot.sound"
-    ],
+    ]
+   },
+   "role": "R1: the within-group sum of squares is exactly invariant under a common-mode shift (the property the plug-in cosine lacks)",
+   "sha256": "4ee0a9bda545618005494644830358ac594da8b1e796bccb89b8948116381857"
+  },
+  "lean/Icc.lean": {
+   "decls": {
     "NeuronClosed.icc_bounds": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.ssbU_nonneg": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.icc_bounds_from_sums": [
      "propext",
      "Classical.choice",
      "Quot.sound"
     ]
    },
-   "role": "the estimator that replaces the half-sum cosine: (R1) the within-group sum of squares is EXACTLY invariant under a common-mode shift, which is the property the plug-in cosine lacks; (R2) the intraclass correlation is bounded in [-1/(n-1), 1], so a perturbation of the variance components cannot move the estimate out of a fixed range. Lean caught a statement error: at MSb = 0 the ICC EQUALS the lower bound, so that side is \u2264, not <"
+   "role": "R2: ICC in [-1/(n-1), 1]; R4: SS_b is nonnegative BY CONSTRUCTION, so the hypothesis 0 <= MSb of R2 is a consequence, not an assumption - which is what the code silently relied on",
+   "sha256": "4d1f7d0135b98139ea28c1dfa24149ab998f1f759c189499c7a23b735634eb84"
+  },
+  "lean/Witness.lean": {
+   "decls": {
+    "NeuronClosed.plug_in_cos_moves": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ]
+   },
+   "role": "R5: the plug-in squared cosine moves from 0 to 1/2 under a common shift while SSw does not - the negative half of the argument, previously prose only",
+   "sha256": "d66ce3c368adae1e58c1dbf948f915843819c8eb9e47b30e53af3cf879ae7daf"
   }
  },
  "scope": "Gauge.lean = 2.44's algebra. Decomposition.lean = 2.42's pathwise+score identity on a finite outcome set. Dimension.lean = 2.42's algebra of split-half quantities (orthogonal families). NOT formalised: construct fidelity, any model claim, and the noise-scale relation itself (doc/references/isotropy-and-noise-scale.md records why isotropy is the wrong assumption).",
- "audit_date": "2026-10-30"
+ "audit_date": "2026-10-30",
+ "modularisation": "one theorem group per file (Ssw / Icc / Witness), each compiled independently, after three consecutive breakages came from editing a single 91-line file by string slicing. Reliability.lean is gone, superseded by these three.",
+ "still_missing": "R3 (the code's NORMALISED form sum||x_i||^2 - ||sum x_i||^2/K) is still not formalised: the proof needs the cross-term identity and its goal ends up containing ||(K : Real)||^2 versus K^2, i.e. the real-absolute norm of a SCALAR inside a smul expansion. What is proved is the K^2-scaled version (Ssw.lean)."
 }

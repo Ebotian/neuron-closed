@@ -1,97 +1,26 @@
-# lean/ — 计划 2.44 的代数内容，机器可检
+# lean/ — 每条定理一个文件
 
-本目录属于本仓，但**不依赖**本仓的任何东西；它只依赖本机公共的 Lean 环境
-（`/home/ebt/lean/mathlib-v4.33.0-rc1`，见 `doc/NEXT_SESSION.md` 的环境备忘）。
+**分文件的理由**（来自一次真实的失败）：这些声明原来都在一个 91 行的 `Reliability.lean` 里，我用字符串切片插入新内容，
+连续三次把文件结构切坏（`unexpected token '/--'`、`expected 'lemma'`）；另外 `plug_in_cos_moves` 两次失败只是因为我漏了
+`open scoped InnerProductSpace`——在一个单文件里这种遗漏很难定位。**一个定理组一个文件、各自独立编译**之后，五条声明一次通过。
 
-## 跑
-
-```bash
-leanm lean/Gauge.lean        # 编译 + 打印 #print axioms
-```
-
-`opl-leancheck --file lean/Gauge.lean --decl NeuronClosed.lift_maps_back`（**不要**加 `--evidence-out`，
-否则才需要签名密钥）给出独立判定。
-
-## `Gauge.lean` 里的三条
-
-记号：坐标空间 `E`（每层 9216 维），残差空间 `F`（每层 2560 维），`W : E →L[ℝ] F` 是下投影，
-预算度量 `M := W† ∘ W`（unit `W_down` 列的 Gram）。因为 `dim E > dim F`，`M` 奇异。
-
-| 定理 | 陈述 | 对应 |
+| 文件 | 定理 | 内容 |
 |---|---|---|
-| `ker_gram` | `ker M = ker W` | 2.44：奇异＝投影的核。**注意这条 mathlib 已有**（`ContinuousLinearMap.ker_adjoint_comp_self`），我们只是把它作为对象重述——它是教科书结论，不是我们的发现 |
-| `gauge_invariance` | `u₀ ∈ ker M ⇒ W (u + u₀) = W u` | 核方向零效应零收益：加它不改变扰动 |
-| `lift_maps_back` | `W` 满射且 `M u = W† y ⇒ W u = y` | 2.44 的数值事实 `cos(W·u_M, ∇Φ) = 1.0000` 的代数内容：任何解在残差空间的像**就是** `y` |
+| `Gauge.lean` | `ker_gram` / `gauge_invariance` / `lift_maps_back` | 2.44：奇异度量是规范；解在残差空间的像就是 `∇Φ` |
+| `Decomposition.lean` | `expectation_deriv_decomp` / `sum_p_score_eq_zero` / `baseline_free` | 2.42：pathwise + score 分解；baseline 在期望里免费 |
+| `Dimension.lean` | 5 条 | 2.42：正交族下 split-half 与切分无关 |
+| **`Ssw.lean`** | `ssw_shift_invariant` | **R1**：组内平方和对**公共平移精确不变**（plug-in 余弦缺的正是这条） |
+| **`Icc.lean`** | `icc_bounds` / `ssbU_nonneg` / `icc_bounds_from_sums` | **R2**：`ICC ∈ [−1/(n−1), 1]`；**R4**：`SS_b` **按构造非负** ⇒ R2 的前提 `MSb ≥ 0` 是推论而非假设 |
+| **`Witness.lean`** | `plug_in_cos_moves` | **R5**：公共平移下 plug-in 平方余弦 **0 → 1/2**，而 `SS_w` 不变——反面论断，此前只是文字 |
 
-第三条比数值陈述更强：它**不**要求 `u` 是最小范数解，也不需要 Moore–Penrose（mathlib 里没有）；
-只要 `W` 满射、`M u = W† y`，结论就成立。满射在本问题里就是 `2560 ≤ 9216` 且行满秩。
+跑：`leanm lean/Icc.lean`（每个文件独立）。审计：`opl-leancheck --file lean/Icc.lean --decl NeuronClosed.icc_bounds`，
+记录在 `results/lean_audit.json`，`make check` 的 `instruments` 项校验 sha 一致。
 
-## `Decomposition.lean` 里的三条（计划 2.42）
+## 仍未形式化（不得当作已证）
 
-在**有限结果集** `Y` 上陈述（于是全部是普通有限和 + `Real.log`，不需要测度论）：
-
-| 定理 | 陈述 | 意义 |
-|---|---|---|
-| `expectation_deriv_decomp` | `d/du Σ_y p φ = Σ_y p ∂_u φ + Σ_y p φ ∂_u log p` | 期望的导数 = **pathwise 项的期望 + score 项**；2.42 只测了后者 |
-| `sum_p_score_eq_zero` | `Σ_y p ∂_u log p = 0`（只要 `Σ_y p ≡ 1`） | 平均 score 恒为零 |
-| `baseline_free` | `Σ_y p (φ−b) ∂_u log p = Σ_y p φ ∂_u log p`，对任意 `b` | **baseline 在期望里完全抵消**——它只影响方差（有限样本下才起作用） |
-
-`baseline_free` 正是我们实测里当作理所当然的那件事：`b` 的选取不改变目标，只改变估计量的方差。
-
-## `Dimension.lean` 里的五条（计划 2.42 的维度论证）
-
-**不需要概率**：全部是内积代数。
-
-| 定理 | 陈述 |
-|---|---|
-| `norm_sq_sum_of_pairwise_orthogonal` | 两两正交的族：`‖Σx‖² = Σ‖x‖²` |
-| `norm_sq_sum_smul_of_pairwise_orthogonal` | 带符号版：`‖Σ εᵢxᵢ‖² = Σ εᵢ²‖xᵢ‖²` |
-| `four_mul_inner_split` | `4⟪SA,SB⟫ = ‖SA+SB‖² − ‖SA−SB‖²` |
-| `norm_sq_alternating_eq_card_mul` | **`εᵢ = ±1` ⇒ `‖Σ εᵢxᵢ‖² = K·c²`，与符号模式无关** |
-| `four_mul_inner_of_alternating` | **⇒ `4⟪SA,SB⟫ = ‖Σx‖² − Kc²`，与切分无关** |
-
-这就是实测 `r(K)` 平坦（K=2…32 → 0.002…0.022）的机制中**纯代数的一半**：逐 rollout 的 score 向量若两两正交，
-**切分无可变化**，split-half 量只能由比值 `‖Σx‖²/(Kc²)` 决定。
-
-**但另一半（为什么这个比值不随 K 变化）不能用"各向同性"解释**——文献明确否定它
-（`doc/references/isotropy-and-noise-scale.md`：`2401.12143` 各向异性是 inherent；`2602.11185` spike 占约 1.5% 方向
-却主导二阶统计；`2407.11239`/Aghajanyan 2021 梯度子空间低秩）。正确的量是**噪声-信号比**（McCandlish 的 gradient noise scale）：
-`cos ≈ ‖g‖²/(‖g‖² + tr(Σ)/K)`，临界 `K ≈ tr(Σ)/‖g‖²`；各向同性只是 `tr(Σ)=d·v` 的特例。
-所以 `r(K)` 平坦应读作"**`tr(Σ)` 没有被 K 个 rollout 平均下去**"，而**不是**"K ~ d"。
-这两句都**不是**定理：定理只有上面的代数。
-
-**已实测（plan 2.46）**：256 个逐 rollout score 贡献给出 `tr(Σ)=1.212e7`、`‖g‖²=8,078`、**噪声-信号比 = 1500**，
-于是小 r 区 `r ≈ K/1500`（K=32 预测 0.0213 / 实测 0.022），与 Spearman–Brown 反解的 `K*=1424` 相差 5%。
-`K*=1500` 比 `dim=294,912` **小 197 倍**——这正是低秩梯度文献预言的方向。详见 `results/noise_scale.json`。
-
-## 审计（2026-10-30）
-
-- toolchain `leanprover/lean4:v4.33.0-rc1`；mathlib rev `79d0395a1825a6264ad5d269e35e60537518955e`
-- 三个文件、共十一条，全部 `propext, Classical.choice, Quot.sound`（无 `sorryAx`、无自定义 axiom）
-- 独立判定 `PROVED`（`opl-leancheck`，无 `--evidence-out`）
-- 数值与 sha256 见 `results/lean_audit.json`
-
-## 边界
-
-形式化的是**代数命题**，不是 Qwen3.5-4B，也不是"我们的构念就是那个特性"。
-它只证明：在给定 `W` 与度量 `M` 下，核是规范、解在残差空间的像不偏移。
-
-## `Reliability.lean` 里的两条（可靠性 = 方差分量，不是半和余弦）
-
-**为什么换掉**：`r = (‖S‖² − Σ‖xᵢ‖²)/(‖S‖² + Σ‖xᵢ‖²)` 把信号写成**两个同量级数之差**——实测
-`0.174 − 0.155 = 0.019`，只剩一位有效数字；而任何**跨样本公共**的扰动（批内共享的偏差）在分子里一阶就进去，
-在 `Σ‖xᵢ‖²` 里几乎不动。这就是"逐向量 cos 0.999、但 `r` 从 0.0685 跳到 0.2704"的代数原因，换 fp32 也不改变。
-
-| 定理 | 陈述 |
-|---|---|
-| `ssw_shift_invariant` | `SS_w(x + c·1) = SS_w(x)`，**对任意公共平移 `c`**（`SS_w = Σᵢ‖card·xᵢ − Σⱼxⱼ‖²`） |
-| `icc_bounds` | `MSb ≥ 0 < MSw`、`n ≥ 2` ⇒ `−1/(n−1) ≤ ICC ≤ 1`，`ICC = (MSb−MSw)/(MSb+(n−1)MSw)` |
-
-第一条正是 plug-in 缺的性质：批级偏差**精确消掉**，因为 `SS_w` 只用差向量。第二条保证扰动不能把估计推出固定区间
-（对照：半和余弦的分母可以在信号抵消时趋零）。
-
-**形式化抓到我一个真错误**：我原先写的是**严格**下界 `−1/(n−1) < ICC`；Lean 在 `MSb = 0` 处反驳——那里 ICC **正好等于**下界。
-陈述已改为 `≤`，而"下界可达"本身值得写明。
-
-**状态**：定理已证（`opl-leancheck` PROVED，公理仅 `{propext, Classical.choice, Quot.sound}`）；
-**估计量尚未实现进 `scripts/reliability.py`，也没有任何数字用新估计量重算过**——旧的 2.40–2.46 记录保持原状。
+- **R3**：代码实际计算的**归一化**形式 `Σ‖xᵢ‖² − ‖Σxᵢ‖²/K`。已证的是 `K²` 缩放版（`SSw`）。缺口在交叉项恒等式
+  `Σ‖xᵢ+c‖² = Σ‖xᵢ‖² + 2⟪Σxᵢ,c⟫ + K‖c‖²` 的展开：`field_simp` 会在 `smul` 展开里造出 `‖(K:ℝ)‖²`（标量的实数绝对值范数）
+  与 `K²` 并存，需要在那一步内部定位 `Real.norm_eq_abs + abs_of_pos`。
+- `SS_b = SS_t − SS_w` 这个**减法恒等式**本身未证（`Icc.lean` 只是把 `SS_b` 定义成不变量，代码里那条减法仍无形式化支撑）。
+- `‖g‖² = (MS_b − MS_w)/k` 的换算未证。
+- `_f_quantile` 的数值实现未验证。
