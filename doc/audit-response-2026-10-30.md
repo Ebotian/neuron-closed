@@ -228,3 +228,15 @@
   第三版改为"final 对比**最后一个上下文增量**"才有判别力：`|final−Σinc|=0.00e+00`、`|final−last_inc|=4.19`（尺度 5.25）→ PASS。
 - 删除空转 φ 门时误删了刚插入的 helper（同一文本区间），由 `NameError` 抓到并补回。
 - 一次"敏感性测试"因远端无 `python3` 而未真正注入，得到假 PASS；改用 `/root/miniconda3/bin/python` 后成立。
+
+### 数字核验的范围与剩余项（如实）
+
+对本文档与 `NEXT_SESSION` 做了**全文数字扫描**：取所有 ≥2 位小数或科学计数法的数字，按 3 位有效数字与 `results/*.json` 中的每个数值比对。**两份文档均为零未支持项。**
+
+`doc/metadata.json` 的同一扫描仍有 8 个未在 `results/` 中出现的数字：
+`0.000107`、`0.0002`、`0.0003`、`0.00033`、`1.631203e-07`、`3.1e-07`、`3.6e-04`、`9.585372e-07`。
+它们**全部是本次目标之前就存在的旧条目**（`measured/external_mlx_replication/steer_lens_scan`、`measured/compiler_pareto_c8`、
+`measured/lcb_rank_c8`、`sources/g_identity_check`、以及旧版本的 `current`/`notes` 散文），
+已用 `git show 1f50c279:doc/metadata.json` 逐个确认在目标起点即存在。它们不属于本次"重记 2.40/2.42/2.43/2.46/2.45"的范围，
+其中 `g_identity_check` 的数字记在冻结包内而非 `results/`。**本次未改动它们**，也不据此声称它们可信——这是明确的遗留项，
+需要单独一轮按同一标准回溯核验。
