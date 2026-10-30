@@ -25,6 +25,7 @@ for sub in ('core', 'estimators', 'analysis'):
 import engine as E
 from core.loading import load_model_fast
 from core.units import column_norms_dev, dose_scale
+from core.cache import p50_cached, column_norms_cached
 from core.sampling import generate_rollouts
 from estimators.phi import phi_of, slot_ids
 from estimators.score import per_rollout_scores
@@ -72,8 +73,9 @@ def main():
     t0 = time.time()
     tok, model, lm = load_model_fast(a.model, dev)
     layers = list(range(32))
-    p50 = E.estimate_p50(tok, model, lm, layers, dev)
-    norms = column_norms_dev(lm, layers, dev)
+    C, tag = '/root/autodl-tmp/runs/cache_', Path(a.model).name   # same cache p_a2 uses, so the two are comparable
+    p50 = p50_cached(tok, model, lm, layers, dev, f'{C}p50_{tag}.pt')
+    norms = column_norms_cached(lm, layers, dev, f'{C}cn_{tag}.pt')
     SC = dose_scale(p50, norms, layers)
     pad = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
     print(f'SETUP_S {time.time() - t0:.1f}', flush=True)

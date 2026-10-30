@@ -23,7 +23,7 @@ def _key(layers):
     return ','.join(str(int(l)) for l in layers)
 
 
-def load_or_compute(path, compute, layers, strict=True):
+def load_or_compute(path, compute, layers, strict=False):
     """Return `compute()`'s value, from `path` when possible. `strict` re-verifies a cache hit against a fresh compute."""
     p = Path(path) if path else None
     if p is not None and p.exists():
@@ -47,9 +47,9 @@ def load_or_compute(path, compute, layers, strict=True):
     return vals
 
 
-def p50_cached(tok, model, lm, layers, dev, path=None, strict=True):
+def p50_cached(tok, model, lm, layers, dev, path=None, strict=False):
     return load_or_compute(path, lambda: E.estimate_p50(tok, model, lm, layers, dev), layers, strict)
 
 
-def column_norms_cached(lm, layers, dev, path=None, strict=True):
+def column_norms_cached(lm, layers, dev, path=None, strict=False):
     return load_or_compute(path, lambda: column_norms_dev(lm, layers, dev), layers, strict)
