@@ -2,7 +2,7 @@
  "toolchain": "leanprover/lean4:v4.33.0-rc1",
  "mathlib_rev": "79d0395a1825a6264ad5d269e35e60537518955e",
  "mathlib_inputRev": "v4.33.0-rc1",
- "verdict": "PROVED for all six declarations (opl-leancheck without --evidence-out; no signing key involved)",
+ "verdict": "PROVED for all eleven declarations across three files (opl-leancheck without --evidence-out)",
  "already_in_mathlib": "ContinuousLinearMap.ker_adjoint_comp_self states (T\u2020 \u2218L T).ker = T.ker, i.e. ker_gram is textbook; the load-bearing statement is lift_maps_back",
  "boundary": "formalises the algebra (kernel is a gauge; a solution's residual image is exactly y). It does NOT formalise the model, the construct, or trait fidelity.",
  "files": {
@@ -47,7 +47,38 @@
     ]
    },
    "role": "plan 2.42: the pathwise + score decomposition, and that a baseline is free in expectation"
+  },
+  "lean/Dimension.lean": {
+   "sha256": "c582b9610c3d97b52c6aba33b88c0591d03ea7fd7127efac9fcc2f5701d94d92",
+   "decls": {
+    "NeuronClosed.norm_sq_sum_of_pairwise_orthogonal": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.norm_sq_sum_smul_of_pairwise_orthogonal": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.four_mul_inner_split": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.norm_sq_alternating_eq_card_mul": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.four_mul_inner_of_alternating": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ]
+   },
+   "role": "plan 2.42's dimensional claim: for a pairwise orthogonal equal-norm family the split-half inner product is (|S|^2 - K c^2)/4 for EVERY split, hence split-independent; isotropy gives |S|^2 ~ K c^2 and therefore cos ~ 0 at every K"
   }
  },
- "scope": "Gauge.lean = plan 2.44's algebra. Decomposition.lean = plan 2.42's identity, stated on a FINITE outcome set (ordinary finite sums + Real.log, no measure theory): d/du sum_y p phi = sum_y p dphi + sum_y p phi dlog p; the mean score vanishes; and the baseline drops out of the expectation exactly. What is NOT formalised: that phi is the right construct, any statement about the model, and any finite-sample property of the estimator (the baseline matters there, which is the point)."
+ "scope": "Gauge.lean = 2.44's algebra. Decomposition.lean = 2.42's pathwise+score identity on a finite outcome set. Dimension.lean = 2.42's dimension argument as an identity about orthogonal families (no probability needed). NOT formalised anywhere: that phi is the right construct, any claim about the model, and the isotropic model itself (the K ~ d*v/s^2 corollary is arithmetic on the identity GIVEN isotropy, and is stated as a comment, not a theorem)."
 }

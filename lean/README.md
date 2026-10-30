@@ -38,10 +38,27 @@ leanm lean/Gauge.lean        # 编译 + 打印 #print axioms
 
 `baseline_free` 正是我们实测里当作理所当然的那件事：`b` 的选取不改变目标，只改变估计量的方差。
 
+## `Dimension.lean` 里的五条（计划 2.42 的维度论证）
+
+**不需要概率**：全部是内积代数。
+
+| 定理 | 陈述 |
+|---|---|
+| `norm_sq_sum_of_pairwise_orthogonal` | 两两正交的族：`‖Σx‖² = Σ‖x‖²` |
+| `norm_sq_sum_smul_of_pairwise_orthogonal` | 带符号版：`‖Σ εᵢxᵢ‖² = Σ εᵢ²‖xᵢ‖²` |
+| `four_mul_inner_split` | `4⟪SA,SB⟫ = ‖SA+SB‖² − ‖SA−SB‖²` |
+| `norm_sq_alternating_eq_card_mul` | **`εᵢ = ±1` ⇒ `‖Σ εᵢxᵢ‖² = K·c²`，与符号模式无关** |
+| `four_mul_inner_of_alternating` | **⇒ `4⟪SA,SB⟫ = ‖Σx‖² − Kc²`，与切分无关** |
+
+这就是实测 `r(K)` 平坦（K=2…32 → 0.002…0.022）的机制：逐 rollout 的 score 向量若两两正交，
+**切分无可变化**，于是 split-half 量只能由比值 `‖Σx‖²/(Kc²)` 决定；各向同性下 `‖Σx‖² ≈ Kc²`，
+余弦在**每个 K** 都 ≈ 0。**注意**：各向同性模型本身是假设，`K ≈ d·v/s²` 是"给定假设后的算术"，
+写在文件注释里、**不是**定理。
+
 ## 审计（2026-10-30）
 
 - toolchain `leanprover/lean4:v4.33.0-rc1`；mathlib rev `79d0395a1825a6264ad5d269e35e60537518955e`
-- 两个文件、共六条，全部 `propext, Classical.choice, Quot.sound`（无 `sorryAx`、无自定义 axiom）
+- 三个文件、共十一条，全部 `propext, Classical.choice, Quot.sound`（无 `sorryAx`、无自定义 axiom）
 - 独立判定 `PROVED`（`opl-leancheck`，无 `--evidence-out`）
 - 数值与 sha256 见 `results/lean_audit.json`
 
