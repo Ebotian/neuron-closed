@@ -22,7 +22,7 @@ from core.units import column_norms_dev, dose_scale
 from core.loading import load_model_fast
 from core.sampling import generate_rollouts
 from estimators.phi import phi_of
-from estimators.score import per_rollout_scores
+from estimators.score import per_rollout_scores, loo_weights
 from analysis.report import summarize
 
 
@@ -55,7 +55,7 @@ def main():
         rec['ctx'].append(r['id']); rec['phi'][r['id']] = phi
         K, psum = len(seqs), sum(phi)
         S_all.append(per_rollout_scores(model, lm, layers, p50, norms, seqs, pad, dev, len(pre), scale=SC))
-        W_all.append([(x - (psum - x) / max(K - 1, 1)) / (K * len(ctx)) for x in phi])
+        W_all.append(loo_weights(phi, len(ctx)))
         print(f'  [{ci}] {r["id"]} phi mean={psum/K:+.3f}', flush=True)
 
     rec.update(summarize(layers, None, None, None, S_all, W_all, a.rollouts, a.seed, phi_all))

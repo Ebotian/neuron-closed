@@ -28,7 +28,7 @@ from core.units import column_norms_dev, dose_scale
 from core.cache import p50_cached, column_norms_cached
 from core.sampling import generate_rollouts
 from estimators.phi import phi_of, slot_ids
-from estimators.score import per_rollout_scores
+from estimators.score import per_rollout_scores, loo_weights
 from estimators.pathwise import pathwise_batch
 from estimators.teacher import teacher_grad
 from analysis.report import summarize
@@ -46,7 +46,7 @@ def pass_once(model, lm, tok, ctx, layers, p50, norms, SC, pad, dev, rollouts, m
         phi_all += phi
         K, psum = len(seqs), sum(phi)
         S_all.append(per_rollout_scores(model, lm, layers, p50, norms, seqs, pad, dev, len(pre), scale=SC))
-        W_all.append([(x - (psum - x) / max(K - 1, 1)) / (K * len(ctx)) for x in phi])
+        W_all.append(loo_weights(phi, len(ctx)))
         ip, ineg = slot_ids(tok, r['positive']), slot_ids(tok, r['negative'])
         wt = 1.0 / (K * len(ctx))
         items = [(sq, ip, +1.0, wt) for sq in seqs] + [(sq, ineg, -1.0, wt) for sq in seqs]

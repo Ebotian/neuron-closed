@@ -19,5 +19,5 @@
 | 12 | 假"独立样本组"表述（换 rollout 种子 ≠ 独立 context） | 自审 | 文档改为"同上下文内独立 rollout" | metadata / README |
 | 13 | `fd_gate` 证书**未绑定仪器哈希** | 审计指出 | `instrument_sha256` + `make check` 校验 | 两次自动拦下旧证书 |
 | 14 | 旧 Lean sha 失效（改注释后未重审） | 新闸门抓到 | 重审并更新记录 | `instruments` 闸门绿 |
-| 15 | **两份旧记录不可复现**（plan 250 的 MS_w 0.1009、plan 253 的 trΣ 39.8884） | 逐值回归时参考对不上；随后用 HEAD 代码复跑证明代码自洽 | 记录在案，待单独一轮追溯（候选：plan-263 的批量 score 路径、plan-249 的 LOO baseline） | 见 `metadata.plan276/plan277` |
+| 15 | **两份旧记录不可复现**（plan 250 的 MS_w 0.1009、plan 253 的 trΣ 39.8884） | 逐值回归时参考对不上；随后用 HEAD 代码复跑证明代码自洽 | **RETIRED**（不是"已修"）：两条记录从可信集撤出，保留原数字与漂移候选；`results/digit_audit_leftovers.json` 的 8 个残留小数同时从 `NOT VERIFIED` 改为 `RETIRED` | 当前代码给 `MS_w 0.1972` / `ICC +0.0140` 与 `trΣ 39.5366` / `g_sq 0.137051`；`metadata.plan285` 记状态，`plan276/plan277` 是替代推导 |
 | 16 | 薄壳 `p_a4` 第 5 次 device 不匹配（`d` 在 CPU、`SC` 在 GPU） | 运行时报错 | `steer.readout` 先对齐设备再算 | 修后 SELF 2.52e-05 / 1.99e-05 与 v3 逐位相同 |

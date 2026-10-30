@@ -22,7 +22,7 @@ from core.units import column_norms_dev, dose_scale
 from core.loading import load_model_fast
 from core.sampling import generate_rollouts
 from estimators.judge import load_gauges, phi_judge
-from estimators.score import per_rollout_scores
+from estimators.score import per_rollout_scores, loo_weights
 from estimators.teacher import teacher_grad
 from analysis.report import summarize
 
@@ -61,7 +61,7 @@ def main():
         rec['ctx'].append(r['id']); rec['phi'][r['id']] = ph
         K, psum = len(seqs), sum(phi)
         S = per_rollout_scores(model, lm, layers, p50, norms, seqs, pad, dev, len(pre), scale=SC)
-        w_loo = [(x - (psum - x) / max(K - 1, 1)) / (K * len(ctx)) for x in phi]
+        w_loo = loo_weights(phi, len(ctx))
         blk, wl = S.double(), torch.tensor(w_loo, device=dev).unsqueeze(1)
         off = 0
         for l in layers:

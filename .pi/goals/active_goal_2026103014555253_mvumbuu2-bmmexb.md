@@ -2,23 +2,32 @@
   "version": 3,
   "id": "mvumbuu2-bmmexb",
   "objective": "把现役测量链（p_a2_pathj2 / p_a_reinforce / noise_scale / p_a4_closed_form / reliability / fd_gate / quotient_compare_v2）拆成 core/estimators/analysis 三层模块，每一步都用逐值回归证明行为不变，修掉重构过程中暴露的 bug，并把 8×32 基准压到 GPU 均值 ≥60% 且墙钟 ≤60 s。",
-  "status": "paused",
-  "autoContinue": false,
+  "status": "active",
+  "autoContinue": true,
   "usage": {
-    "tokensUsed": 601176,
-    "activeSeconds": 3784
+    "tokensUsed": 645644,
+    "activeSeconds": 4000
   },
   "sisyphus": false,
-  "revision": 191,
+  "revision": 215,
   "createdAt": "2026-10-30T06:55:52.538Z",
-  "updatedAt": "2026-10-30T08:09:16.351Z",
+  "updatedAt": "2026-10-30T08:53:14.729Z",
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
-    "generation": "91569e00-0cdf-4b23-9eec-1e79bcc101db",
+    "generation": "86378234-20f2-4f08-b1e9-cb6248c303e0",
     "used": 1,
-    "phase": "idle",
-    "repairUsed": false
+    "phase": "running",
+    "repairUsed": false,
+    "decision": {
+      "kind": "ready",
+      "purpose": "kickoff"
+    },
+    "dispatch": {
+      "id": "424b8656-0727-420f-9497-b9b41385e597",
+      "kind": "kickoff",
+      "claimedAt": 1793350169703
+    }
   },
   "taskList": {
     "tasks": [
@@ -98,8 +107,7 @@
     "blockCompletion": true,
     "proposedAt": "2026-10-30T06:55:46.811Z"
   },
-  "activePath": ".pi/goals/active_goal_2026103014555253_mvumbuu2-bmmexb.md",
-  "stopReason": "user"
+  "activePath": ".pi/goals/active_goal_2026103014555253_mvumbuu2-bmmexb.md"
 }
 
 # Goal Prompt
@@ -108,11 +116,11 @@
 
 ## Progress
 
-- Status: paused
-- Auto-continue: off
+- Status: running
+- Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 1h03m04s
-- Tokens used: 601K (601,176) tokens
+- Time spent: 1h06m40s
+- Tokens used: 646K (645,644) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->

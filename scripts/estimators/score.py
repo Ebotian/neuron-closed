@@ -19,6 +19,23 @@ from core.units import dose_scale  # the only place the dose unit is formed
 from mlp_capture import Capture
 
 
+def loo_weights(phi, n_ctx):
+    """Leave-one-out baseline: w_i = (phi_i - mean of the OTHER rollouts) / (K * contexts).
+
+    The baseline is FREE in expectation (lean/Decomposition.lean, `baseline_free`), so which baseline is used must not
+    change the estimate - but writing the formula in four places is how the two baselines became indistinguishable.
+    """
+    K, psum = len(phi), sum(phi)
+    return [(x - (psum - x) / max(K - 1, 1)) / (K * n_ctx) for x in phi]
+
+
+def insample_weights(phi, n_ctx):
+    """In-sample baseline: w_i = (phi_i - mean of ALL rollouts) / (K * contexts). Kept as an explicit alternative
+    because reporting BOTH is what shows the estimate does not depend on the baseline choice."""
+    K, psum = len(phi), sum(phi)
+    return [(x - psum / K) / (K * n_ctx) for x in phi]
+
+
 def per_rollout_scores(model, lm, layers, p50, norms, seqs, pad, dev, n_prompt, scale=None):
     """Return S: (K, dim) float32 on `dev`, row i = ∇_u log p(y_i) in dose units (unweighted).
 

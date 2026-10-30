@@ -202,7 +202,11 @@ def check_no_regressions():
          which is how the same functional acquired three normalisations);
       2. a detach-then-clone leaf capture is forbidden anywhere except fd_gate.py's deliberate negative control
          (it silently cut the residual-carrier paths);
-      3. at most ONE split-half implementation may exist (two copies produced the one-sided Gram weighting).
+      3. at most ONE split-half implementation may exist (two copies produced the one-sided Gram weighting);
+      4. a function that a layer module owns may not be re-defined in a shell. This is the one that got past the
+         first three: quotient_compare_v2.py kept its own `def to_v / cos_direct / null_for` next to the import of
+         the same names, so the import was shadowed and two of the three copies were dead code. Nothing numerical
+         went wrong, which is exactly why a value check could not have caught it.
     Scope is the live measurement chain: the historical experiment scripts are frozen records and are not checked.
     """
     bad = []
@@ -224,10 +228,19 @@ def check_no_regressions():
             continue
         if 'detach().clone().requires_grad_' in p.read_text(encoding='utf8', errors='replace'):
             bad.append(f'scripts/{p.name}: detach-then-clone capture outside legacy_capture.py')
-    defs = [p.name for p in scripts.rglob('*.py')
-            if p.name in LIVE_CHAIN and 'def split_half' in p.read_text(encoding='utf8', errors='replace')]
-    if len(defs) > 1:
-        bad.append(f'split-half implemented in {defs} - keep exactly one (analysis/split_half.py)')
+    owned = {'split_half': 'analysis/split_half.py', 'to_v': 'analysis/quotient.py',
+             'cos_direct': 'analysis/quotient.py', 'null_for': 'analysis/quotient.py',
+             'report_list': 'analysis/quotient.py', 'q3_verdict': 'analysis/quotient.py'}
+    # scope is the LIVE chain, like the other three rules: the historical scripts are frozen records of what was
+    # done then, and rewriting them to satisfy a gate today would falsify the record instead of enforcing anything.
+    for name in LIVE_CHAIN:
+        p = scripts / name
+        if not p.exists():
+            continue
+        txt = p.read_text(encoding='utf8', errors='replace')
+        for fn, owner in owned.items():
+            if re.search(rf'^\s*def {fn}\(', txt, re.M):
+                bad.append(f'scripts/{name}: redefines {fn}() - it is owned by {owner}')
     return bad
 
 

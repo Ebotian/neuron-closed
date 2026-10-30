@@ -18,7 +18,7 @@ from core.cache import p50_cached, column_norms_cached
 from core.loading import load_model_fast
 from core.sampling import generate_rollouts
 from estimators.phi import phi_of, slot_ids
-from estimators.score import per_rollout_scores
+from estimators.score import per_rollout_scores, loo_weights, insample_weights
 from estimators.pathwise import pathwise_batch
 from estimators.teacher import teacher_grad
 from analysis.split_half import split_half_curve
@@ -70,9 +70,8 @@ def main():
         rec['ctx'].append(r['id']); rec['phi'][r['id']] = ph
 
         S = per_rollout_scores(model, lm, layers, p50, norms, seqs, pad, dev, len(pre), scale=SC)
-        K = len(seqs); psum = sum(ph)
-        w_loo = [(x - (psum - x) / max(K - 1, 1)) / (K * len(ctx)) for x in ph]
-        w_in = [(x - psum / K) / (K * len(ctx)) for x in ph]
+        K = len(seqs)
+        w_loo, w_in = loo_weights(ph, len(ctx)), insample_weights(ph, len(ctx))
         blk, wl, wi = S.double(), torch.tensor(w_loo, device=dev).unsqueeze(1), torch.tensor(w_in, device=dev).unsqueeze(1)
         for l, off, d_ in OFFS:
             col = blk[:, off:off + d_]
