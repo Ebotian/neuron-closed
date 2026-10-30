@@ -16,7 +16,7 @@ def _flat(d, layers):
 
 
 def summarize(layers, g_path, g_teach, g_path_in, S_all, W_all, rollouts, seed, phi_all, pathwise=None):
-    flat = lambda d: _flat(d, layers)
+    flat = lambda d: _flat(d, layers) if d is not None else None
     Gt = torch.cat(S_all, 0)
     Wf = torch.tensor([w for ws in W_all for w in ws], device=Gt.device)
     Mw = Gt.double() * Wf.unsqueeze(1)
@@ -32,9 +32,12 @@ def summarize(layers, g_path, g_teach, g_path_in, S_all, W_all, rollouts, seed, 
                                             device=Gt.device),
                  'convention': 'r(K) ~ K/(K+2*kappa); K(r=0.5) = 2*kappa'},
            'ICC': icc,
-           'C1p': {'cos_path_teach': float(torch.nn.functional.cosine_similarity(gp.unsqueeze(0), gt.unsqueeze(0)))},
-           'baseline_compare': {'cos_loo_vs_insample': float(torch.nn.functional.cosine_similarity(
-               gp.unsqueeze(0), flat(g_path_in).unsqueeze(0))), 'K': rollouts}}
+           }
+    if gp is not None and gt is not None:
+        rec['C1p'] = {'cos_path_teach': float(torch.nn.functional.cosine_similarity(gp.unsqueeze(0), gt.unsqueeze(0)))}
+    if gp is not None and g_path_in is not None:
+        rec['baseline_compare'] = {'cos_loo_vs_insample': float(torch.nn.functional.cosine_similarity(
+            gp.unsqueeze(0), flat(g_path_in).unsqueeze(0))), 'K': rollouts}
     if pathwise is not None:
         gw = flat(pathwise)
         rec['C2_split'] = {'cos_pathwise_teach': float(torch.nn.functional.cosine_similarity(gw.unsqueeze(0), gt.unsqueeze(0))),
