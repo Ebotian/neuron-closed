@@ -22,12 +22,12 @@ if [ "$STEP" != "lean" ]; then
 echo "== fd_gate on $HOST =="
 "${SCP[@]}" "$ROOT/scripts/mlp_capture.py" "$ROOT/scripts/fd_gate.py" "$ROOT/scripts/verify_units.py" \
     "$ROOT/scripts/legacy_capture.py" "$HOST:/root/autodl-tmp/scripts/j2space/" \
-    || die "could not copy the instrument to $HOST (a copy failure used to be swallowed by '|| true')"
+    || die "could not copy the instrument to $HOST (a copy failure used to be swallowed by a trailing ignore)"
 "${SCP[@]}" "$ROOT/scripts/core/units.py" "$HOST:/root/autodl-tmp/scripts/j2space/core/" || die "could not copy core/units.py"
 "${SCP[@]}" "$ROOT/scripts/analysis/fd.py" "$HOST:/root/autodl-tmp/scripts/j2space/analysis/" || die "could not copy analysis/fd.py"
 # the exit status must be the GATE's, not a trailing `tail`'s: `python x.py; tail -2 log` reports tail's status
 "${SSH[@]}" 'cd /root/autodl-tmp/scripts/j2space && /root/miniconda3/bin/python fd_gate.py > /tmp/fd_certify.raw 2>&1' \
-    || { "${SSH[@]}" 'tail -20 /tmp/fd_certify.raw' >&2 || true; die "fd_gate exited non-zero on the remote box"; }
+    || { "${SSH[@]}" 'tail -20 /tmp/fd_certify.raw' >&2 || :; die "fd_gate exited non-zero on the remote box"; }
 "${SSH[@]}" 'tail -2 /tmp/fd_certify.raw'
 "${SCP[@]}" "$HOST:/root/autodl-tmp/runs/fd_gate.json" "$ROOT/results/fd_gate.json" || die "could not fetch the fd_gate record"
 python3 - "$ROOT" <<'PY' || exit 1

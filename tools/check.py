@@ -250,6 +250,12 @@ def check_no_regressions():
             continue
         if 'detach().clone().requires_grad_' in p.read_text(encoding='utf8', errors='replace'):
             bad.append(f'scripts/{p.name}: detach-then-clone capture outside legacy_capture.py')
+    # the independent-half estimator must derive each half's weights INSIDE the half. Slicing the full-group list is what
+    # broke E[<a,b>] = ||g||^2 while the docstring claimed otherwise, and no value check can see it (the numbers look fine).
+    rep = scripts / 'analysis/report.py'
+    if rep.exists() and re.search(r'W\[h\s*\*\s*half', rep.read_text(encoding='utf8', errors='replace')):
+        bad.append('scripts/analysis/report.py: slices the full-group weight list into halves - '
+                   'recompute loo_weights inside each half (core.weights)')
     owned = {'split_half': 'analysis/split_half.py', 'to_v': 'analysis/quotient.py',
              'cos_direct': 'analysis/quotient.py', 'null_for': 'analysis/quotient.py',
              'report_list': 'analysis/quotient.py', 'q3_verdict': 'analysis/quotient.py'}
@@ -264,6 +270,15 @@ def check_no_regressions():
             if re.search(rf'^\s*def {fn}\(', txt, re.M):
                 bad.append(f'scripts/{name}: redefines {fn}() - it is owned by {owner}')
     return bad
+
+
+def check_gates():
+    """Inject every known gate failure and require a red light. Stdlib only, so it runs without torch or a GPU."""
+    r = subprocess.run([sys.executable, str(ROOT / 'scripts/verify_gates.py')], capture_output=True, text=True)
+    if r.returncode != 0:
+        lines = [l.strip() for l in (r.stdout + r.stderr).splitlines() if '[FAIL]' in l]
+        return lines[:4] or [f'scripts/verify_gates.py exited {r.returncode}']
+    return []
 
 
 def check_compile():
@@ -382,6 +397,8 @@ def main():
         bad = check_ledger(); results[f'ledger ({len(json.loads((ROOT / "evidence/ledger.json").read_text(encoding="utf8"))["verdicts"])} verdicts)'] = bad
     if cmd in ('all', 'noregress'):
         results['noregress (one functional, one implementation)'] = check_no_regressions()
+    if cmd in ('all', 'gates'):
+        results['gates (the guards fail when they should)'] = check_gates()
     if cmd in ('all', 'instruments'):
         results['instruments (lean sha + fd gate)'] = check_instruments()
     if cmd in ('all', 'git'):
