@@ -33,6 +33,7 @@ search, our **direction** agrees to 93–99% but the exact 1–4 coordinate **li
 | `tools/check.py` | **唯一验证入口**（`make check` 的 8 项） |
 | `vendor/` | 冻结的测量包（带 `CHECKSUMS.sha256`，只读，不修改） |
 | `lexicons/`、`probes/` | 词表与上下文/对比集（第三方来源见 `NOTICE`） |
+| `lean/` | **Lean 4 形式化**（计划 2.44 的代数：核是规范、解在残差空间的像就是 `∇Φ`）。用本机公共 mathlib 环境，`leanm lean/Gauge.lean` 即可复检；公理只用三条标准公理 |
 | `evidence/ledger.json` | 外部证据总账（8 来源 × 14 主张，机械校验） |
 
 ## 快速开始

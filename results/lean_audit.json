@@ -1,0 +1,27 @@
+{
+ "file": "lean/Gauge.lean",
+ "sha256": "e44b1e78673f15bb17f93883ff9ab689b887a2cc267b8f872768ba81e46870a4",
+ "toolchain": "leanprover/lean4:v4.33.0-rc1",
+ "mathlib_rev": "79d0395a1825a6264ad5d269e35e60537518955e",
+ "mathlib_inputRev": "v4.33.0-rc1",
+ "decls": {
+  "NeuronClosed.ker_gram": [
+   "propext",
+   "Classical.choice",
+   "Quot.sound"
+  ],
+  "NeuronClosed.gauge_invariance": [
+   "propext",
+   "Classical.choice",
+   "Quot.sound"
+  ],
+  "NeuronClosed.lift_maps_back": [
+   "propext",
+   "Classical.choice",
+   "Quot.sound"
+  ]
+ },
+ "verdict": "PROVED (opl-leancheck, no --evidence-out, no signing key)",
+ "already_in_mathlib": "ContinuousLinearMap.ker_adjoint_comp_self states (T\u2020 \u2218L T).ker = T.ker, i.e. ker_gram is textbook; the load-bearing statement is lift_maps_back",
+ "boundary": "formalises the algebra (kernel is a gauge; a solution's residual image is exactly y). It does NOT formalise the model, the construct, or trait fidelity."
+}

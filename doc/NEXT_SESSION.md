@@ -236,7 +236,12 @@ v*_l = b · ∇Φ_l / ‖∇Φ‖          ← 一行，没有 Gram、没有 Cho
 2. 该目录**不是 git 仓**、也不要提交（7.5 GB 第三方快照，按 `AGENTS.md` 只记来源与版本）；
 3. 换 mathlib 版本就**新建目录**，别在原地升级。
 
-**还没有的**：`opl-leancheck` 的签名密钥（需 `cd ~/Downloads/kimi-research/plugin && ./bin/opl-sign init`）；
-本仓内也没有任何 `.lean` 文件。要检查一个 Lean 文件的公理依赖，两种做法等价，后者多一条带
-`file_sha256` + `toolchain` 的 `opl.evidence/1` 记录：
-`leanm x.lean`（文件内自行 `#print axioms thm`） vs `opl-leancheck --file x.lean --decl thm`。
+**不需要签名密钥**（更正上一版备忘的错误引导）：`opl-leancheck` 只在传 `--evidence-out` 时才调用签名器
+（`bin/opl-leancheck` 第 124/150 行），不写证据文件时照常审计。所以命令是
+`opl-leancheck --file lean/Gauge.lean --decl <thm>`，**不加** `--evidence-out`。
+
+**形式化已开始**：`lean/Gauge.lean`（见 `lean/README.md`、`results/lean_audit.json`）三条全部
+`PROVED`、公理只用 `{propext, Classical.choice, Quot.sound}`。两条诚实更正：
+(a) `ker(W†W)=ker(W)` **mathlib 已有**（`ContinuousLinearMap.ker_adjoint_comp_self`）⇒ 2.44 的"核"那一半是教科书结论；
+(b) 真正承重的 `lift_maps_back`（`W` 满射 + `M u = W† y` ⇒ `W u = y`）**不需要**最小范数、也不需要伪逆
+（mathlib 没有 Moore–Penrose），它就是 `cos(W·u_M, ∇Φ)=1.0000` 的代数内容。

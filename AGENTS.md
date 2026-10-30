@@ -24,6 +24,7 @@ vendor/         冻结的测量包（带 CHECKSUMS.sha256，不修改）
 lexicons/       词表（只存可再分发的；第三方来源见 NOTICE）
 probes/         上下文/对比集
 evidence/       外部证据总账 ledger.json
+lean/           Lean 4 形式化（计划 2.44 的代数；用本机公共 mathlib 环境，见 NEXT_SESSION）
 ```
 
 ## 完成定义（Definition of Done）
