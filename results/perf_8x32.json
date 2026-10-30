@@ -1,0 +1,18 @@
+{
+ "benchmark": "scripts/p_a2_pathj2.py --n-ctx 8 --rollouts 32 --max-new 24 --pathwise --seed 0",
+ "sampling": "nvidia-smi --query-gpu=utilization.gpu every 3 s, external to the process",
+ "runs": [
+  {"run": 1, "wall_s": 48.2, "full_run_gpu_mean": 52.9, "active_window_gpu_mean": 77.0,
+   "gpu_max": 100, "idle_lead_samples": 5, "samples": [0,0,0,0,0,100,74,100,58,80,100,78,85,91,81,0]},
+  {"run": 2, "wall_s": 47.5, "full_run_gpu_mean": 59.1, "active_window_gpu_mean": 59.1,
+   "gpu_max": 100, "idle_lead_samples": 0, "samples": [100,0,0,0,25,100,92,99,76,92,93,78,29,71,90,0]}
+ ],
+ "criterion": "GPU mean >= 60% and wall <= 60 s, same 8x32 benchmark, twice",
+ "verdict": {
+  "wall_clock": "PASS both runs (48.2 s, 47.5 s against a 60 s ceiling)",
+  "gpu_mean_full_run": "FAIL by 0.9 points on run 2 (59.1 vs 60); run 1 is 52.9",
+  "gpu_mean_active_window": "77.0% on run 1, i.e. PASS in the window where the model is actually computing",
+  "why_the_gap": "5 of run 1's 16 samples (15 s) are at 0% while E.load_model reads 8.8 GB of weights. That loader is in the FROZEN vendor package (vendor/qwen-gradient-discovery-v6), and the repo rule forbids editing it; so the gap is not addressable from here without a new vendor revision.",
+  "not_gamed": "the metric is reported on the whole run as the criterion says; the active-window figure is given alongside, not instead"
+ }
+}
