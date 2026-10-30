@@ -50,3 +50,33 @@ def null_for(items, ref_v, Wn, layers, n_null, seed=0):
     vals.sort()
     return {'n': len(vals), 'mean': sum(vals) / len(vals) if vals else None,
             'p95': vals[int(0.95 * len(vals)) - 1] if vals else None, 'max': vals[-1] if vals else None}
+
+
+def report_list(items, recipe_v, Wn, layers, L1, L2, n_null, seed=0):
+    """Everything the comparison reports for ONE position list: per-recipe quantiles, the matched null, the L1/L2 strata."""
+    v = to_v(items, Wn, layers)
+    cs = [(c, tags) for (c, tags) in ((cos_direct(v, rv, layers), tags) for (_, rv, tags) in recipe_v) if c is not None]
+    vals = sorted(c for c, _ in cs)
+    nl = null_for(items, v, Wn, layers, n_null, seed)
+    grp = {'L1_only': [], 'L2_only': [], 'other': []}
+    for c, tags in cs:
+        if tags & L1 and not (tags & L2):
+            grp['L1_only'].append(c)
+        elif tags & L2 and not (tags & L1):
+            grp['L2_only'].append(c)
+        else:
+            grp['other'].append(c)
+    q = lambda f: (vals[int(f * (len(vals) - 1))] if vals else None)
+    return {'n_coords': len(items),
+            'per_recipe': {'median': q(0.5), 'p25': q(0.25), 'p75': q(0.75), 'max': vals[-1] if vals else None},
+            'null_matched': nl,
+            'frac_recipes_above_null_p95': (None if not nl['p95'] else sum(1 for c in vals if c > nl['p95']) / len(vals)),
+            'strata': {k: (sorted(v2)[len(v2) // 2] if v2 else None) for k, v2 in grp.items()},
+            'strata_n': {k: len(v2) for k, v2 in grp.items()}}
+
+
+def q3_verdict(lists):
+    """The frozen wording rule: 'HIGH ALIGNMENT' only if the median over recipes exceeds the matched null p95."""
+    return {k: ('HIGH ALIGNMENT' if (v['per_recipe']['median'] is not None and v['null_matched']['p95'] is not None
+                                     and v['per_recipe']['median'] > v['null_matched']['p95']) else 'no high alignment')
+            for k, v in lists.items()}

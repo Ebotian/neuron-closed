@@ -1,27 +1,9 @@
 #!/usr/bin/env python3
-"""Task-9 (plan 2.54): quotient-space comparison, redone after the audit.
+"""Compare position lists in the quotient space, per recipe, against a matched null.
 
-WHAT THE AUDIT FOUND (doc/audit-response-2026-10-30.md §8): the deleted version
-  * accumulated the cosine denominator only over layers touched by BOTH lists, so it was not the direct-sum cosine;
-  * computed the random null only for the 64-entry list and then used it to interpret the 32-layer list;
-  * drew null doses as all +1, matching neither the sign nor the magnitude distribution;
-  * summed recipes of different traits into one list, which can cancel.
-Everything below fixes those four things and nothing else:
-
-  COSINE      full direct-sum over ALL 32 layers: num = sum_l <a_l,b_l>, den = sum_l ||a_l||^2 (no layer filtering)
-  NULL        for EVERY compared list, >=20 random lists drawn to match that list's own per-layer counts AND its own
-              dose magnitudes with their signs (sampled without replacement from the list's own doses)
-  UNITS       v_l = sum over the list's coordinates of dose * unit(W_down column); a list that never touches layer l
-              contributes the zero vector there, which is what "direct sum" means
-  STRATA      each neuronary recipe is compared SEPARATELY (its own coordinates and doses), never summed with others;
-              recipes are then grouped by the frozen L1/L2 tag map of scripts/tag_level_dose.py
-
-FROZEN CRITERION (written before the run)
-  Q1  report, per compared list: the direct-sum cosine against each recipe, and the median / IQR / max over recipes.
-  Q2  report the matched-null distribution for the SAME list (mean, p95, max) and the fraction of recipes whose cosine
-      exceeds the null p95. That fraction, not a single number, is the evidence.
-  Q3  the verdict wording is fixed in advance: "no high alignment" unless the median over recipes exceeds the null p95
-      for that list. Anything weaker must also be reported as weaker.
+Fixes the four defects the audit found in the first version: direct-sum cosine over ALL layers, a null matched to EACH list's own
+per-layer counts and signed dose magnitudes, one comparison per recipe instead of summing across traits, and frozen L1/L2 strata.
+Arithmetic lives in analysis/quotient.py; the rule that decides the verdict is `q3_verdict` there.
 """
 from __future__ import annotations
 import argparse, csv, json, math, random, sys
@@ -48,7 +30,7 @@ def read_positions(path, dose_col):
 
 
 def main():
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser()  # noqa: E501
     ap.add_argument('--recipes', default='/root/autodl-tmp/quo/nry_all.json')
     ap.add_argument('--model', default='/root/autodl-tmp/Qwen3.5-4B')
     ap.add_argument('--lists', default='/root/autodl-tmp/quo/positions_K64.csv:dose_at_b0.05,'
@@ -115,41 +97,14 @@ def main():
                  set(r.get('tags') or [])) for r in recs]
 
     out = {'n_recipes': len(recs), 'lists': {}}
+    from analysis.quotient import report_list, q3_verdict
     for spec in a.lists.split(','):
         path, col = spec.split(':')
         items = read_positions(path, col)
-        v = to_v(items)
-        cs = []
-        for (rid, rv, tags) in recipe_v:
-            c = cos_direct(v, rv)
-            if c is not None:
-                cs.append((c, tags))
-        vals = sorted(c for c, _ in cs)
-        nl = null_for(items, v, a.n_null)   # null: random list vs OUR OWN list (same histogram/doses)
-        grp = {'L1_only': [], 'L2_only': [], 'other': []}
-        for c, tags in cs:
-            if tags & L1 and not (tags & L2):
-                grp['L1_only'].append(c)
-            elif tags & L2 and not (tags & L1):
-                grp['L2_only'].append(c)
-            else:
-                grp['other'].append(c)
-        entry = {'n_coords': len(items), 'per_recipe': {'median': vals[len(vals) // 2] if vals else None,
-                                                        'p25': vals[len(vals) // 4] if vals else None,
-                                                        'p75': vals[3 * len(vals) // 4] if vals else None,
-                                                        'max': vals[-1] if vals else None},
-                 'null_matched': nl,
-                 'frac_recipes_above_null_p95': (None if not nl['p95'] else
-                                                 sum(1 for c in vals if c > nl['p95']) / len(vals)),
-                 'strata': {k: (sorted(v2)[len(v2) // 2] if v2 else None) for k, v2 in grp.items()},
-                 'strata_n': {k: len(v2) for k, v2 in grp.items()}}
+        entry = report_list(items, recipe_v, Wn, layers, L1, L2, a.n_null)
         out['lists'][path.split('/')[-1]] = entry
         print(path.split('/')[-1], json.dumps(entry, default=str)[:400], flush=True)
-
-    med = {k: v['per_recipe']['median'] for k, v in out['lists'].items()}
-    p95 = {k: v['null_matched']['p95'] for k, v in out['lists'].items()}
-    out['Q3_verdict'] = {k: ('HIGH ALIGNMENT' if (med[k] is not None and p95[k] is not None and med[k] > p95[k])
-                             else 'no high alignment') for k in med}
+    out['Q3_verdict'] = q3_verdict(out['lists'])
     print('Q3', out['Q3_verdict'], flush=True)
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     json.dump(out, open(a.out, 'w'), indent=1, default=str)

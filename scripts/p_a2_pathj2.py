@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 """Plan 2.42 re-run: a thin shell that assembles modules and writes results. No measurement logic lives here.
-FROZEN CRITERIA: doc/plan-2.42-frozen.md (phi = path J2 in nats; 1 batched backward per context; 2K pairs in chunks
-of 8; leave-one-out weights so E[(phi-b_-i)s_i]=g; ICC from the Gram)."""
+FROZEN: doc/plan-2.42-frozen.md (phi = path J2 in nats; 1 batched backward per context; 2K pairs in chunks of 8; LOO
+weights so E[(phi-b_-i)s_i]=g; ICC from the Gram)."""
 from __future__ import annotations
 import argparse
-import json
-import sys
+import json, sys
 from pathlib import Path
 
 import torch
-
 sys.path.insert(0, '/root/autodl-tmp/scripts/j2space')
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 for sub in ('core', 'estimators', 'analysis'):
     sys.path.insert(0, str(Path(__file__).resolve().parent / sub))
 import engine as E
 from core.units import column_norms_dev, dose_scale
+from core.cache import p50_cached, column_norms_cached
 from core.loading import load_model_fast
 from core.sampling import generate_rollouts
 from estimators.phi import phi_of, slot_ids
@@ -42,8 +41,10 @@ def main():
         model = model.float()
         lm = E.model_lm(model)
     layers = list(range(32))
-    p50 = E.estimate_p50(tok, model, lm, layers, dev)
-    norms = column_norms_dev(lm, layers, dev)
+    C = f'/root/autodl-tmp/runs/cache_'        # keyed by the frozen weights, not by the run
+    tag = Path(a.model).name
+    p50 = p50_cached(tok, model, lm, layers, dev, f'{C}p50_{tag}.pt')
+    norms = column_norms_cached(lm, layers, dev, f'{C}cn_{tag}.pt')
     SC = dose_scale(p50, norms, layers)
     for q in model.parameters():
         q.requires_grad_(False)
@@ -114,7 +115,6 @@ def main():
             rec['C2_split']['cos_pathwise_teach'], rec['C2_split']['norm_pathwise'],
             rec['C2_split']['ratio_score_over_pathwise']), flush=True)
     return 0
-
 
 if __name__ == '__main__':
     sys.exit(main())

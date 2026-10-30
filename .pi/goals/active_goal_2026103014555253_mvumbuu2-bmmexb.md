@@ -5,28 +5,28 @@
   "status": "active",
   "autoContinue": true,
   "usage": {
-    "tokensUsed": 481192,
-    "activeSeconds": 2824
+    "tokensUsed": 576727,
+    "activeSeconds": 3762
   },
   "sisyphus": false,
-  "revision": 144,
+  "revision": 178,
   "createdAt": "2026-10-30T06:55:52.538Z",
-  "updatedAt": "2026-10-30T07:44:00.744Z",
+  "updatedAt": "2026-10-30T08:02:16.390Z",
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
-    "generation": "c1cfa42e-c0a0-4596-8c46-49e6e9f6ea10",
-    "used": 3,
+    "generation": "b6abfcea-2722-4c5e-a91a-528cedd2ad84",
+    "used": 1,
     "phase": "running",
     "repairUsed": false,
     "decision": {
       "kind": "ready",
-      "purpose": "ready"
+      "purpose": "kickoff"
     },
     "dispatch": {
-      "id": "65d841a9-f344-46fe-831e-5c8fda8f7fac",
-      "kind": "ready",
-      "claimedAt": 1793345927276
+      "id": "57feb583-8516-4829-a8c5-f22edb9ac4f0",
+      "kind": "kickoff",
+      "claimedAt": 1793346880625
     }
   },
   "taskList": {
@@ -119,8 +119,8 @@
 - Status: running
 - Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 47m04s
-- Tokens used: 481K (481,192) tokens
+- Time spent: 1h02m42s
+- Tokens used: 577K (576,727) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->
