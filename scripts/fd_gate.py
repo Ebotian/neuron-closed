@@ -89,19 +89,35 @@ def main():
                 h.remove()
 
     def analytic(mode, want):
-        hs, cap, dl = [], {}, {}
-        for L in want:
+        """mode 'new' MUST go through the shipped module; mode 'old' is the inline legacy negative control.
+
+        The first version of this function re-implemented the zero-leaf hook inline even for mode 'new', so the
+        certificate would have kept passing after a regression inside mlp_capture.Capture. The auditor was right:
+        a certificate must exercise the artifact it names. Now 'new' calls Capture(...).dose_grad() end to end and
+        slices the concatenated vector back into layers, and fd_gate.json pins the module inode's hash.
+        """
+        if mode == 'new':
+            with Capture(lm, list(want), p50, norms) as cap:
+                model.zero_grad(set_to_none=True)
+                o = model(input_ids=ids, use_cache=False)
+                lp = F.log_softmax(o.logits[:, :-1].float(), -1)
+                lp[0, pos - 1, torch.tensor(slot, device=dev)].sum().backward()
+                flat = cap.dose_grad()          # <- the shipped code path, reduction and scaling included
+            out, off = {}, 0
+            for L in want:
+                d_ = int(lm.layers[L].mlp.down_proj.weight.shape[1])
+                out[L] = flat[off:off + d_].clone()
+                off += d_
+            return out
+        hs, cap_, = [], {}
+        for L in list(want):
             def build(idx):
                 def hook(_m, args):
                     x = args[0]
-                    if mode == 'new':
-                        if idx not in dl:
-                            dl[idx] = torch.zeros_like(x, requires_grad=True)
-                        return (x + dl[idx],) + tuple(args[1:])
-                    if idx in cap:
+                    if idx in cap_:
                         return None
-                    xx = x.detach().clone().requires_grad_(True)
-                    cap[idx] = xx
+                    xx = x.detach().clone().requires_grad_(True)   # the legacy (wrong) readout, deliberately kept
+                    cap_[idx] = xx
                     return (xx,) + tuple(args[1:])
                 return hook
             hs.append(lm.layers[L].mlp.down_proj.register_forward_pre_hook(build(L)))
@@ -112,8 +128,7 @@ def main():
             lp[0, pos - 1, torch.tensor(slot, device=dev)].sum().backward()
             out = {}
             for L in want:
-                t = dl[L] if mode == 'new' else cap[L]
-                g = t.grad
+                g = cap_[L].grad
                 out[L] = g.sum(dim=tuple(range(g.dim() - 1))).double().cpu() * \
                     (p50[L] / norms[L].clamp(min=1e-12)).double()
             return out

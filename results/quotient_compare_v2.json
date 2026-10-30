@@ -28,7 +28,8 @@
     "L1_only": 38,
     "L2_only": 49,
     "other": 104
-   }
+   },
+   "headline": "0 by construction (disjoint support) - not evidence"
   },
   "positions_all32_K1024_pairs.csv": {
    "n_coords": 1024,
@@ -61,5 +62,8 @@
  ],
  "artifacts": [
   "results/quotient_compare_v2.json"
- ]
+ ],
+ "raw_run_record": "results/quotient_compare_v2_raw.json (unmodified script output: per_recipe{p25,p75}, null_matched{n,mean,p95,max}, Q3_verdict)",
+ "schema_note": "the summary in this file re-types the numbers (iqr / null_p95 / strata_median / verdict). The raw record above is the authority; the summary is a convenience view. The audit was right that the first commit shipped only the re-typed view.",
+ "k64_is_tautological": "the K=64 list lives in layers 13-14 only, while most recipes never touch those layers, so with a strict direct-sum cosine its per-recipe median is EXACTLY 0 by construction. That row is therefore not evidence of disagreement and must not be quoted as such; the informative list is the 32-layer K=1024 one."
 }

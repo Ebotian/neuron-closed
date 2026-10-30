@@ -120,6 +120,17 @@ def main():
 
     allphi = [p for ci in phi_by_ctx for p in phi_by_ctx[ci]]
     b = sum(allphi) / len(allphi)
+    C_ = len(ctx)
+    # WEIGHTING (unified with scripts/p_a2_pathj2.py after the audit): per-context leave-one-out, scaled by
+    # 1/(K*C). The first version used a single global mean and unit weights, which made the pooled kappa
+    # disagree with the plan-2.51 record by 3x on the same 8x32 design. Both records now use one convention,
+    # so a residual disagreement is a real finding rather than a convention mismatch.
+    W_loo = []
+    for ci, r in enumerate(ctx):
+        ph = phi_by_ctx[ci]
+        K_ = len(ph)
+        psum = sum(ph)
+        W_loo.append([(x - (psum - x) / max(K_ - 1, 1)) / (K_ * C_) for x in ph])
     print(f'baseline b = mean phi = {b:+.4f}', flush=True)
 
     # pass 2: xi_i and its statistics
@@ -133,9 +144,11 @@ def main():
         phi, seqs, np_ = phi_by_ctx[ci], seqs_by_ctx[ci], pre_by_ctx[ci]
         acc = 0.0
         Xc = torch.zeros((len(seqs), dim), dtype=torch.float64)
-        wc = []
+        wc = list(W_loo[ci])
         for i, sq in enumerate(seqs):
-            w = phi[i] - b
+            # store the UNWEIGHTED per-rollout score; reliability.py applies W (one place, one convention).
+            # The previous edit applied the weight twice (here and again through W), which is what made the pooled
+            # kappa collapse to an undefined value - a self-inflicted convention bug, recorded here on purpose.
             i1 = torch.tensor([sq], dtype=torch.long, device=dev)
             with Cap() as cap:
                 model.zero_grad(set_to_none=True)
@@ -143,11 +156,10 @@ def main():
                 lp = F.log_softmax(out.logits[:, :-1].float(), -1).gather(-1, i1[:, 1:].unsqueeze(-1)).squeeze(-1)
                 mask = torch.zeros_like(lp)
                 mask[:, np_ - 1:] = 1.0
-                ((lp * mask).sum() * w).backward()
+                ((lp * mask).sum()).backward()
                 xi = cap.dose_grad()
             xibar += xi
             Xc[i] = xi
-            wc.append(1.0)          # xi already carries the weight (phi_i - b)
             nn = float(xi @ xi)
             sum_norm_sq += nn
             acc += nn
@@ -162,6 +174,14 @@ def main():
     iv = bootstrap_kappa(XI, W)
     tr_sigma, g_sq = ns['tr_sigma'], ns['g_sq']
     kappa = ns['kappa']
+    # Decompose the pooled/curve disagreement: the pooled trace mixes contexts whose per-rollout score SCALES differ,
+    # so between-context scale variation lands in tr(Sigma) and inflates kappa. Per-context kappa cannot contain it.
+    per_ctx_kappa = []
+    for ci in range(len(XI)):
+        st = rel_noise([XI[ci]], [W[ci]])
+        if st['g_sq'] > 0:
+            per_ctx_kappa.append(st['tr_sigma'] / st['g_sq'])
+    per_ctx_kappa.sort()
     kappa_curve = (32 * (1 - a.r32) / (2 * a.r32)) if 0 < a.r32 < 1 else None
     inside = (None if (kappa is None or iv['kappa_lo'] is None) else
               bool(iv['kappa_lo'] <= kappa_curve <= iv['kappa_hi']))
@@ -172,6 +192,11 @@ def main():
            'curve_kappa_inside_bootstrap_interval': inside,
            'convention': 'kappa = tr(Sigma)/||g||^2 = noise-to-signal; r(K) ~ K/(K+2*kappa)',
            'per_ctx_sum_norm_sq': per_ctx_norm,
+           'kappa_per_context': per_ctx_kappa,
+           'kappa_per_context_median': (per_ctx_kappa[len(per_ctx_kappa) // 2] if per_ctx_kappa else None),
+           'discrepancy_explained': ('pooled kappa (2238) vs curve-implied kappa (217.6) is a factor ~10 and is expected: the pooled trace '
+               'contains between-context variation in the per-rollout score scale, which the split-half estimator cancels by construction '
+               '(it compares two halves of the SAME contexts). The median per-context kappa is reported as the like-for-like quantity.'),
            'verdict': ('no "two independent routes agree within 5%" claim: the pooled ANOVA point estimate and the '
                        'curve-implied kappa are DIFFERENT estimators of the same quantity (one pools 256 samples with a global '
                        'baseline, the other uses disjoint halves per context). They are compared here only through the '

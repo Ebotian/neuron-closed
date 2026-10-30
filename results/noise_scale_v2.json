@@ -1,54 +1,33 @@
 {
- "status": "MEASURED on the corrected instrument (task-8, plan 2.53); supersedes the retracted plan 2.46",
- "design": {
-  "model": "Qwen3.5-4B bf16",
-  "contexts": 8,
-  "rollouts_per_context": 32,
-  "n": 256,
-  "dim": 294912,
-  "xi": "weight_i * s_i with the leave-one-out baseline; s_i from the corrected readout",
-  "estimators": "pooled ANOVA (one pool of 256, global baseline) vs split-half curve r(K)=K/(K+2\u03ba) (disjoint halves, per context)"
- },
+ "status": "MEASURED on the corrected instrument, WEIGHTING UNIFIED after the audit (task-8 rework)",
+ "raw_run_record": "results/noise_scale_v2_raw.json (unmodified script output)",
+ "what_changed": "the first version used a single global baseline and unit weights, while the plan-2.51 record used per-context leave-one-out with 1/(K*C). That convention mismatch is the whole of the 3x disagreement between the two committed \"trusted\" records (2100.6 vs 6403.7). Both now use the same LOO weighting, and the two records agree to 6% (tr(Sigma) 39.726 vs 39.888; ||g||^2 0.01891 vs 0.01782; kappa 2100.6 vs 2238.5).",
  "numbers": {
-  "tr_sigma": 21028703.26255543,
-  "g_sq": 3283.8333077512652,
-  "kappa_pooled": 6403.706062947412,
-  "kappa_bootstrap_interval": [
-   120.32658263602583,
-   2674.198751009905
+  "tr_sigma": 39.888426843248425,
+  "g_sq": 0.017819465789395916,
+  "kappa_pooled": 2238.474896760676,
+  "kappa_pooled_interval": [
+   107.15218268304457,
+   622.3835864962999
   ],
-  "kappa_implied_by_measured_r32": 217.5766423357664,
-  "r32": 0.0685,
-  "curve_inside_interval": true,
-  "per_ctx_sum_norm_sq": {
-   "0": 193309135.92299157,
-   "1": 799762643.8663146,
-   "2": 127259350.99925527,
-   "3": 1096032173.3723462,
-   "4": 170600697.62852862,
-   "5": 64218097.499109685,
-   "6": 2741423970.397604,
-   "7": 191582626.85482377
-  }
+  "kappa_per_context": [
+   56.0027543825612,
+   103.51307397443796,
+   125.36804354456443,
+   353.4668539340407,
+   712.3775060411467
+  ],
+  "kappa_per_context_median": 125.36804354456443,
+  "kappa_implied_by_curve": 217.5766423357664,
+  "n_contexts_with_positive_signal": 5
  },
- "old_vs_new": {
-  "tr_sigma": [
-   12120000.0,
-   21028703.26255543
-  ],
-  "g_sq": [
-   8077.7,
-   3283.8333077512652
-  ],
-  "kappa_pooled": [
-   1500.5,
-   6403.706062947412
-  ],
-  "claim": "old \"1500 vs 1424 agree within 5%\" is dead on two counts: it compared \u03ba with 2\u03ba, and it compared two different estimators"
- },
- "verdict": "the noise-to-signal ratio is 217.6 by the split-half-consistent route (from the measured r(32)=0.0685 of plan 2.51), and that value lies INSIDE the context-bootstrap interval. The pooled ANOVA point estimate is 6403.7, ~29x larger, and it is the estimator the audit showed to be invalid (E[f(X)] != f(E[X]); a global baseline mixed with between-context variation). So the defensible number is kappa ~ 217 (interval from the bootstrap), i.e. ~217 rollouts per context for r=0.5 - not 1500, and certainly not the ambient dimension. No claim of independent agreement is made: the two routes are compared only through the interval.",
- "per_context_dominance": "the per-context sum||xi||^2 spans 6.4e+07..2.7e+09, so the pooled trace is dominated by a few contexts - which is exactly why the pooled point estimate is not trustworthy",
+ "headline": "the defensible range is kappa ~ 125 (median per-context) to 218 (curve-implied), i.e. of order 10^2 rollouts per context for r=0.5. The POOLED estimate 2238 is ~10x higher and is not the like-for-like quantity: it mixes contexts whose per-rollout score scales differ, variation the split-half estimator cancels by comparing two halves of the same contexts. Only 5 of 8 contexts even have a positive signal estimate (g_sq > 0), which is itself a finding about n=256.",
+ "not_claimed": [
+  "that two independent routes agree within 5% (deleted: it compared kappa against 2*kappa and two different estimators)",
+  "a single point value for kappa",
+  "that the estimator class is unusable"
+ ],
  "artifacts": [
-  "results/noise_scale_v2.json"
+  "results/noise_scale_v2_raw.json"
  ]
 }

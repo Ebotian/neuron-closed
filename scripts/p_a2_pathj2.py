@@ -86,8 +86,8 @@ def main():
     ap.add_argument('--out', default='/root/autodl-tmp/runs/p_a2_path.json')
     ap.add_argument('--selftest', action='store_true')
     ap.add_argument('--pathwise', action='store_true')
-    ap.add_argument('--phi-selftest', action='store_true',
-                    help='task-3 gate: the two code paths for phi must agree to <1e-6 (run in fp32)')
+    ap.add_argument('--branch-selftest', action='store_true',
+                    help='task-3 gate: FD must reproduce the SHIPPED pathwise and teacher terms (fp32)')
     a = ap.parse_args()
     dev = 'cuda:0'
     torch.manual_seed(a.seed)
@@ -166,10 +166,47 @@ def main():
         print(f'SELF phi values batch={[round(float(x),4) for x in b2]} single={[round(float(x),4) for x in s2]}', flush=True)
         return 0 if ok else 1
 
-    if a.phi_selftest:
-        # task-3 gate: phi must be the SAME functional whether it is evaluated batched (phi_of, used for the
-        # weights) or per-row with the pathwise branch's own expression. fp32 is used because bf16 batching
-        # noise (~5e-3) would dominate the 1e-6 tolerance the criterion asks for.
+    def pathwise_term(sq, ids_slot, sgn, weight):
+        """d/du of weight * sgn * (mean over the slot's own tokens of log p(t | x, seq)).
+
+        ONE implementation: the main loop and --branch-selftest both call this, so the gate cannot certify a copy.
+        Returns per-layer dose-scaled gradients.
+        """
+        full = sq + ids_slot
+        j1 = torch.tensor([full], dtype=torch.long, device=dev)
+        with Cap() as cap:
+            model.zero_grad(set_to_none=True)
+            out = model(input_ids=j1, use_cache=False)
+            lp = F.log_softmax(out.logits[:, :-1].float(), -1)
+            pos = torch.arange(len(sq), len(full), device=dev)
+            tgt = torch.tensor(ids_slot, device=dev)
+            (lp[0, pos - 1, tgt].mean() * (sgn * weight)).backward()
+            raw = cap.grad_sum()
+        return {l: raw[l] * (p50[l] / norms[l].clamp(min=1e-12)).double() for l in layers}
+
+    def teacher_term(prompt, slot_txt, sgn, weight):
+        """d/du of weight * sgn * (MEAN over suffix tokens of log p(slot | prompt)) — the teacher-forced readout."""
+        rid, rpre, rsuf = E.candidate_ids(tok, prompt, slot_txt, dev, 384)
+        i1 = (rid.to(dev) if torch.is_tensor(rid) else torch.tensor(rid, device=dev)).view(1, -1).long()
+        with Cap() as cap:
+            model.zero_grad(set_to_none=True)
+            out = model(input_ids=i1, use_cache=False)
+            lp = F.log_softmax(out.logits[:, :-1].float(), -1).gather(-1, i1[:, 1:].unsqueeze(-1)).squeeze(-1)
+            mask = torch.zeros_like(lp)
+            mask[:, int(rpre) - 1:] = 1.0
+            ((lp * mask).sum() / mask.sum() * (sgn * weight)).backward()
+            raw = cap.grad_sum()
+        return {l: raw[l] * (p50[l] / norms[l].clamp(min=1e-12)).double() for l in layers}
+
+    if a.branch_selftest:
+        """REAL gate for the four defects fixed in plan 2.48, replacing the vacuous one.
+
+        The deleted version compared phi_of against slot_lp with identical arguments - the same function called twice,
+        so 0.00e+00 was guaranteed and it could not have detected anything. This one differentiates the SHIPPED helpers
+        (pathwise_term / teacher_term, the very functions the main loop calls) against fp32 finite differences of the
+        functional they claim to differentiate, using a deliberately MULTI-TOKEN slot so that a second division by |slot|
+        would show up as a factor |slot|, and it separately checks that g_pw accumulates across contexts.
+        """
         model = model.float()
         lm = E.model_lm(model)
         p50 = E.estimate_p50(tok, model, lm, layers, dev)
@@ -177,32 +214,77 @@ def main():
         p_ = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
         r = ctx[0]
         pre = E.prompt_prefix(tok, r['prompt'])
+        SLOT_TXT = 'deeply hostile and cruel'
+        slot_t = tok(SLOT_TXT, add_special_tokens=False).input_ids
+        print(f'BRANCH-SELFTEST slot tokens={len(slot_t)}', flush=True)
         torch.manual_seed(0)
-        ids = torch.tensor([pre], dtype=torch.long, device=dev)
+        ids0 = torch.tensor([pre], dtype=torch.long, device=dev)
         with torch.inference_mode():
-            o = model.generate(input_ids=ids, do_sample=True, temperature=1.0, top_p=1.0,
-                               max_new_tokens=12, use_cache=True, num_return_sequences=3, pad_token_id=p_)
-        seqs = [pre + g for g in o[:, ids.shape[1]:].tolist()]
-        with torch.inference_mode():
-            # A must be evaluated with the SAME batch shape as the branch (one row at a time). Batching
-            # three rows changes the cuBLAS kernel and moves a 151,936-way fp32 softmax by ~5e-4, which
-            # would swamp the 1e-6 tolerance for a reason that has nothing to do with the functional.
-            A = [float(phi_of([sq], r)[0]) for sq in seqs]
-            A_batched = [float(x) for x in phi_of(seqs, r)]
-        ip, ineg = slot_ids(tok, r['positive']), slot_ids(tok, r['negative'])
-        B = []
-        for sq in seqs:
-            tot = 0.0
-            for ids_slot, sgn in ((ip, +1.0), (ineg, -1.0)):
-                tot += sgn * float(slot_lp([sq], None, ids_slot)[0])
-            B.append(tot)
-        d = max(abs(x - y) for x, y in zip(A, B))
-        d_batch = max(abs(x - y) for x, y in zip(A_batched, A))
-        print(f'PHI-SELFTEST fp32  same-batch-shape: phi_of={[round(x,9) for x in A]} '
-              f'branch={[round(x,9) for x in B]}  |max diff|={d:.2e}', flush=True)
-        print(f'PHI-SELFTEST (reported, not gated) batched-vs-single kernel effect |max diff|={d_batch:.2e}', flush=True)
-        print('PHI-SELFTEST', 'PASS' if d < 1e-6 else 'FAIL', flush=True)
-        return 0 if d < 1e-6 else 1
+            o = model.generate(input_ids=ids0, do_sample=True, temperature=1.0, top_p=1.0,
+                               max_new_tokens=10, use_cache=True, num_return_sequences=1, pad_token_id=p_)
+        seq = pre + o[0, ids0.shape[1]:].tolist()
+
+        def steer_phi(fn):
+            def phi(doses):
+                hs = []
+                for (L, n), d in doses.items():
+                    vec = torch.zeros(lm.layers[L].mlp.down_proj.weight.shape[1], device=dev, dtype=torch.float32)
+                    vec[n] = d * p50[L] / float(norms[L][n])
+                    def mk(v):
+                        def hook(_m, inp):
+                            act = inp[0].clone()
+                            return (act + v.to(device=act.device, dtype=act.dtype),) + inp[1:]
+                        return hook
+                    hs.append(lm.layers[L].mlp.down_proj.register_forward_pre_hook(mk(vec)))
+                try:
+                    with torch.inference_mode():
+                        return fn()
+                finally:
+                    for h in hs:
+                        h.remove()
+            return phi
+
+        def read_path():
+            full = seq + slot_t
+            j1 = torch.tensor([full], dtype=torch.long, device=dev)
+            out = model(input_ids=j1, use_cache=False)
+            lp = F.log_softmax(out.logits[:, :-1].float(), -1)
+            pos = torch.arange(len(seq), len(full), device=dev)
+            return float(lp[0, pos - 1, torch.tensor(slot_t, device=dev)].mean())
+
+        def read_teach():
+            rid, rpre, rsuf = E.candidate_ids(tok, r['prompt'], SLOT_TXT, dev, 384)
+            i1 = (rid.to(dev) if torch.is_tensor(rid) else torch.tensor(rid, device=dev)).view(1, -1).long()
+            out = model(input_ids=i1, use_cache=False)
+            lp = F.log_softmax(out.logits[:, :-1].float(), -1).gather(-1, i1[:, 1:].unsqueeze(-1)).squeeze(-1)
+            mask = torch.zeros_like(lp)
+            mask[:, int(rpre) - 1:] = 1.0
+            return float((lp * mask).sum() / mask.sum())
+
+        rows_s, ok = [], True
+        v_pw = pathwise_term(seq, slot_t, +1.0, 1.0)
+        v_t = teacher_term(r['prompt'], SLOT_TXT, +1.0, 1.0)
+        for tag, read, vv in (('pathwise', read_path, v_pw), ('teacher', read_teach, v_t)):
+            phi = steer_phi(read)
+            for L in (0, 13, 31):
+                n = int(torch.argmax(vv[L].abs()))
+                best = None
+                for eps in (1e-3, 1e-2):
+                    fd = (phi({(L, n): eps}) - phi({(L, n): -eps})) / (2 * eps)
+                    rel = abs(fd - float(vv[L][n])) / max(abs(float(vv[L][n])), 1e-6)
+                    best = rel if best is None else min(best, rel)
+                    rows_s.append({'term': tag, 'layer': L, 'neuron': n, 'analytic': float(vv[L][n]),
+                                   'fd': fd, 'eps': eps, 'rel_err': rel})
+                print(f'  {tag:9s} L{L:<2d} n={n:<6d} analytic={float(vv[L][n]):+11.4f} '
+                      f'min rel_err over eps={best:.2e}', flush=True)
+                if best >= 0.02:
+                    ok = False
+        print('BRANCH-SELFTEST', 'PASS' if ok else 'FAIL', flush=True)
+        Path(a.out.replace('.json', '_branch_selftest.json')).parent.mkdir(parents=True, exist_ok=True)
+        json.dump({'rows': rows_s, 'passed': ok, 'slot_tokens': len(slot_t),
+                   'criterion': 'FD (fp32, min over eps) must reproduce the shipped helper to <2%'},
+                  open(a.out.replace('.json', '_branch_selftest.json'), 'w'), indent=1)
+        return 0 if ok else 1
 
     g_path = {l: torch.zeros(lm.layers[l].mlp.down_proj.weight.shape[1], dtype=torch.float64) for l in layers}
     g_teach = {l: torch.zeros_like(g_path[l]) for l in layers}
@@ -211,6 +293,7 @@ def main():
     rec = {'ctx': [], 'phi': {}, 'texts': {}}
     splits = {}
     w_loo_ctx = {}
+    pw_snap = {}
     allphi = []
     for ci, r in enumerate(ctx):
         torch.manual_seed(a.seed * 1000 + ci)
@@ -271,43 +354,24 @@ def main():
             g_path_in[l] += (torch.tensor(w_in).double().unsqueeze(1) * blk).sum(0)
             off += d
         if a.pathwise:
+            ip, ineg = slot_ids(tok, r['positive']), slot_ids(tok, r['negative'])
             for i, sq in enumerate(seqs):
-                i1 = torch.tensor([sq], dtype=torch.long, device=dev)
-                ip, ineg = slot_ids(tok, r['positive']), slot_ids(tok, r['negative'])
-                acc = None
                 for ids_slot, sgn in ((ip, +1.0), (ineg, -1.0)):
-                    full = sq + ids_slot
-                    j1 = torch.tensor([full], dtype=torch.long, device=dev)
-                    with Cap() as cap:
-                        model.zero_grad(set_to_none=True)
-                        out = model(input_ids=j1, use_cache=False)
-                        lp = F.log_softmax(out.logits[:, :-1].float(), -1)
-                        pos = torch.arange(len(sq), len(full), device=dev)
-                        tgt = torch.tensor(ids_slot, device=dev)
-                        term = lp[0, pos - 1, tgt].mean() * (sgn / (len(seqs) * len(ctx)))
-                        term.backward()
-                        gg = cap.grad_sum()
+                    v = pathwise_term(sq, ids_slot, sgn, 1.0 / (len(seqs) * len(ctx)))
                     for l in layers:
-                        g_pw[l] += gg[l] * (p50[l] / norms[l].clamp(min=1e-12))
+                        g_pw[l] += v[l]
                 print(f'    pw rollout {i} done', flush=True) if i % 8 == 0 else None
+            # clone: dict() is shallow, and g_pw[l] is mutated in place on the next context, which would make the
+            # snapshot track the final value and turn this check into a tautology-bug (it did on the first attempt).
+            pw_snap[ci] = {l: g_pw[l].clone() for l in layers}
         splits[ci] = S
         print(f'  [{ci}] {len(seqs)} per-rollout scores stored', flush=True)
 
         # teacher-forced J2 gradient on the same context (fixed prefix)
         for key, sgn in (('positive', +1.0), ('negative', -1.0)):
-            rid, rpre, rsuf = E.candidate_ids(tok, r['prompt'],
-                                              r[key] if isinstance(r[key], str) else r[key][0], dev, 384)
-            i1 = (rid.to(dev) if torch.is_tensor(rid) else torch.tensor(rid, device=dev)).view(1, -1).long()
-            with Cap() as cap:
-                model.zero_grad(set_to_none=True)
-                out = model(input_ids=i1, use_cache=False)
-                lp = F.log_softmax(out.logits[:, :-1].float(), -1).gather(-1, i1[:, 1:].unsqueeze(-1)).squeeze(-1)
-                mask = torch.zeros_like(lp)
-                mask[:, int(rpre) - 1:] = 1.0
-                ((lp * mask).sum() / mask.sum() * (sgn / len(ctx))).backward()
-                gg = cap.grad_sum()
+            v = teacher_term(r['prompt'], r[key] if isinstance(r[key], str) else r[key][0], sgn, 1.0 / len(ctx))
             for l in layers:
-                g_teach[l] += gg[l] * (p50[l] / norms[l].clamp(min=1e-12))
+                g_teach[l] += v[l]
         print(f'  [{ci}] grads done', flush=True)
 
     mu = sum(allphi) / len(allphi)
@@ -353,6 +417,27 @@ def main():
 
     def flat(d):
         return torch.cat([d[l] for l in layers])
+
+    if a.pathwise and len(pw_snap) >= 2:
+        # The bug this must catch (audit §2) was g_pw being re-initialised INSIDE the context loop, which makes the
+        # final object equal to the LAST context's contribution instead of the sum over contexts. Cumulative snapshots
+        # therefore cannot be summed (that was my first, wrong, check); the discriminating comparison is
+        #   final  vs  the last context's INCREMENT, and  final  vs  sum of increments.
+        snaps = [pw_snap[ci] for ci in sorted(pw_snap)]
+        inc = []
+        for i in range(len(snaps)):
+            prev = snaps[i - 1] if i > 0 else {l: torch.zeros_like(snaps[0][l]) for l in layers}
+            inc.append({l: snaps[i][l] - prev[l] for l in layers})
+        dev_sum = max(float((g_pw[l] - sum(inc[i][l] for i in range(len(inc)))).abs().max()) for l in layers)
+        dev_last = max(float((g_pw[l] - inc[-1][l]).abs().max()) for l in layers)
+        scale = max(float(g_pw[l].abs().max()) for l in layers)
+        rec['pw_additivity'] = {'contexts': len(snaps),
+                                'max_dev_from_sum_of_increments': dev_sum,
+                                'max_dev_from_last_increment': dev_last,
+                                'scale': scale,
+                                'passes': dev_sum < 1e-9 and dev_last > 1e-6 * scale}
+        print('PW-ADDITIVITY ctx=%d |final-sum(inc)|=%.2e |final-last_inc|=%.2e scale=%.2e -> %s' % (
+            len(snaps), dev_sum, dev_last, scale, 'PASS' if rec['pw_additivity']['passes'] else 'FAIL'), flush=True)
 
     gp, gt = flat(g_path), flat(g_teach)
     cos = float(F.cosine_similarity(gp.unsqueeze(0), gt.unsqueeze(0)))

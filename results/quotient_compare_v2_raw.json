@@ -1,0 +1,61 @@
+{
+ "n_recipes": 191,
+ "lists": {
+  "positions_K64.csv": {
+   "n_coords": 64,
+   "per_recipe": {
+    "median": 0.0,
+    "p25": 0.0,
+    "p75": 0.0,
+    "max": 0.12490240607583325
+   },
+   "null_matched": {
+    "n": 40,
+    "mean": -0.0016465756346236537,
+    "p95": 0.019506006381362368,
+    "max": 0.040800941365126374
+   },
+   "frac_recipes_above_null_p95": 0.020942408376963352,
+   "strata": {
+    "L1_only": 0.0,
+    "L2_only": 0.0,
+    "other": 0.0
+   },
+   "strata_n": {
+    "L1_only": 38,
+    "L2_only": 49,
+    "other": 104
+   }
+  },
+  "positions_all32_K1024_pairs.csv": {
+   "n_coords": 1024,
+   "per_recipe": {
+    "median": -0.00026291089789588166,
+    "p25": -0.0029833904742009834,
+    "p75": 0.001923939616561148,
+    "max": 0.030860247878281812
+   },
+   "null_matched": {
+    "n": 40,
+    "mean": 1.7802279815293196e-05,
+    "p95": 0.007316849064674114,
+    "max": 0.012942878133102789
+   },
+   "frac_recipes_above_null_p95": 0.07853403141361257,
+   "strata": {
+    "L1_only": 0.0004684889740043587,
+    "L2_only": -0.00029971567910702125,
+    "other": -0.0005383604523968856
+   },
+   "strata_n": {
+    "L1_only": 38,
+    "L2_only": 49,
+    "other": 104
+   }
+  }
+ },
+ "Q3_verdict": {
+  "positions_K64.csv": "no high alignment",
+  "positions_all32_K1024_pairs.csv": "no high alignment"
+ }
+}

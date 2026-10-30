@@ -46,6 +46,8 @@ def main():
     layers = list(range(32))
     p50 = E.estimate_p50(tok, model, lm, layers, dev)
     norms = E.column_norms(lm, layers)
+    import hashlib
+    gsha = hashlib.sha256(Path(a.gfile).read_bytes()).hexdigest()
     blob = torch.load(a.gfile)
     g = {'j2': blob['g_teach'], 'pw': blob['g_pw']}
 
@@ -208,7 +210,10 @@ def main():
             v = readout(U[k], b)
             res[f'{k}@{b}'] = {'J2': v, 'dJ2': v - base}
             print(f'C {k}@{b}: J2={v:+.5f} dJ2={v-base:+.5f}', flush=True)
-    out = {'C0_gram': {'max_asym': sym, 'rank_per_layer': Rk['j2'][:4], 'budget2_j2': b2,
+    out = {'gfile': a.gfile, 'gfile_sha256': gsha,
+           'provenance': 'd* read from the blob named above; the blob is /root/autodl-tmp/runs/p_a2_v2.pt, written by '
+                         'scripts/p_a2_pathj2.py on the corrected instrument (see results/reliability_242_refactor_check.json)',
+           'C0_gram': {'max_asym': sym, 'rank_per_layer': Rk['j2'][:4], 'budget2_j2': b2,
                        'note': 'full Gram is singular (rank<=2560<9216); min-norm solve via thin SVD'},
            'A': {'cos_M': cm, 'coord_cos': coord_cos},
            'B': {str(k): v for k, v in ov.items()},

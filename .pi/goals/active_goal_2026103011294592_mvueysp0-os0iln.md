@@ -5,14 +5,14 @@
   "status": "active",
   "autoContinue": true,
   "usage": {
-    "tokensUsed": 588767,
-    "activeSeconds": 1754
+    "tokensUsed": 637148,
+    "activeSeconds": 3433
   },
   "sisyphus": false,
   "createdAt": "2026-10-30T03:29:45.924Z",
-  "updatedAt": "2026-10-30T03:59:28.383Z",
+  "updatedAt": "2026-10-30T04:27:40.409Z",
   "activePath": ".pi/goals/active_goal_2026103011294592_mvueysp0-os0iln.md",
-  "revision": 66,
+  "revision": 89,
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
@@ -115,8 +115,10 @@
       {
         "id": "task-11",
         "title": "文档收尾：audit response §12 标为已完成、metadata 与 NEXT_SESSION 状态同步",
-        "status": "pending",
-        "verificationContract": "RETRACTED 条目与新版条目一一对应；每个被引数字都能在 results/ 找到；make check 绿"
+        "status": "complete",
+        "verificationContract": "RETRACTED 条目与新版条目一一对应；每个被引数字都能在 results/ 找到；make check 绿",
+        "completedAt": "2026-10-30T03:59:38.698Z",
+        "evidence": "§12 all 11 items marked complete with artifact per item; retraction->replacement table (9 rows); 20 cited numbers verified numerically vs 54 results files, zero misses; NEXT_SESSION synced; make check"
       }
     ],
     "blockCompletion": true,
@@ -133,8 +135,8 @@
 - Status: running
 - Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 29m14s
-- Tokens used: 589K (588,767) tokens
+- Time spent: 57m13s
+- Tokens used: 637K (637,148) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->
@@ -148,5 +150,5 @@
 - [x] task-8: 重跑 2.46（噪声尺度），报告 κ 与区间并做一致性检查 — evidence: kappa_curve 217.6 inside bootstrap [120.3,2674.2]; pooled 6403.7 flagged invalid; 5% claim removed; results/noise_scale_v2.json + plan253
 - [x] task-9: 商空间比较重做：完整直和余弦、按各自列表匹配的零分布（含符号与剂量分布）、按 trait 分层 — evidence: direct-sum over 32 layers; per-list matched null (40 draws, own signed doses); 191 recipes compared separately; L1/L2 strata; 2.1%/7.9% above null p95; frozen wording 'no high alignment'
 - [x] task-10: make check 加固：Lean 审计 sha 与当前文件一致 + 仪器校准门的最近一次通过记录 — evidence: check_instruments added; both failure modes triggered (blank line in lean file; gate_passes=false) then restored; Dimension.lean re-audited PROVED
-- [ ] task-11: 文档收尾：audit response §12 标为已完成、metadata 与 NEXT_SESSION 状态同步 — contract: RETRACTED 条目与新版条目一一对应；每个被引数字都能在 results/ 找到；make check 绿
+- [x] task-11: 文档收尾：audit response §12 标为已完成、metadata 与 NEXT_SESSION 状态同步 — evidence: §12 all 11 items marked complete with artifact per item; retraction->replacement table (9 rows); 20 cited numbers verified numerically vs 54 results files, zero misses; NEXT_SESSION synced; make check
 

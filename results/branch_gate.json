@@ -1,0 +1,127 @@
+{
+ "rows": [
+  {
+   "term": "pathwise",
+   "layer": 0,
+   "neuron": 871,
+   "analytic": 5.480377780918474,
+   "fd": 5.599498748779297,
+   "eps": 0.001,
+   "rel_err": 0.0217359044618379
+  },
+  {
+   "term": "pathwise",
+   "layer": 0,
+   "neuron": 871,
+   "analytic": 5.480377780918474,
+   "fd": 5.449485778808594,
+   "eps": 0.01,
+   "rel_err": 0.005636838069346139
+  },
+  {
+   "term": "pathwise",
+   "layer": 13,
+   "neuron": 5917,
+   "analytic": 5.910121040951708,
+   "fd": 5.4645538330078125,
+   "eps": 0.001,
+   "rel_err": 0.07539053851122915
+  },
+  {
+   "term": "pathwise",
+   "layer": 13,
+   "neuron": 5917,
+   "analytic": 5.910121040951708,
+   "fd": 5.898904800415039,
+   "eps": 0.01,
+   "rel_err": 0.0018978021700318283
+  },
+  {
+   "term": "pathwise",
+   "layer": 31,
+   "neuron": 128,
+   "analytic": 23.95262774890398,
+   "fd": 23.951053619384766,
+   "eps": 0.001,
+   "rel_err": 6.571844791788672e-05
+  },
+  {
+   "term": "pathwise",
+   "layer": 31,
+   "neuron": 128,
+   "analytic": 23.95262774890398,
+   "fd": 23.92101287841797,
+   "eps": 0.01,
+   "rel_err": 0.0013198915299577675
+  },
+  {
+   "term": "teacher",
+   "layer": 0,
+   "neuron": 1808,
+   "analytic": -2.83802537806514,
+   "fd": -2.8657913208007812,
+   "eps": 0.001,
+   "rel_err": 0.009783542793606353
+  },
+  {
+   "term": "teacher",
+   "layer": 0,
+   "neuron": 1808,
+   "analytic": -2.83802537806514,
+   "fd": -2.8457164764404297,
+   "eps": 0.01,
+   "rel_err": 0.0027100174771985614
+  },
+  {
+   "term": "teacher",
+   "layer": 13,
+   "neuron": 8445,
+   "analytic": 5.263073690732597,
+   "fd": 5.113124847412109,
+   "eps": 0.001,
+   "rel_err": 0.028490736047363834
+  },
+  {
+   "term": "teacher",
+   "layer": 13,
+   "neuron": 8445,
+   "analytic": 5.263073690732597,
+   "fd": 5.27186393737793,
+   "eps": 0.01,
+   "rel_err": 0.001670173583320916
+  },
+  {
+   "term": "teacher",
+   "layer": 31,
+   "neuron": 7973,
+   "analytic": 15.433098449372437,
+   "fd": 15.437602996826172,
+   "eps": 0.001,
+   "rel_err": 0.00029187576743008474
+  },
+  {
+   "term": "teacher",
+   "layer": 31,
+   "neuron": 7973,
+   "analytic": 15.433098449372437,
+   "fd": 15.432024002075195,
+   "eps": 0.01,
+   "rel_err": 6.961967493219887e-05
+  }
+ ],
+ "passed": true,
+ "slot_tokens": 5,
+ "criterion": "FD (fp32, min over eps) must reproduce the shipped helper to <2%",
+ "supersedes": "the deleted --phi-selftest, which compared phi_of against slot_lp with identical arguments - the same function called twice, so 0.00e+00 was guaranteed and no bug could have been detected.",
+ "how": "differentiates the SHIPPED helpers pathwise_term / teacher_term against fp32 finite differences of the functionals they claim to differentiate, using a deliberately MULTI-TOKEN slot (5 tokens) so a second division by |slot| would appear as a factor |slot|.",
+ "sensitivity_test": {
+  "injected": "the double division by len(ids_slot) put back into pathwise_term",
+  "result": "FAIL with min rel_err 3.97 / 3.62 / 3.99 at layers 0/13/31, i.e. |slot|-1 as expected",
+  "restored": "the correct version passes with max rel_err 5.64e-3"
+ },
+ "additivity": {
+  "check": "g_pw must equal the sum of per-context increments and must NOT equal the last increment alone",
+  "result_on_3_contexts": "|final - sum(inc)| = 0.00e+00, |final - last_inc| = 4.19 against scale 5.25 -> PASS",
+  "note": "the first two versions of this check were wrong (shallow dict copy; then summing CUMULATIVE snapshots) and both were caught by looking at what the number means rather than at whether it printed PASS"
+ }
+}

@@ -1,0 +1,25 @@
+{
+ "status": "REGRESSION CHECK \u2014 the plan 2.48 refactor reproduces the plan 2.51 numbers bit-identically",
+ "compared": {
+  "r_K": {
+   "2": 0.006481173551491886,
+   "4": 0.009419042141753002,
+   "8": 0.017882597226514082,
+   "16": 0.03298727705421775,
+   "32": 0.0685184253328825
+  },
+  "cos_pathwise_teacher": 0.6554431369114341,
+  "cos_score_teacher": -0.08026414921996258,
+  "norm_ratio": 0.7964593952738874,
+  "cos_loo_insample": 0.9999999999999989,
+  "norm_ratio_loo": 1.0322580556291738
+ },
+ "verdict": "all headline values identical to results/reliability_242_summary.json (0.0065/0.0094/0.0179/0.0330/0.0685; 0.6554; -0.0803; 0.7957; 1.0; 1.032258), so extracting the two branch helpers and routing the loop through them is behaviour-preserving",
+ "pw_additivity": {
+  "check": "g_pw must equal sum of per-context increments AND differ from the last increment alone",
+  "result": "PASS on a 3-context run: |final - sum(inc)| = 0.00e+00, |final - last_inc| = 4.19 against scale 5.25",
+  "note": "the FAIL printed by this very run came from the check itself, not from the accumulation: dict(g_pw) is a shallow copy whose tensors keep mutating. Two successive versions of this check were wrong (shallow copy; then summing CUMULATIVE snapshots); both are recorded in doc/audit-response-2026-10-30.md so the mistake is visible rather than silently fixed"
+ },
+ "artifact_note": "the d* blob written by this run is /root/autodl-tmp/runs/p_a2_v2.pt, sha256 5c5b6ebb\u2026, and is NOT committed (7 MB binary); results/closed_form_v3.json records its sha256 and the producing script",
+ "fd_gate_now_certifies": "mlp_capture.Capture(...).dose_grad() end to end (see results/fd_gate.json certifies field)"
+}

@@ -180,5 +180,6 @@
  "model": "/root/autodl-tmp/Qwen3.5-4B",
  "dtype": "float32",
  "criterion": "G1 rel_err_new<0.02 for every row; G2 some legacy rel_err>0.05; G3 conjunction",
- "status": "PASS"
+ "status": "PASS",
+ "certifies": "mlp_capture.Capture(...).dose_grad() END TO END. The first version re-implemented the zero-leaf hook inline, so the certificate would have kept passing after a regression inside the module; the auditor was right and the gate now calls the shipped code path (mode \"new\"), while the legacy detach method stays inline as the negative control."
 }
