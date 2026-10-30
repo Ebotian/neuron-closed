@@ -150,6 +150,46 @@ def check_checksums():
     return bad
 
 
+def check_instruments():
+    """Two gates the audit asked for (audit-response §12.8).
+
+    1. Every Lean audit record must match the CURRENT file: a docstring edit invalidates the record, which is how
+       lean/Dimension.lean's stale sha256 was found. The theorems are unaffected by a comment, but the record may not
+       claim to certify a file it never saw.
+    2. The finite-difference calibration gate must exist, must have PASSED, and must pin the hash of the instrument it
+       certified (scripts/mlp_capture.py). Without that pin the gate would keep certifying an old implementation.
+    """
+    import hashlib
+    bad = []
+    aud = ROOT / 'results/lean_audit.json'
+    if not aud.exists():
+        bad.append('results/lean_audit.json missing')
+    else:
+        d = json.loads(aud.read_text(encoding='utf8'))
+        for f, rec in (d.get('files') or {}).items():
+            fp = ROOT / f
+            if not fp.exists():
+                bad.append(f'{f}: missing')
+                continue
+            h = hashlib.sha256(fp.read_bytes()).hexdigest()
+            if h != rec.get('sha256'):
+                bad.append(f'{f}: sha256 mismatch (record {str(rec.get("sha256"))[:12]}, file {h[:12]}) '
+                           '-- re-audit or update the record')
+    gate = ROOT / 'results/fd_gate.json'
+    if not gate.exists():
+        bad.append('results/fd_gate.json missing: no calibration record, so no gradient number may be quoted')
+    else:
+        g = json.loads(gate.read_text(encoding='utf8'))
+        if not (g.get('verdict') or {}).get('gate_passes'):
+            bad.append(f'calibration gate did not pass: {g.get("verdict")}')
+        inst = ROOT / 'scripts/mlp_capture.py'
+        h = hashlib.sha256(inst.read_bytes()).hexdigest()
+        if g.get('instrument_sha256') != h:
+            bad.append(f'instrument changed since the gate ran (record {str(g.get("instrument_sha256"))[:12]}, '
+                       f'now {h[:12]}) -- rerun scripts/fd_gate.py')
+    return bad
+
+
 def check_compile():
     bad = []
     files = [p for p in ROOT.rglob('*.py') if '.venv' not in p.parts and 'node_modules' not in p.parts]
@@ -264,6 +304,8 @@ def main():
         bad, n = check_dedup(); results[f'dedup ({n})'] = bad
     if cmd in ('all', 'ledger'):
         bad = check_ledger(); results[f'ledger ({len(json.loads((ROOT / "evidence/ledger.json").read_text(encoding="utf8"))["verdicts"])} verdicts)'] = bad
+    if cmd in ('all', 'instruments'):
+        results['instruments (lean sha + fd gate)'] = check_instruments()
     if cmd in ('all', 'git'):
         bad, n = check_git(); results[f'git ({n} tracked files)'] = bad
     fail = 0

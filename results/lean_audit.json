@@ -49,7 +49,7 @@
    "role": "plan 2.42: the pathwise + score decomposition, and that a baseline is free in expectation"
   },
   "lean/Dimension.lean": {
-   "sha256": "c582b9610c3d97b52c6aba33b88c0591d03ea7fd7127efac9fcc2f5701d94d92",
+   "sha256": "aae5b614ea065f4b77e1a3fe919eebc157b3f5cbe5d9d22f0679c4fe0e2be6ab",
    "decls": {
     "NeuronClosed.norm_sq_sum_of_pairwise_orthogonal": [
      "propext",
@@ -77,8 +77,10 @@
      "Quot.sound"
     ]
    },
-   "role": "plan 2.42's algebra: for a pairwise orthogonal equal-norm family the split-half inner product is (|S|^2 - K c^2)/4 for EVERY split, hence split-independent. The earlier 'isotropy => cos ~ 0 => K ~ d' reading is RETRACTED: see doc/references/isotropy-and-noise-scale.md - anisotropy is inherent (arXiv:2401.12143, 2602.11185, 2407.11239) and the correct scaling quantity is the noise-to-signal ratio tr(Sigma)/|g|^2, not the ambient dimension."
+   "role": "plan 2.42's algebra: for a pairwise orthogonal equal-norm family the split-half inner product is (|S|^2 - K c^2)/4 for EVERY split, hence split-independent. The earlier 'isotropy => cos ~ 0 => K ~ d' reading is RETRACTED: see doc/references/isotropy-and-noise-scale.md - anisotropy is inherent (arXiv:2401.12143, 2602.11185, 2407.11239) and the correct scaling quantity is the noise-to-signal ratio tr(Sigma)/|g|^2, not the ambient dimension.",
+   "note": "sha updated 2026-10-30 after a docstring-only edit (the retraction of the isotropy reading); the five declarations were re-audited with opl-leancheck and report PROVED with axioms {propext, Classical.choice, Quot.sound}"
   }
  },
- "scope": "Gauge.lean = 2.44's algebra. Decomposition.lean = 2.42's pathwise+score identity on a finite outcome set. Dimension.lean = 2.42's algebra of split-half quantities (orthogonal families). NOT formalised: construct fidelity, any model claim, and the noise-scale relation itself (doc/references/isotropy-and-noise-scale.md records why isotropy is the wrong assumption)."
+ "scope": "Gauge.lean = 2.44's algebra. Decomposition.lean = 2.42's pathwise+score identity on a finite outcome set. Dimension.lean = 2.42's algebra of split-half quantities (orthogonal families). NOT formalised: construct fidelity, any model claim, and the noise-scale relation itself (doc/references/isotropy-and-noise-scale.md records why isotropy is the wrong assumption).",
+ "audit_date": "2026-10-30"
 }

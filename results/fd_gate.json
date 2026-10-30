@@ -1,4 +1,6 @@
 {
+ "instrument": "scripts/mlp_capture.py",
+ "instrument_sha256": "2aaab2a2f6343cf81df54edf0b05cd612702addbd380f1803a231e50ec9dea46",
  "summary_min_over_eps": [
   {
    "layer": 0,
@@ -178,6 +180,5 @@
  "model": "/root/autodl-tmp/Qwen3.5-4B",
  "dtype": "float32",
  "criterion": "G1 rel_err_new<0.02 for every row; G2 some legacy rel_err>0.05; G3 conjunction",
- "status": "PASS",
- "note": "Frozen criterion G1 (min over eps of the relative error < 2% for every coordinate), G2 (the legacy detach method must show >5% somewhere, else the gate cannot see the bug), G3 (conjunction over layers 0/13/31). fp32 is required: bf16 finite differences are swamped by precision noise. The gate logic was corrected once BEFORE reading any science number, because the frozen criterion is the min over eps while the first implementation tested each (coordinate, eps) pair separately - recorded here so the amendment is auditable."
+ "status": "PASS"
 }

@@ -159,7 +159,12 @@ def main():
                'gate_passes': bool(ok_new and ok_old_visible)}
     print(json.dumps(verdict), flush=True)
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
-    json.dump({'summary_min_over_eps': summary, 'rows': rows_out, 'verdict': verdict,
+    # the gate certifies THIS instrument, so the record must pin its hash; tools/check.py compares it
+    import hashlib
+    inst = Path(__file__).resolve().parent / 'mlp_capture.py'
+    inst_sha = hashlib.sha256(inst.read_bytes()).hexdigest()
+    json.dump({'instrument': 'scripts/mlp_capture.py', 'instrument_sha256': inst_sha,
+               'summary_min_over_eps': summary, 'rows': rows_out, 'verdict': verdict,
                'eps': eps_list, 'layers': want, 'topn': a.topn,
                'model': a.model, 'dtype': 'float32',
                'criterion': 'G1 rel_err_new<0.02 for every row; G2 some legacy rel_err>0.05; G3 conjunction'},
