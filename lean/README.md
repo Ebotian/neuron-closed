@@ -1,5 +1,10 @@
 # lean/ — 每条定理一个文件
 
+**审计规模（`make certify` 实测，2026-10-30）**：9 个文件、**26 个唯一声明**、`#print axioms` 共 27 行（`SsDecomp.lean`
+把 `ssb_is_between_scatter` 写了两遍）。全部 PROVED，公理集合恰为 `{propext, Classical.choice, Quot.sound}`。
+数字由 `results/lean_audit.json` 的 `decl_counts` 给出，不是手写的——先前我在提交信息里写过"32 个声明"，那是把
+`#print axioms` 的行数、层的数量和历史记忆混在一起的结果，属于应删的错误数字。
+
 **分文件的理由**（来自一次真实的失败）：这些声明原来都在一个 91 行的 `Reliability.lean` 里，我用字符串切片插入新内容，
 连续三次把文件结构切坏（`unexpected token '/--'`、`expected 'lemma'`）；另外 `plug_in_cos_moves` 两次失败只是因为我漏了
 `open scoped InnerProductSpace`——在一个单文件里这种遗漏很难定位。**一个定理组一个文件、各自独立编译**之后，五条声明一次通过。

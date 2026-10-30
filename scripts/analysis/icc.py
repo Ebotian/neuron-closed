@@ -61,7 +61,17 @@ def _f_quantile(p, d1, d2, iters=200):
 
 
 def icc_from_gram_py(G, group_sizes, k=None, alpha=0.05):
-    """`G` as a list of rows of floats (n×n). Returns the same dict shape as the torch version did."""
+    """`G` as a list of rows of floats (n×n).
+
+    WHAT `between_var` IS AND IS NOT (audit P1, 2026-10-30). With the one-way random-effects model
+    `x_ci = mu + a_c + e_ci`, `E[MS_w] = tr Sigma_w` and `E[MS_b] = tr Sigma_w + k tr Sigma_b`, so
+    `(MS_b - MS_w)/k` estimates **tr Sigma_b - the variance BETWEEN context means**, not `||mu||^2`.
+    Both quantities are unchanged by adding a common vector to every observation, which is why this
+    statistic is robust to a shared shift and also why it cannot answer "how strong is the mean gradient".
+    The old field name `g_sq` invited exactly that misreading; it is kept only as a deprecated alias.
+    `norm_estimate` is `||ghat||` for the pooled estimator (free from the Gram: the total of all entries
+    is `||sum_i w_i x_i||^2`), and `||g||^2` itself needs INDEPENDENT replicates - see `cross_replicate`.
+    """
     n = sum(group_sizes)
     C = len(group_sizes)
     if k is None:
@@ -81,9 +91,15 @@ def icc_from_gram_py(G, group_sizes, k=None, alpha=0.05):
     ms_b = ss_b / df_b
     denom = ms_b + (k - 1) * ms_w
     icc = (ms_b - ms_w) / denom if denom != 0 else None
+    between = (ms_b - ms_w) / k
     out = {'n': n, 'C': C, 'k': k, 'SS_w': ss_w, 'SS_b': ss_b,
-           'tr_sigma': ms_w, 'g_sq': (ms_b - ms_w) / k, 'icc': icc,
-           'lambda_ratio': (ms_w / ((ms_b - ms_w) / k)) if (ms_b - ms_w) > 0 else None}
+           'tr_sigma': ms_w,                      # tr Sigma_w: rollout noise
+           'between_var': between,                # tr Sigma_b: context heterogeneity (NOT ||mu||^2)
+           'g_sq': between,                       # DEPRECATED alias for between_var; kept so old records still parse
+           'norm_estimate': total ** 0.5,         # ||ghat|| for the pooled weighted estimator
+           'icc': icc,
+           'noise_over_between': (ms_w / between) if between > 0 else None,
+           'lambda_ratio': (ms_w / between) if between > 0 else None}
     if ms_w > 0 and df_b > 0:
         F = ms_b / ms_w
         loF = F / _f_quantile(1 - alpha / 2, df_b, df_w)
@@ -95,4 +111,31 @@ def icc_from_gram_py(G, group_sizes, k=None, alpha=0.05):
     else:
         out.update({'F': None, 'icc_interval': None, 'tr_sigma_interval': None})
     out['unit'] = 'context is the independent unit; more rollouts do not settle context-level reproducibility'
+    out['identifiability'] = {
+        'between_var': 'estimates tr Sigma_b; shift-invariant, so it says nothing about ||mu||',
+        'norm_estimate': 'estimates ||ghat|| for THIS sample; E||ghat||^2 = ||g||^2 + tr Cov(ghat), so it is not ||g||^2',
+        'g_sq': 'DEPRECATED name for between_var - do not interpret as the squared norm of the mean gradient',
+        'interval_caveat': ('the F interval is exact only for a SCALAR normal model. These observations are vectors, so the '
+                            'squared dispersion is a weighted sum of chi-squares and the trace ratio is not F-distributed: the '
+                            'interval is a heuristic whose coverage is NOT established, and an interval containing zero is not '
+                            'evidence of no signal')}
+    return out
+
+
+def cross_replicate(g_a, g_b):
+    """The two independent-replicate identities that make `||g||^2` estimable (audit P1 / section 7).
+
+    With `ghat_A`, `ghat_B` independent and unbiased with equal covariance:
+        E[<g_A, g_B>] = ||g||^2                  (signal, unbiased, no centring)
+        0.5 * E||g_A - g_B||^2 = tr Cov(ghat)    (noise)
+    The ratio is a signal-to-noise on the SAME scale, which is what `between_var` cannot give.
+    """
+    import torch
+    a, b = g_a.double(), g_b.double()
+    signal, noise = float(a @ b), 0.5 * float(((a - b) ** 2).sum())
+    return {'signal_sq': signal, 'noise_trace': noise,
+            'snr': (signal / noise) if noise > 0 else None,
+            'norms': [float(a.norm()), float(b.norm())],
+            'note': ('both arms must come from DISJOINT rollouts and recompute their own baseline inside their half; a '
+                     'split taken after the full-group weights are formed is not independent')}
     return out
