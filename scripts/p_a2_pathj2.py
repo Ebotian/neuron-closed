@@ -66,7 +66,8 @@ import torch.nn.functional as F
 
 sys.path.insert(0, '/root/autodl-tmp/scripts/j2space')
 import engine as E
-from mlp_capture import Capture as _Capture, column_norms_dev
+from mlp_capture import Capture as _Capture
+from core.units import column_norms_dev, dose_scale
 
 
 def slot_ids(tok, s):
@@ -105,6 +106,7 @@ def main():
     layers = list(range(32))
     p50 = E.estimate_p50(tok, model, lm, layers, dev)
     norms = column_norms_dev(lm, layers, dev)
+    SC = dose_scale(p50, norms, layers)   # the ONE place the dose unit is formed
     for q in model.parameters():
         q.requires_grad_(False)
     pad = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
@@ -189,7 +191,7 @@ def main():
             coef = sgn * weight * ((1.0 / len(ids_slot)) if a.inject_double_division else 1.0)
             (lp[0, pos - 1, tgt].mean() * coef).backward()
             raw = cap.grad_sum()
-        return {l: raw[l].to(dev) * (p50[l] / norms[l].clamp(min=1e-12)).to(dev).double() for l in layers}
+        return {l: raw[l].to(dev) * SC[l].to(dev) for l in layers}
 
     def teacher_term(prompt, slot_txt, sgn, weight):
         """d/du of weight * sgn * (MEAN over suffix tokens of log p(slot | prompt)) — the teacher-forced readout."""
@@ -203,7 +205,7 @@ def main():
             mask[:, int(rpre) - 1:] = 1.0
             ((lp * mask).sum() / mask.sum() * (sgn * weight)).backward()
             raw = cap.grad_sum()
-        return {l: raw[l].to(dev) * (p50[l] / norms[l].clamp(min=1e-12)).to(dev).double() for l in layers}
+        return {l: raw[l].to(dev) * SC[l].to(dev) for l in layers}
 
     if a.branch_selftest:
         """REAL gate for the four defects fixed in plan 2.48, replacing the vacuous one.
@@ -351,7 +353,7 @@ def main():
         off = 0
         for l in layers:
             d_ = int(lm.layers[l].mlp.down_proj.weight.shape[1])
-            S[:, off:off + d_] = (gps[l] * (p50[l] / norms[l].clamp(min=1e-12)).to(dev).double()).float()
+            S[:, off:off + d_] = (gps[l] * SC[l].to(dev)).float()
             off += d_
 
         # --- task-4: two baselines from the SAME per-rollout scores
@@ -399,7 +401,7 @@ def main():
                     (per * sign_w).sum().backward()
                     gps = cap._c.grad_per_sample()
                 for l in layers:
-                    g_pw[l] += (gps[l].sum(0) * (p50[l] / norms[l].clamp(min=1e-12)).to(dev).double())
+                    g_pw[l] += (gps[l].sum(0) * SC[l].to(dev))
                 del out, lp, gps, bid, am, smask
                 torch.cuda.empty_cache()
             pw_snap[ci] = {l: g_pw[l].clone() for l in layers}
