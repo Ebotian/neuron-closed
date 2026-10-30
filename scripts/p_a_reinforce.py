@@ -284,10 +284,17 @@ def main():
                 g_j2[l] += g[l].to(dev) * (p50[l] / norms[l].clamp(min=1e-12)).to(dev).double()
         print(f'  J2 ctx {ci} done', flush=True)
 
-    from reliability import split_half_curve_fast, noise_scale, bootstrap_stats_fast
+    from reliability import (split_half_curve_fast, noise_scale, bootstrap_stats_fast,
+                            gram_from_scores, icc_from_gram)
     rel = {'split_half': split_half_curve_fast(S_all, W_all, ks=(2, 4, 8)),
            'noise_scale': noise_scale(S_all, W_all),
            'interval': bootstrap_stats_fast(S_all, W_all)}
+    G = gram_from_scores(S_all, W_all)
+    icc = icc_from_gram(G, [int(x.shape[0]) for x in S_all], k=K_)
+    rec['ICC'] = icc
+    print('ICC  MSw=%.4f %s  ICC=%s %s' % (icc['tr_sigma'], icc['tr_sigma_interval'],
+        None if icc['icc'] is None else round(icc['icc'], 4),
+        None if icc['icc_interval'] is None else [round(x, 4) for x in icc['icc_interval']]), flush=True)
     rec['reliability'] = rel
     iv = rel['interval']
     print('REL r(K)=%s' % {k: round(v['r_mean'], 4) for k, v in rel['split_half'].items()}, flush=True)

@@ -170,7 +170,7 @@ def main():
         W.append(wc)
         print(f'  ctx {ci} done, cumulative n={n}', flush=True)
 
-    from reliability import noise_scale as rel_noise, bootstrap_stats_fast
+    from reliability import noise_scale as rel_noise, bootstrap_stats_fast, gram_from_scores, icc_from_gram
     ns = rel_noise(XI, W)
     iv = bootstrap_stats_fast(XI, W)
     tr_sigma, g_sq = ns['tr_sigma'], ns['g_sq']
@@ -205,6 +205,7 @@ def main():
                "cancels by construction because it compares two halves of the SAME contexts. The median per-context kappa is the "
                "like-for-like quantity." % (None if kappa is None else round(kappa, 1),
                                             None if kappa_curve is None else round(kappa_curve, 2), a.r32)),
+           'icc': icc_from_gram(gram_from_scores(XI, W), [int(x.shape[0]) for x in XI], k=a.rollouts),
            'verdict': ('no "two independent routes agree within 5%" claim: the pooled ANOVA point estimate and the '
                        'curve-implied kappa are DIFFERENT estimators of the same quantity (one pools 256 samples with a global '
                        'baseline, the other uses disjoint halves per context). They are compared here only through the '
