@@ -88,3 +88,4 @@ end NeuronClosed
 
 #print axioms NeuronClosed.ssw_shift_invariant
 #print axioms NeuronClosed.icc_bounds
+

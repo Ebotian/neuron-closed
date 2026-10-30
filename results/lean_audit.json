@@ -81,7 +81,7 @@
    "note": "sha updated 2026-10-30 after a docstring-only edit (the retraction of the isotropy reading); the five declarations were re-audited with opl-leancheck and report PROVED with axioms {propext, Classical.choice, Quot.sound}"
   },
   "lean/Reliability.lean": {
-   "sha256": "feba8c53f2d606c0aeae18f4be66ca0c309cd2817cf9f197c62a1af1e68baff4",
+   "sha256": "33994989e70be5d8bc0102a5f43d3575aa356a788f1ea26ef3cabe9641774cbe",
    "decls": {
     "NeuronClosed.ssw_shift_invariant": [
      "propext",
