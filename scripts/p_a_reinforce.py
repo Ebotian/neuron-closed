@@ -79,7 +79,7 @@ def p_toxic(gauges, texts, dev, batch=8):
 
 from mlp_capture import Capture  # noqa: E402  (single corrected implementation; see its docstring)
 
-def score_batch(model, ids, lens, weights, n_prompt):
+def score_batch(model, ids, lens, weights, n_prompt, mean_over_suffix=False):
     """Weighted sum over samples of sum_t log p(t) over CONTINUATION positions only.
 
     Two masks, and they are NOT interchangeable: `pad_mask` is the attention mask (prompt INCLUDED,
@@ -97,6 +97,9 @@ def score_batch(model, ids, lens, weights, n_prompt):
     tgt = ids[:, 1:]
     lp = F.log_softmax(logits, -1).gather(-1, tgt.unsqueeze(-1)).squeeze(-1)
     per = (lp * score_mask[:, 1:].float()).sum(dim=1)
+    if mean_over_suffix:
+        # readouts divide by their own token count (the score term does NOT: it is the sequence density)
+        per = per / score_mask[:, 1:].float().sum(dim=1).clamp(min=1)
     return (per * weights).sum(), per
 
 
@@ -221,6 +224,13 @@ def main():
         return 2
 
     base = c0_mean
+    offs, _o = [], 0
+    for l in layers:
+        _d = lm.layers[l].mlp.down_proj.weight.shape[1]
+        offs.append((l, _o, _d))
+        _o += _d
+    per_dim = _o
+    S_all, W_all = [], []
     for ci, r in enumerate(ctx):
         prefix, seqs = keep[ci]
         ph = rec['phi'][r['id']]
@@ -236,14 +246,26 @@ def main():
         psum = sum(phi)
         w = torch.tensor([(phi[i] - (psum - phi[i]) / max(K_ - 1, 1)) / (K_ * len(ctx))
                           for i in range(K_)], dtype=torch.float32, device=dev)
-        with Capture(lm, layers) as cap:
-            model.zero_grad(set_to_none=True)
-            loss, per = score_batch(model, ids, [len(x) for x in seqs], w, len(prefix))
-            loss.backward()
-            g = cap.grad_sum()
-        for l in layers:
-            g_re[l] += g[l] * (p50[l] / norms[l].clamp(min=1e-12))
-        print(f'  RE ctx {ci} K={len(seqs)} w={[round(float(x),4) for x in w]} loss={float(loss):+.3f}', flush=True)
+        S = torch.zeros((K_, per_dim), dtype=torch.float64)
+        for i, sq in enumerate(seqs):
+            i1 = torch.tensor([sq], dtype=torch.long, device=dev)
+            with Capture(lm, layers) as cap:
+                model.zero_grad(set_to_none=True)
+                out = model(input_ids=i1, use_cache=False)
+                lp = F.log_softmax(out.logits[:, :-1].float(), -1).gather(-1, i1[:, 1:].unsqueeze(-1)).squeeze(-1)
+                mask = torch.zeros_like(lp)
+                mask[:, len(prefix) - 1:] = 1.0
+                ((lp * mask).sum()).backward()   # weight 1: store the raw score, weight afterwards
+                g = cap.grad_sum()
+            for l, o_, d_ in offs:
+                S[i, o_:o_ + d_] = (g[l] * (p50[l] / norms[l].clamp(min=1e-12))).double()
+        wloo = [float(w[i]) for i in range(K_)]
+        for i in range(K_):
+            for l, o_, d_ in offs:
+                g_re[l] += wloo[i] * S[i, o_:o_ + d_]
+        S_all.append(S)
+        W_all.append(wloo)
+        print(f'  RE ctx {ci} K={K_} w_loo={[round(x,5) for x in wloo]}', flush=True)
 
         for key, sgn in (('positive', +1.0), ('negative', -1.0)):
             sl = r[key]
@@ -254,12 +276,23 @@ def main():
             with Capture(lm, layers) as cap:
                 model.zero_grad(set_to_none=True)
                 loss1, _ = score_batch(model, ids1, [ids1.shape[1]],
-                                       torch.tensor([sgn / len(ctx)], device=dev), int(rpre))
+                                       torch.tensor([sgn / len(ctx)], device=dev), int(rpre),
+                                       mean_over_suffix=True)
                 loss1.backward()
                 g = cap.grad_sum()
             for l in layers:
                 g_j2[l] += g[l] * (p50[l] / norms[l].clamp(min=1e-12))
         print(f'  J2 ctx {ci} done', flush=True)
+
+    from reliability import split_half_curve, noise_scale, bootstrap_kappa
+    rel = {'split_half': split_half_curve(S_all, W_all, ks=(2, 4, 8)),
+           'noise_scale': noise_scale(S_all, W_all),
+           'interval': bootstrap_kappa(S_all, W_all)}
+    rec['reliability'] = rel
+    print('REL r(K)=%s kappa=%s interval=[%s, %s]' % (
+        {k: round(v['r_mean'], 4) for k, v in rel['split_half'].items()},
+        None if rel['noise_scale']['kappa'] is None else round(rel['noise_scale']['kappa'], 1),
+        rel['interval']['kappa_lo'], rel['interval']['kappa_hi']), flush=True)
 
     def flat(d):
         return torch.cat([d[l] for l in layers])

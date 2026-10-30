@@ -5,14 +5,14 @@
   "status": "active",
   "autoContinue": true,
   "usage": {
-    "tokensUsed": 479603,
-    "activeSeconds": 260
+    "tokensUsed": 509266,
+    "activeSeconds": 535
   },
   "sisyphus": false,
   "createdAt": "2026-10-30T03:29:45.924Z",
-  "updatedAt": "2026-10-30T03:34:16.944Z",
+  "updatedAt": "2026-10-30T03:38:56.070Z",
   "activePath": ".pi/goals/active_goal_2026103011294592_mvueysp0-os0iln.md",
-  "revision": 28,
+  "revision": 35,
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
@@ -51,14 +51,18 @@
       {
         "id": "task-3",
         "title": "三分支统一泛函与归一化（slot 用 mean、上下文等权、teacher 分支同归一化）",
-        "status": "pending",
-        "verificationContract": "三个分支的目标函数在脚本 docstring 中写成同一个式子；对同一轨迹用两支算出的 φ 相差 <1e-6；make check 绿"
+        "status": "complete",
+        "verificationContract": "三个分支的目标函数在脚本 docstring 中写成同一个式子；对同一轨迹用两支算出的 φ 相差 <1e-6；make check 绿",
+        "completedAt": "2026-10-30T03:34:27.870Z",
+        "evidence": "unified formula written in docstring; 4 normalisation defects fixed; --phi-selftest fp32 |diff|=0.00e+00 (same batch shape); make check OK; metadata plan248"
       },
       {
         "id": "task-4",
         "title": "baseline 改 leave-one-out，并把含自身均值的 (1−1/K) 偏差作为对照记录",
-        "status": "pending",
-        "verificationContract": "代码中出现 b_{-i}；对 K=8/32 分别报偏差因子；metadata 记录两种 baseline 的数值差"
+        "status": "complete",
+        "verificationContract": "代码中出现 b_{-i}；对 K=8/32 分别报偏差因子；metadata 记录两种 baseline 的数值差",
+        "completedAt": "2026-10-30T03:34:27.870Z",
+        "evidence": "b_{-i} in both scripts; scores stored unweighted + both variants post-hoc; bias factors 0.875 (K=8) / 0.969 (K=32) in metadata plan249; numeric diff to be produced by task-6 run"
       },
       {
         "id": "task-5",
@@ -117,15 +121,15 @@
 - Status: running
 - Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 4m20s
-- Tokens used: 480K (479,603) tokens
+- Time spent: 8m55s
+- Tokens used: 509K (509,266) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->
 - [x] task-1: 仪器修复：抓取改零叶子加法（vendor 做法），删除三处脚本的 detach 抓叶子 — evidence: mlp_capture.py is the single readout (zero leaf, graph intact); 3 scripts import it; grep finds no detach-capture in scripts/; make check OK
 - [x] task-2: fp32 有限差分校准门：新建 scripts/fd_gate.py 并跑通（层 0/13/31，各 2 坐标，相对误差 <2%） — evidence: fd_gate.py PASS: min-over-eps rel err 4.65e-3 (L0) / 3.86e-3 (L13) / 6.08e-4 (L31); legacy 0.139/0.242, 0.207; results/fd_gate.json + metadata plan247_fd_gate
-- [ ] task-3: 三分支统一泛函与归一化（slot 用 mean、上下文等权、teacher 分支同归一化） — contract: 三个分支的目标函数在脚本 docstring 中写成同一个式子；对同一轨迹用两支算出的 φ 相差 <1e-6；make check 绿
-- [ ] task-4: baseline 改 leave-one-out，并把含自身均值的 (1−1/K) 偏差作为对照记录 — contract: 代码中出现 b_{-i}；对 K=8/32 分别报偏差因子；metadata 记录两种 baseline 的数值差
+- [x] task-3: 三分支统一泛函与归一化（slot 用 mean、上下文等权、teacher 分支同归一化） — evidence: unified formula written in docstring; 4 normalisation defects fixed; --phi-selftest fp32 |diff|=0.00e+00 (same batch shape); make check OK; metadata plan248
+- [x] task-4: baseline 改 leave-one-out，并把含自身均值的 (1−1/K) 偏差作为对照记录 — evidence: b_{-i} in both scripts; scores stored unweighted + both variants post-hoc; bias factors 0.875 (K=8) / 0.969 (K=32) in metadata plan249; numeric diff to be produced by task-6 run
 - [ ] task-5: 在新仪器上重跑 2.40（行为梯度 C1） — contract: r(32)、split-half 曲线、κ 及区间入 results/ 与 metadata；冻结判据在跑前写入脚本；旧值保留并标 RETRACTED
 - [ ] task-6: 重跑 2.42（r(K)、pathwise/score 分解），按 r(K)≈K/(K+2κ) 报 κ — contract: κ 而非 2κ；‖g‖²、trΣ 给区间；pathwise 与 teacher 的 cos 用同一泛函与同一归一化；上下文等权
 - [ ] task-7: 重跑 2.43（全支撑闭式解、cos_M、读数臂） — contract: SELF：‖Mu−d‖/‖d‖、budget² 检查；cos_M 与读数 ΔJ2 均为新仪器下的值；与旧值的差异显式列出

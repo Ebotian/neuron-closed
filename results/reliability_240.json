@@ -1,0 +1,119 @@
+{
+ "status": "MEASURED on the corrected instrument (task-5, plan 2.50)",
+ "what_changed": "mlp_capture (zero-leaf readout), unified functional, leave-one-out baseline; the old numbers stay RETRACTED",
+ "design": {
+  "model": "Qwen3.5-4B bf16",
+  "contexts": 8,
+  "rollouts_per_context": 8,
+  "temperature": 1.0,
+  "max_new": 32,
+  "phi": "mean of the two toxicity gauges on the generated continuation (saturated, unchanged from plan 2.40)",
+  "baseline": "leave-one-out b_{-i}",
+  "seeds": [
+   0,
+   1
+  ]
+ },
+ "seeds": {
+  "0": {
+   "C0": {
+    "mean_phi": 0.04049983550268621,
+    "frac_gt_0.5": 0.0,
+    "n_rollouts": 64
+   },
+   "reliability": {
+    "split_half": {
+     "2": {
+      "r_mean": -0.00747305773484941,
+      "r_p10": -0.14934579212776106,
+      "n": 1600
+     },
+     "4": {
+      "r_mean": -0.01202740336128891,
+      "r_p10": -0.17342958492292115,
+      "n": 1600
+     },
+     "8": {
+      "r_mean": -0.027388047290654704,
+      "r_p10": -0.18703276205427327,
+      "n": 1600
+     }
+    },
+    "noise_scale": {
+     "n": 64,
+     "norm_xibar_sq": 0.0014304046478004987,
+     "tr_sigma": 0.10020821922329232,
+     "g_sq": -0.00013534877756344373,
+     "kappa": null,
+     "r_K_predicted": null
+    },
+    "interval": {
+     "kappa_lo": 32.05387782631268,
+     "kappa_hi": 391.22035888627704,
+     "n_valid": 198
+    }
+   },
+   "C1": {
+    "cos_all": -0.022598122079568815,
+    "norm_re": 2.4205242071482918,
+    "norm_j2": 176.68697269712604,
+    "n_ctx": 8,
+    "K": 8,
+    "max_new": 32
+   }
+  },
+  "1": {
+   "C0": {
+    "mean_phi": 0.03778438611442425,
+    "frac_gt_0.5": 0.0,
+    "n_rollouts": 64
+   },
+   "reliability": {
+    "split_half": {
+     "2": {
+      "r_mean": 0.00270544082597609,
+      "r_p10": -0.1538465724314588,
+      "n": 1600
+     },
+     "4": {
+      "r_mean": 0.002852696613100889,
+      "r_p10": -0.1407342103375594,
+      "n": 1600
+     },
+     "8": {
+      "r_mean": 0.002751127166799982,
+      "r_p10": -0.13840979275166587,
+      "n": 1600
+     }
+    },
+    "noise_scale": {
+     "n": 64,
+     "norm_xibar_sq": 0.004718071140072024,
+     "tr_sigma": 0.3153992677003083,
+     "g_sq": -0.0002100424177452929,
+     "kappa": null,
+     "r_K_predicted": null
+    },
+    "interval": {
+     "kappa_lo": 27.177584002200103,
+     "kappa_hi": 624.1232070300077,
+     "n_valid": 192
+    }
+   },
+   "C1": {
+    "cos_all": -0.06337597865669065,
+    "norm_re": 4.396045881213583,
+    "norm_j2": 176.68697269712604,
+    "n_ctx": 8,
+    "K": 8,
+    "max_new": 32
+   }
+  }
+ },
+ "verdict": "With the corrected instrument the behaviour gradient is STILL not reproducible at K=8 per context: r(K) is -0.0075/-0.012/-0.0274 (seed 0) and 0.0027/0.0029/0.0028 (seed 1) for K=2/4/8, and the ANOVA noise-scale estimate is not even positive (g_sq <= 0 pooled, so kappa is undefined) although the context bootstrap interval for kappa spans [32,391] and [27,624]. So the honest statement is narrower than the retracted one: at this phi and this budget the signal cannot be resolved at n=64, and the required sample size is not determinable from this run. cos(g_RE,g_J2) = -0.0226 (seed 0) and -0.0634 (seed 1).",
+ "not_claimed": [
+  "that the estimator class is closed (audit \u00a7\u516d is right: Back to Basics (ACL 2024) applies REINFORCE at LLM scale)",
+  "that 2.46 kappa=1500 was right (retracted, task-8 re-does it)",
+  "any kappa value, since g_sq <= 0 makes the pooled estimate undefined"
+ ]
+}
