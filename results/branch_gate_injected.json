@@ -1,0 +1,116 @@
+{
+ "rows": [
+  {
+   "term": "pathwise",
+   "layer": 0,
+   "neuron": 871,
+   "analytic": 1.0964089292052392,
+   "fd": 5.599498748779297,
+   "eps": 0.001,
+   "rel_err": 4.107126182234069
+  },
+  {
+   "term": "pathwise",
+   "layer": 0,
+   "neuron": 871,
+   "analytic": 1.0964089292052392,
+   "fd": 5.449485778808594,
+   "eps": 0.01,
+   "rel_err": 3.9703040842241193
+  },
+  {
+   "term": "pathwise",
+   "layer": 13,
+   "neuron": 5917,
+   "analytic": 1.1818874511803301,
+   "fd": 5.4645538330078125,
+   "eps": 0.001,
+   "rel_err": 3.6235822434280514
+  },
+  {
+   "term": "pathwise",
+   "layer": 13,
+   "neuron": 5917,
+   "analytic": 1.1818874511803301,
+   "fd": 5.898904800415039,
+   "eps": 0.01,
+   "rel_err": 3.9910884446094315
+  },
+  {
+   "term": "pathwise",
+   "layer": 31,
+   "neuron": 128,
+   "analytic": 4.790524301979531,
+   "fd": 23.951053619384766,
+   "eps": 0.001,
+   "rel_err": 3.999672710038807
+  },
+  {
+   "term": "pathwise",
+   "layer": 31,
+   "neuron": 128,
+   "analytic": 4.790524301979531,
+   "fd": 23.92101287841797,
+   "eps": 0.01,
+   "rel_err": 3.993401842995218
+  },
+  {
+   "term": "teacher",
+   "layer": 0,
+   "neuron": 1808,
+   "analytic": -2.83802537806514,
+   "fd": -2.8657913208007812,
+   "eps": 0.001,
+   "rel_err": 0.009783542793606353
+  },
+  {
+   "term": "teacher",
+   "layer": 0,
+   "neuron": 1808,
+   "analytic": -2.83802537806514,
+   "fd": -2.8457164764404297,
+   "eps": 0.01,
+   "rel_err": 0.0027100174771985614
+  },
+  {
+   "term": "teacher",
+   "layer": 13,
+   "neuron": 8445,
+   "analytic": 5.263073690732597,
+   "fd": 5.113124847412109,
+   "eps": 0.001,
+   "rel_err": 0.028490736047363834
+  },
+  {
+   "term": "teacher",
+   "layer": 13,
+   "neuron": 8445,
+   "analytic": 5.263073690732597,
+   "fd": 5.27186393737793,
+   "eps": 0.01,
+   "rel_err": 0.001670173583320916
+  },
+  {
+   "term": "teacher",
+   "layer": 31,
+   "neuron": 7973,
+   "analytic": 15.433098449372437,
+   "fd": 15.437602996826172,
+   "eps": 0.001,
+   "rel_err": 0.00029187576743008474
+  },
+  {
+   "term": "teacher",
+   "layer": 31,
+   "neuron": 7973,
+   "analytic": 15.433098449372437,
+   "fd": 15.432024002075195,
+   "eps": 0.01,
+   "rel_err": 6.961967493219887e-05
+  }
+ ],
+ "passed": false,
+ "slot_tokens": 5,
+ "injected_double_division": true,
+ "criterion": "FD (fp32, min over eps) must reproduce the shipped helper to <2%"
+}

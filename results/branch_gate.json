@@ -111,17 +111,6 @@
  ],
  "passed": true,
  "slot_tokens": 5,
- "criterion": "FD (fp32, min over eps) must reproduce the shipped helper to <2%",
- "supersedes": "the deleted --phi-selftest, which compared phi_of against slot_lp with identical arguments - the same function called twice, so 0.00e+00 was guaranteed and no bug could have been detected.",
- "how": "differentiates the SHIPPED helpers pathwise_term / teacher_term against fp32 finite differences of the functionals they claim to differentiate, using a deliberately MULTI-TOKEN slot (5 tokens) so a second division by |slot| would appear as a factor |slot|.",
- "sensitivity_test": {
-  "injected": "the double division by len(ids_slot) put back into pathwise_term",
-  "result": "FAIL with min rel_err 3.97 / 3.62 / 3.99 at layers 0/13/31, i.e. |slot|-1 as expected",
-  "restored": "the correct version passes with max rel_err 5.64e-3"
- },
- "additivity": {
-  "check": "g_pw must equal the sum of per-context increments and must NOT equal the last increment alone",
-  "result_on_3_contexts": "|final - sum(inc)| = 0.00e+00, |final - last_inc| = 4.19 against scale 5.25 -> PASS",
-  "note": "the first two versions of this check were wrong (shallow dict copy; then summing CUMULATIVE snapshots) and both were caught by looking at what the number means rather than at whether it printed PASS"
- }
+ "injected_double_division": false,
+ "criterion": "FD (fp32, min over eps) must reproduce the shipped helper to <2%"
 }

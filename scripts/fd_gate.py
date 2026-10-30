@@ -179,6 +179,9 @@ def main():
     inst = Path(__file__).resolve().parent / 'mlp_capture.py'
     inst_sha = hashlib.sha256(inst.read_bytes()).hexdigest()
     json.dump({'instrument': 'scripts/mlp_capture.py', 'instrument_sha256': inst_sha,
+               'certifies': ('mlp_capture.Capture(...).dose_grad() END TO END: mode "new" in this script calls the shipped '
+                             'module, not an inline copy, so a regression inside grad_sum/dose_grad fails this gate'),
+               'negative_control': 'mode "old" keeps the legacy detach capture inline on purpose',
                'summary_min_over_eps': summary, 'rows': rows_out, 'verdict': verdict,
                'eps': eps_list, 'layers': want, 'topn': a.topn,
                'model': a.model, 'dtype': 'float32',

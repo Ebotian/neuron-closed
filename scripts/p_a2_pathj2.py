@@ -86,6 +86,8 @@ def main():
     ap.add_argument('--out', default='/root/autodl-tmp/runs/p_a2_path.json')
     ap.add_argument('--selftest', action='store_true')
     ap.add_argument('--pathwise', action='store_true')
+    ap.add_argument('--inject-double-division', action='store_true',
+                    help='sensitivity test: put the L^-2 slot normalisation back, so --branch-selftest must FAIL')
     ap.add_argument('--branch-selftest', action='store_true',
                     help='task-3 gate: FD must reproduce the SHIPPED pathwise and teacher terms (fp32)')
     a = ap.parse_args()
@@ -180,7 +182,8 @@ def main():
             lp = F.log_softmax(out.logits[:, :-1].float(), -1)
             pos = torch.arange(len(sq), len(full), device=dev)
             tgt = torch.tensor(ids_slot, device=dev)
-            (lp[0, pos - 1, tgt].mean() * (sgn * weight)).backward()
+            coef = sgn * weight * ((1.0 / len(ids_slot)) if a.inject_double_division else 1.0)
+            (lp[0, pos - 1, tgt].mean() * coef).backward()
             raw = cap.grad_sum()
         return {l: raw[l] * (p50[l] / norms[l].clamp(min=1e-12)).double() for l in layers}
 
@@ -282,6 +285,7 @@ def main():
         print('BRANCH-SELFTEST', 'PASS' if ok else 'FAIL', flush=True)
         Path(a.out.replace('.json', '_branch_selftest.json')).parent.mkdir(parents=True, exist_ok=True)
         json.dump({'rows': rows_s, 'passed': ok, 'slot_tokens': len(slot_t),
+                   'injected_double_division': bool(a.inject_double_division),
                    'criterion': 'FD (fp32, min over eps) must reproduce the shipped helper to <2%'},
                   open(a.out.replace('.json', '_branch_selftest.json'), 'w'), indent=1)
         return 0 if ok else 1

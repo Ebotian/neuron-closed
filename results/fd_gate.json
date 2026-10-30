@@ -1,6 +1,8 @@
 {
  "instrument": "scripts/mlp_capture.py",
  "instrument_sha256": "2aaab2a2f6343cf81df54edf0b05cd612702addbd380f1803a231e50ec9dea46",
+ "certifies": "mlp_capture.Capture(...).dose_grad() END TO END: mode \"new\" in this script calls the shipped module, not an inline copy, so a regression inside grad_sum/dose_grad fails this gate",
+ "negative_control": "mode \"old\" keeps the legacy detach capture inline on purpose",
  "summary_min_over_eps": [
   {
    "layer": 0,
@@ -180,6 +182,5 @@
  "model": "/root/autodl-tmp/Qwen3.5-4B",
  "dtype": "float32",
  "criterion": "G1 rel_err_new<0.02 for every row; G2 some legacy rel_err>0.05; G3 conjunction",
- "status": "PASS",
- "certifies": "mlp_capture.Capture(...).dose_grad() END TO END. The first version re-implemented the zero-leaf hook inline, so the certificate would have kept passing after a regression inside the module; the auditor was right and the gate now calls the shipped code path (mode \"new\"), while the legacy detach method stays inline as the negative control."
+ "status": "PASS"
 }
