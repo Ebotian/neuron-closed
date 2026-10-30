@@ -1,5 +1,5 @@
 {
- "status": "NOT VERIFIED - pre-existing legacy decimals, recorded so they are not mistaken for verified numbers",
+ "status": "RETIRED - not verified, and no longer cited. These eight decimals appear only in legacy entries written before this repair; they are withdrawn from the trusted set rather than left pending, so nothing in the current record depends on them.",
  "values": [
   0.000107,
   0.0002,
