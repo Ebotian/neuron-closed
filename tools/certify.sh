@@ -60,7 +60,11 @@ lean = root / 'lean'
 ALLOWED = {'propext', 'Classical.choice', 'Quot.sound'}
 files = sorted(lean.glob('*.lean'))
 checks = 0                                     # declarations CHECKED (a file may print one twice)
-out = {'files': {}, 'checked_at': None, 'allowed_axioms': sorted(ALLOWED)}
+tool = plugin / 'bin/opl-leancheck'
+out = {'files': {}, 'allowed_axioms': sorted(ALLOWED),
+       # WHICH TOOL PRODUCED THIS. Without it, any stub that printed the three allowed axioms produced a green record -
+       # which is how a fault-injection run with a fake plugin left results/lean_audit.json polluted yet passing.
+       'plugin': {'path': str(tool), 'sha256': hashlib.sha256(tool.read_bytes()).hexdigest() if tool.exists() else None}}
 failures = []
 for f in files:
     decls = [l.split()[2] for l in f.read_text().splitlines() if l.startswith('#print axioms ')]
@@ -90,8 +94,9 @@ for f in files:
                 entry['decls'][d], status = ax, 'FAILED'
                 failures.append(f'{f.name}:{d} uses axioms outside the whitelist: {sorted(set(ax) - ALLOWED)}')
             elif not ax:
-                entry['decls'][d], status = ['FAILED'], 'FAILED'
-                failures.append(f'{f.name}:{d} reported an EMPTY axiom list - a proof of nothing')
+                # An EMPTY list is legitimate: `theorem t : True := True.intro` uses no axiom, and the tool prints `→[]`.
+                # Only an UNPARSABLE list is a failure (the branch above). Treating empty as failure was over-rejection.
+                entry['decls'][d], status = [], 'PROVED' 
             else:
                 entry['decls'][d], status = ax, 'PROVED'
         print(f'  {status}  {f.name}  {d}')

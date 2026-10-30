@@ -176,12 +176,15 @@
    }
   }
  },
- "checked_at": null,
  "allowed_axioms": [
   "Classical.choice",
   "Quot.sound",
   "propext"
  ],
+ "plugin": {
+  "path": "/home/ebt/Downloads/kimi-research/plugin/bin/opl-leancheck",
+  "sha256": "e2c47d67a0adc6d1ebf43dcdeb85c7e2b175711580872180e0bce7a97cc00e85"
+ },
  "decl_counts": {
   "files": 9,
   "declarations": 26,

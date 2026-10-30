@@ -79,11 +79,21 @@ def randomised_like(items, Wn, rng, mode='within_layer'):
 
 
 def _stats(vals):
+    """Quantiles of one recipe's null.
+
+    THE p95 IS A THRESHOLD, NOT A TEST LEVEL. With n draws, `int(0.95*n) - 1` is the floor(0.95n)-th smallest; at n=40 that
+    is the 38th of 40, i.e. the THIRD largest, and if the observation were iid with the draws (and the distribution
+    continuous) then P(obs > that order statistic) = 3/41 = 7.32%, not 5%. With ties - and K64 has many - the effective
+    level is not even that. So the exceedance fraction is descriptive; claiming significance needs a defined
+    randomisation test, which this is not.
+    """
     vals = sorted(vals)
     if not vals:
         return {'n': 0, 'mean': None, 'p95': None, 'max': None}
-    return {'n': len(vals), 'mean': sum(vals) / len(vals),
-            'p95': vals[int(0.95 * len(vals)) - 1], 'max': vals[-1]}
+    idx = int(0.95 * len(vals)) - 1
+    return {'n': len(vals), 'mean': sum(vals) / len(vals), 'p95': vals[idx], 'p95_rank_from_top': len(vals) - idx,
+            'implied_level_if_iid_continuous': (len(vals) - idx) / (len(vals) + 1),
+            'max': vals[-1], 'n_ties_at_p95': sum(1 for v in vals if v == vals[idx])}
 
 
 def null_for_recipes(items, recipe_v, Wn, layers, n_null, seed=0, mode='within_layer'):

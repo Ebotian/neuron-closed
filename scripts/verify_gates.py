@@ -7,8 +7,9 @@ INJECTING the failure, not by reading the code. A gate that is only tested by ha
 so every known failure mode is injected here, every run.
 
 Checks
-  1-4  results/lean_audit.json tampered four ways (declaration FAILED, axiom outside the whitelist, declaration dropped,
-       verdict not all-proved) -> the instruments gate must go red. The record is restored afterwards.
+  1-6  results/lean_audit.json tampered six ways (an entire file record deleted, decl_counts left stale, declaration FAILED,
+       axiom outside the whitelist, declaration dropped, verdict not all-proved) -> the instruments gate must go red.
+       The record is restored afterwards.
   5.   tools/certify.sh must not swallow failures (`|| true` on a copy/run, or a trailing command masking an exit status).
   6.   tools/certify.sh must exit non-zero when the remote box cannot be reached.
   7.   the live record's axioms must be exactly the whitelist and its verdict must say all-proved.
@@ -66,6 +67,14 @@ def main():
     def bad_verdict(d):
         d['verdict'] = 'INCOMPLETE: 1 of 27 declaration checks not proved'
 
+    def drop_whole_file(d):
+        d['files'].pop(sorted(d['files'])[0])
+
+    def stale_counts(d):
+        d['decl_counts'] = {'files': 1, 'declarations': 1, 'checks': 1, 'proved': 1, 'failed': 0}
+
+    tamper('an entire file record deleted', drop_whole_file)
+    tamper('decl_counts left stale', stale_counts)
     tamper('declaration FAILED', set_failed)
     tamper('axiom outside the whitelist', unknown_axiom)
     tamper('declaration dropped from the record', drop_decl)

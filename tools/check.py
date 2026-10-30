@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -167,7 +168,26 @@ def check_instruments():
         bad.append('results/lean_audit.json missing')
     else:
         d = json.loads(aud.read_text(encoding='utf8'))
-        for f, rec in (d.get('files') or {}).items():
+        # WHICH TOOL PRODUCED THE RECORD. A stub plugin that printed the three allowed axioms used to yield a green record,
+        # so the audit is bound to the checker binary by hash and to the expected path.
+        expected_tool = Path(os.environ.get('OPL_PLUGIN', '/home/ebt/Downloads/kimi-research/plugin')) / 'bin/opl-leancheck'
+        pip = d.get('plugin') or {}
+        if not expected_tool.exists():
+            bad.append(f'the Lean checker is missing at {expected_tool} - cannot verify the audit was produced by it')
+        elif pip.get('sha256') != hashlib.sha256(expected_tool.read_bytes()).hexdigest():
+            bad.append(f'lean audit was produced by a different checker (record {str(pip.get("sha256"))[:12]} at '
+                       f'{pip.get("path")}, expected {expected_tool}) -- rerun make certify')
+        # FILE-LEVEL COMPLETENESS. The loop below walked the RECORD, so a whole file missing from it was invisible: deleting
+        # lean/Decomposition.lean's entry left the check green. The expected set comes from disk, not from the record.
+        recorded = set((d.get('files') or {}).keys())
+        expected = {str(p.relative_to(ROOT)) for p in (ROOT / 'lean').glob('*.lean')}
+        if recorded != expected:
+            missing = sorted(expected - recorded)
+            extra = sorted(recorded - expected)
+            bad.append(f'lean audit does not cover the files on disk (missing record(s) {missing}, stale {extra}) '
+                       '-- rerun make certify')
+        checks = 0
+        for f, rec in sorted((d.get('files') or {}).items()):
             fp = ROOT / f
             if not fp.exists():
                 bad.append(f'{f}: missing')
@@ -180,6 +200,7 @@ def check_instruments():
             # entry to ['FAILED'] with the file untouched and this gate stayed green, which made "make check OK" unable
             # to distinguish a proved record from a failed one.
             decls = rec.get('decls') or {}
+            checks += len(decls)
             allowed = {'propext', 'Classical.choice', 'Quot.sound'}
             failed = [k for k, v in decls.items()
                       if any('FAILED' in str(x) for x in (v or [])) or (set(v or []) - allowed)]
@@ -195,6 +216,11 @@ def check_instruments():
                 missing = sorted(set(on_disk) - set(decls))
                 extra = sorted(set(decls) - set(on_disk))
                 bad.append(f'{f}: record does not cover the file (missing {missing[:3]}, extra {extra[:3]})')
+        # the counts printed in the record must be RECOMPUTED, not trusted: the old numbers survive a file deletion otherwise
+        dc = d.get('decl_counts') or {}
+        if dc and (dc.get('files') != len(recorded) or dc.get('declarations') != checks):
+            bad.append(f'lean audit decl_counts do not match the files (record says {dc.get("files")} files / '
+                       f'{dc.get("declarations")} declarations, recomputed {len(recorded)} / {checks}) -- rerun make certify')
         if 'PROVED for every declaration' not in str(d.get('verdict')):
             bad.append(f'lean audit verdict is not all-proved: {d.get("verdict")}')
     gate = ROOT / 'results/fd_gate.json'
@@ -270,6 +296,15 @@ def check_no_regressions():
             if re.search(rf'^\s*def {fn}\(', txt, re.M):
                 bad.append(f'scripts/{name}: redefines {fn}() - it is owned by {owner}')
     return bad
+
+
+def run_script(rel):
+    """Run a stdlib-only verification script and turn a non-zero exit into a failure line."""
+    r = subprocess.run([sys.executable, str(ROOT / rel)], capture_output=True, text=True)
+    if r.returncode != 0:
+        out = [l.strip() for l in (r.stdout + r.stderr).splitlines() if 'MISMATCH' in l or 'FAIL' in l]
+        return out[:3] or [f'{rel} exited {r.returncode}']
+    return []
 
 
 def check_gates():
@@ -399,6 +434,8 @@ def main():
         results['noregress (one functional, one implementation)'] = check_no_regressions()
     if cmd in ('all', 'gates'):
         results['gates (the guards fail when they should)'] = check_gates()
+    if cmd in ('all', 'snr'):
+        results['snr (half-sample identities, exact)'] = run_script('scripts/verify_snr.py')
     if cmd in ('all', 'instruments'):
         results['instruments (lean sha + fd gate)'] = check_instruments()
     if cmd in ('all', 'git'):
