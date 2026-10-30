@@ -35,7 +35,10 @@ def readout(model, lm, tok, ctx, layers, d, b, SC, dev):
     """Mean teacher-forced J2 over the contexts at budget b (d=None means no injection)."""
     # d lives on the CPU (it comes from the min-norm solve), SC may live on the device: bring them together FIRST.
     # This is the exact mismatch class core/design.py exists to prevent, and this shell hit it once.
-    alpha = {} if d is None else {l: ((b * d[l]) * SC[l].to(d[l].device)).float().to(dev) for l in layers}
+    # Match the arithmetic that produced the committed record: multiply in float32 ON THE DEVICE. Doing it in
+    # float64 on the host and casting afterwards moved the readout ratios by 0.3% (1.3053 vs 1.3098) - a value change
+    # from arithmetic association, not from physics, so the device-side float32 form is the one kept.
+    alpha = {} if d is None else {l: ((b * d[l].float().to(dev)) * SC[l].to(dev)) for l in layers}
     tot = 0.0
     with (steer(lm, alpha) if d is not None else contextlib.nullcontext()):
         with torch.inference_mode():

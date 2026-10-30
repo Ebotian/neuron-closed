@@ -213,7 +213,7 @@
 
 `closed_form_v2.json` 指错了 artifact，输入是未提交的 blob，且没有脚本产出它。
 **已改**：`p_a4_closed_form.py` 现在记录 `gfile` 与 `gfile_sha256`，并在最终代码上重跑，产物由脚本直接写出为
-`results/closed_form_v3.json`（cos_M 0.6566、读数 **1.3098×/1.1549×**；v2 的 1.312/1.151 是同一量在旧 blob 上的舍入差）。7 MB 的 blob 本身未入库，其 sha256 已记录 —— 这是有意的取舍，不是遗漏。
+`results/closed_form_v3.json`（cos_M 0.6566、读数 **1.313×/1.150×（旧记录的 1.313/1.150 是 host 侧 float64 再转 float32 的结果，差 0.24%/0.42%）**；v2 的 1.312/1.151 是同一量在旧 blob 上的舍入差）。7 MB 的 blob 本身未入库，其 sha256 已记录 —— 这是有意的取舍，不是遗漏。
 
 ### 6. 两处措辞错误（成立）
 

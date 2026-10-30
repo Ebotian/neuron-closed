@@ -5,7 +5,6 @@
  },
  "gfile": "/root/autodl-tmp/runs/p_a2_v2.pt",
  "gfile_sha256": "5c5b6ebb2ca86a25a643e854b3a812a12ce4b19b5d1c920c668fcaba0170ae6e",
- "provenance": "d* read from the blob named above; the blob is /root/autodl-tmp/runs/p_a2_v2.pt, written by scripts/p_a2_pathj2.py on the corrected instrument (see results/reliability_242_refactor_check.json)",
  "C0_gram": {
   "max_asym": 0.0,
   "rank_per_layer": [
@@ -14,45 +13,43 @@
    2560,
    2560
   ],
-  "budget2_j2": 0.9988328027473619,
-  "note": "full Gram is singular (rank<=2560<9216); min-norm solve via thin SVD"
+  "budget2_j2": 0.9988328027473619
  },
  "A": {
   "cos_M": 0.6565706443400678,
-  "coord_cos": 0.6750579035830186
+  "coord_cos": 0.6750579035830185
  },
  "B": {
   "64": {
-   "jaccard": 0.391304347826087,
-   "shared": 36
+   "shared": 36,
+   "jaccard": 0.391304347826087
   },
   "256": {
-   "jaccard": 0.36533333333333334,
-   "shared": 137
+   "shared": 137,
+   "jaccard": 0.36533333333333334
   },
   "1024": {
-   "jaccard": 0.2872407291011942,
-   "shared": 457
+   "shared": 457,
+   "jaccard": 0.2872407291011942
   }
  },
  "C": {
   "base": -0.7745909541845322,
   "j2@0.05": {
-   "J2": 2.8474396467208862,
-   "dJ2": 3.6220306009054184
+   "J2": 2.843136966228485,
+   "dJ2": 3.6177279204130173
   },
   "pw@0.05": {
-   "J2": 1.990675613284111,
-   "dJ2": 2.765266567468643
+   "J2": 1.9807663559913635,
+   "dJ2": 2.7553573101758957
   },
   "j2@0.1": {
-   "J2": 4.744627892971039,
-   "dJ2": 5.519218847155571
+   "J2": 4.735404908657074,
+   "dJ2": 5.509995862841606
   },
   "pw@0.1": {
-   "J2": 4.004430830478668,
-   "dJ2": 4.7790217846632
+   "J2": 4.01466166973114,
+   "dJ2": 4.789252623915672
   }
- },
- "design": "d* from plan 2.42 (j2 = teacher-forced, pw = pathwise), same closed form, same metric"
+ }
 }
