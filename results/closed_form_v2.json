@@ -1,0 +1,73 @@
+{
+ "status": "MEASURED on the corrected instrument (task-7, plan 2.52); supersedes the retracted plan 2.43",
+ "design": {
+  "model": "Qwen3.5-4B bf16",
+  "support": "FULL 32 x 9216 = 294,912 coordinates",
+  "closed_form": "x_l = M_l^+ d*_l ; q = sum_l d*_l \u00b7 x_l ; u = b x / sqrt(q) ; M_l = Gram of unit W_down columns (rank 2560)",
+  "d_star": "j2 = teacher-forced J2 gradient; pw = pathwise term, both from the corrected readout (/root/autodl-tmp/runs/p_a2_new.pt)"
+ },
+ "SELF": {
+  "residual_Mu_minus_d_over_d": {
+   "j2": 2.52e-05,
+   "pw": 1.99e-05
+  },
+  "budget2": 0.9988328027473619,
+  "rank_per_layer": [
+   2560,
+   2560,
+   2560,
+   2560
+  ]
+ },
+ "old_vs_new": {
+  "cos_M": {
+   "retracted": 0.4306,
+   "corrected": 0.6565704771273457
+  },
+  "coord_cos": {
+   "retracted": 0.4733,
+   "corrected": 0.6750583241374009
+  },
+  "jaccard64": {
+   "retracted": 0.2549,
+   "corrected": 0.391304347826087
+  },
+  "shared64": {
+   "retracted": 26,
+   "corrected": 36
+  },
+  "jaccard256": {
+   "retracted": 0.222,
+   "corrected": 0.36533333333333334
+  },
+  "jaccard1024": {
+   "retracted": 0.163,
+   "corrected": 0.2872407291011942
+  },
+  "dJ2_j2_005": {
+   "retracted": 1.74432,
+   "corrected": 3.6220306009054184
+  },
+  "dJ2_pw_005": {
+   "retracted": 0.77574,
+   "corrected": 2.7614445090293884
+  },
+  "dJ2_j2_010": {
+   "retracted": 3.20288,
+   "corrected": 5.519218847155571
+  },
+  "dJ2_pw_010": {
+   "retracted": 1.46685,
+   "corrected": 4.793598547577858
+  }
+ },
+ "readout_ratio": {
+  "b0.05": 1.311643449311431,
+  "b0.10": 1.1513727719114817
+ },
+ "verdict": "three numbers change materially. (1) cos_M(u_j2,u_pw) = 0.657 (was 0.431), and it reproduces the gradient-level cos(pathwise, teacher) = 0.6554 to within 0.002, which is an internal consistency check that did not hold before. (2) The two lists share 36 of 64 top positions (Jaccard 0.391, was 0.255): the d* variants agree more than the retracted analysis suggested. (3) The teacher-forced arm still wins on its own readout but by 1.31x at b=0.05 and 1.15x at b=0.10 (was 2.25x/2.18x) - still expected, since d*_j2 is by construction the gradient of that readout, and still unable to adjudicate between the two d* without a behaviour arm.",
+ "unchanged": "the verdict of plan 2.43 - that this comparison cannot choose between the two d* - is unaffected; only its magnitude changed.",
+ "artifacts": [
+  "results/reliability_242.json"
+ ]
+}

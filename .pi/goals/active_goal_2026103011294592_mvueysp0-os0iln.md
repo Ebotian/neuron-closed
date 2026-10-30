@@ -5,14 +5,14 @@
   "status": "active",
   "autoContinue": true,
   "usage": {
-    "tokensUsed": 516894,
-    "activeSeconds": 1288
+    "tokensUsed": 540867,
+    "activeSeconds": 1392
   },
   "sisyphus": false,
   "createdAt": "2026-10-30T03:29:45.924Z",
-  "updatedAt": "2026-10-30T03:51:32.342Z",
+  "updatedAt": "2026-10-30T03:53:17.428Z",
   "activePath": ".pi/goals/active_goal_2026103011294592_mvueysp0-os0iln.md",
-  "revision": 43,
+  "revision": 46,
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
@@ -67,14 +67,18 @@
       {
         "id": "task-5",
         "title": "在新仪器上重跑 2.40（行为梯度 C1）",
-        "status": "pending",
-        "verificationContract": "r(32)、split-half 曲线、κ 及区间入 results/ 与 metadata；冻结判据在跑前写入脚本；旧值保留并标 RETRACTED"
+        "status": "complete",
+        "verificationContract": "r(32)、split-half 曲线、κ 及区间入 results/ 与 metadata；冻结判据在跑前写入脚本；旧值保留并标 RETRACTED",
+        "completedAt": "2026-10-30T03:51:48.004Z",
+        "evidence": "2 seeds on corrected instrument: r(K) ~0/-0.027 and 0.0027-0.0029; pooled kappa undefined (g_sq<=0); bootstrap interval [32,391]/[27,624]; cos=-0.0226/-0.0634; results/reliability_240.json + plan250"
       },
       {
         "id": "task-6",
         "title": "重跑 2.42（r(K)、pathwise/score 分解），按 r(K)≈K/(K+2κ) 报 κ",
-        "status": "pending",
-        "verificationContract": "κ 而非 2κ；‖g‖²、trΣ 给区间；pathwise 与 teacher 的 cos 用同一泛函与同一归一化；上下文等权"
+        "status": "complete",
+        "verificationContract": "κ 而非 2κ；‖g‖²、trΣ 给区间；pathwise 与 teacher 的 cos 用同一泛函与同一归一化；上下文等权",
+        "completedAt": "2026-10-30T03:51:48.004Z",
+        "evidence": "r(K) 0.0065..0.0685; kappa curve 217.5 inside bootstrap [108.7,610.2]; pooled 2100.6 flagged untrusted; cos(pw,teach)=0.6554 by layer 0.27->0.90; score/pw ratio 0.797; LOO vs in-sample cos 1.0 ratio 1"
       },
       {
         "id": "task-7",
@@ -121,8 +125,8 @@
 - Status: running
 - Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 21m28s
-- Tokens used: 517K (516,894) tokens
+- Time spent: 23m12s
+- Tokens used: 541K (540,867) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->
@@ -130,8 +134,8 @@
 - [x] task-2: fp32 有限差分校准门：新建 scripts/fd_gate.py 并跑通（层 0/13/31，各 2 坐标，相对误差 <2%） — evidence: fd_gate.py PASS: min-over-eps rel err 4.65e-3 (L0) / 3.86e-3 (L13) / 6.08e-4 (L31); legacy 0.139/0.242, 0.207; results/fd_gate.json + metadata plan247_fd_gate
 - [x] task-3: 三分支统一泛函与归一化（slot 用 mean、上下文等权、teacher 分支同归一化） — evidence: unified formula written in docstring; 4 normalisation defects fixed; --phi-selftest fp32 |diff|=0.00e+00 (same batch shape); make check OK; metadata plan248
 - [x] task-4: baseline 改 leave-one-out，并把含自身均值的 (1−1/K) 偏差作为对照记录 — evidence: b_{-i} in both scripts; scores stored unweighted + both variants post-hoc; bias factors 0.875 (K=8) / 0.969 (K=32) in metadata plan249; numeric diff to be produced by task-6 run
-- [ ] task-5: 在新仪器上重跑 2.40（行为梯度 C1） — contract: r(32)、split-half 曲线、κ 及区间入 results/ 与 metadata；冻结判据在跑前写入脚本；旧值保留并标 RETRACTED
-- [ ] task-6: 重跑 2.42（r(K)、pathwise/score 分解），按 r(K)≈K/(K+2κ) 报 κ — contract: κ 而非 2κ；‖g‖²、trΣ 给区间；pathwise 与 teacher 的 cos 用同一泛函与同一归一化；上下文等权
+- [x] task-5: 在新仪器上重跑 2.40（行为梯度 C1） — evidence: 2 seeds on corrected instrument: r(K) ~0/-0.027 and 0.0027-0.0029; pooled kappa undefined (g_sq<=0); bootstrap interval [32,391]/[27,624]; cos=-0.0226/-0.0634; results/reliability_240.json + plan250
+- [x] task-6: 重跑 2.42（r(K)、pathwise/score 分解），按 r(K)≈K/(K+2κ) 报 κ — evidence: r(K) 0.0065..0.0685; kappa curve 217.5 inside bootstrap [108.7,610.2]; pooled 2100.6 flagged untrusted; cos(pw,teach)=0.6554 by layer 0.27->0.90; score/pw ratio 0.797; LOO vs in-sample cos 1.0 ratio 1
 - [ ] task-7: 重跑 2.43（全支撑闭式解、cos_M、读数臂） — contract: SELF：‖Mu−d‖/‖d‖、budget² 检查；cos_M 与读数 ΔJ2 均为新仪器下的值；与旧值的差异显式列出
 - [ ] task-8: 重跑 2.46（噪声尺度），报告 κ 与区间并做一致性检查 — contract: κ 与由 r(K) 反解的 κ 同口径比较；报告两估计的区间是否重叠；不再宣称“两条独立路径吻合 5%”
 - [ ] task-9: 商空间比较重做：完整直和余弦、按各自列表匹配的零分布（含符号与剂量分布）、按 trait 分层 — contract: cos_v 覆盖全部 32 层分母；零分布对每个被检列表各自生成 ≥20 个匹配随机列表；跨 trait 配方不再合并求和；结论措辞降级为“本次比较无高对齐”除非证据升级
