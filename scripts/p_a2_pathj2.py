@@ -66,7 +66,7 @@ import torch.nn.functional as F
 
 sys.path.insert(0, '/root/autodl-tmp/scripts/j2space')
 import engine as E
-from mlp_capture import Capture as _Capture
+from mlp_capture import Capture as _Capture, column_norms_dev
 
 
 def slot_ids(tok, s):
@@ -86,6 +86,7 @@ def main():
     ap.add_argument('--out', default='/root/autodl-tmp/runs/p_a2_path.json')
     ap.add_argument('--selftest', action='store_true')
     ap.add_argument('--pathwise', action='store_true')
+    ap.add_argument('--fp32', action='store_true', help='run the model in float32: removes the shared bf16 batch bias that moves r(K)')
     ap.add_argument('--inject-double-division', action='store_true',
                     help='sensitivity test: put the L^-2 slot normalisation back, so --branch-selftest must FAIL')
     ap.add_argument('--branch-selftest', action='store_true',
@@ -98,9 +99,12 @@ def main():
     ctx = [r for r in rows if r['trait'] == 'hostility'][:a.n_ctx]
     print(f'prompts: {len(ctx)} hostility', flush=True)
     tok, model, lm = E.load_model(a.model, dev)
+    if a.fp32:
+        model = model.float()
+        lm = E.model_lm(model)
     layers = list(range(32))
     p50 = E.estimate_p50(tok, model, lm, layers, dev)
-    norms = E.column_norms(lm, layers)
+    norms = column_norms_dev(lm, layers, dev)
     for q in model.parameters():
         q.requires_grad_(False)
     pad = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
@@ -213,7 +217,7 @@ def main():
         model = model.float()
         lm = E.model_lm(model)
         p50 = E.estimate_p50(tok, model, lm, layers, dev)
-        norms = E.column_norms(lm, layers)
+        norms = column_norms_dev(lm, layers, dev)
         p_ = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
         r = ctx[0]
         pre = E.prompt_prefix(tok, r['prompt'])
@@ -364,15 +368,40 @@ def main():
             g_path_in[l] += (torch.tensor(w_in, device=dev).double().unsqueeze(1) * blk).sum(0)
             off += d
         if a.pathwise:
+            # TENSORISED: all 2K (rollout, slot-sign) pairs in ONE padded batch and ONE backward. The per-sample
+            # gradients come out of the same delta leaf (grad_per_sample), so this replaces 64 single-sequence
+            # backwards per context with a single batched one.
             ip, ineg = slot_ids(tok, r['positive']), slot_ids(tok, r['negative'])
-            for i, sq in enumerate(seqs):
-                for ids_slot, sgn in ((ip, +1.0), (ineg, -1.0)):
-                    v = pathwise_term(sq, ids_slot, sgn, 1.0 / (len(seqs) * len(ctx)))
-                    for l in layers:
-                        g_pw[l] += v[l]
-                print(f'    pw rollout {i} done', flush=True) if i % 8 == 0 else None
-            # clone: dict() is shallow, and g_pw[l] is mutated in place on the next context, which would make the
-            # snapshot track the final value and turn this check into a tautology-bug (it did on the first attempt).
+            items = []
+            for i_, sq in enumerate(seqs):
+                items.append((sq + ip, +1.0, len(ip)))
+                items.append((sq + ineg, -1.0, len(ineg)))
+            CHUNK = 8    # memory, not FLOPs, is the binding constraint at 31.5 GiB
+            Tmax = max(len(x) for x, _, _ in items)
+            for c0 in range(0, len(items), CHUNK):
+                part = items[c0:c0 + CHUNK]
+                bid = torch.full((len(part), Tmax), pad, dtype=torch.long, device=dev)
+                am = torch.zeros_like(bid)
+                smask = torch.zeros_like(bid)
+                sign_w = torch.zeros(len(part), dtype=torch.float64, device=dev)
+                for b_, (full, sgn, nslot) in enumerate(part):
+                    bid[b_, :len(full)] = torch.tensor(full, device=dev)
+                    am[b_, :len(full)] = 1
+                    smask[b_, len(full) - nslot:len(full)] = 1
+                    # `per` above is already the MEAN over the slot's tokens, so no further /nslot here
+                    sign_w[b_] = sgn / (len(seqs) * len(ctx))
+                with Cap() as cap:
+                    model.zero_grad(set_to_none=True)
+                    out = model(input_ids=bid, attention_mask=am, use_cache=False)
+                    lp = torch.log_softmax(out.logits[:, :-1].float(), -1).gather(
+                        -1, bid[:, 1:].unsqueeze(-1)).squeeze(-1)
+                    per = (lp * smask[:, 1:].float()).sum(1) / smask[:, 1:].float().sum(1).clamp(min=1)
+                    (per * sign_w).sum().backward()
+                    gps = cap._c.grad_per_sample()
+                for l in layers:
+                    g_pw[l] += (gps[l].sum(0) * (p50[l] / norms[l].clamp(min=1e-12)).to(dev).double())
+                del out, lp, gps, bid, am, smask
+                torch.cuda.empty_cache()
             pw_snap[ci] = {l: g_pw[l].clone() for l in layers}
         splits[ci] = S
         print(f'  [{ci}] {len(seqs)} per-rollout scores stored', flush=True)
@@ -398,12 +427,22 @@ def main():
     # Reliability via scripts/reliability.py: one convention for the whole repo.
     #   split-half compares TWO DISJOINT HALVES of size K/2  =>  r(K) ~ K/(K+2*kappa)
     #   kappa = tr(Sigma)/||g||^2 with an interval from resampling CONTEXTS (the independent unit).
-    from reliability import split_half_curve_fast, noise_scale, bootstrap_stats_fast
+    from reliability import (split_half_curve_fast, noise_scale, bootstrap_stats_fast,
+                            gram_from_scores, icc_from_gram)
     W_all = [w_loo_ctx[ci] for ci in range(len(ctx))]
     curve = split_half_curve_fast([splits[ci] for ci in range(len(ctx))], W_all,
                              ks=tuple(k for k in (2, 4, 8, 16, 32) if k <= a.rollouts))
     ns = noise_scale([splits[ci] for ci in range(len(ctx))], W_all)
     iv = bootstrap_stats_fast([splits[ci] for ci in range(len(ctx))], W_all)
+    # TENSORISED, ROBUST estimator: one Gram over all rollouts, then sums of squares -> ICC + F interval.
+    # SS_w uses only DIFFERENCES of rollouts, so the batched bf16 shared bias cancels (lean: ssw_shift_invariant).
+    G = gram_from_scores([splits[ci] for ci in range(len(ctx))], W_all)
+    icc = icc_from_gram(G, [int(splits[ci].shape[0]) for ci in range(len(ctx))], k=a.rollouts)
+    rec['ICC'] = icc
+    print('ICC  MSw=%.6f [%s]  MSb-derived ||g||^2=%.6f  ICC=%s interval=%s' % (
+        icc['tr_sigma'], icc['tr_sigma_interval'], icc['g_sq'],
+        None if icc['icc'] is None else round(icc['icc'], 4),
+        None if icc['icc_interval'] is None else [round(x, 4) for x in icc['icc_interval']]), flush=True)
     r32 = curve.get(a.rollouts, {}).get('r_mean')
     rec['R'] = {'r_of_K': curve, 'noise_scale': ns, 'kappa_interval': iv,
                 'convention': 'r(K) ~ K/(K+2*kappa), so r=0.5 needs K = 2*kappa, NOT kappa. kappa is the noise-to-signal ratio.',

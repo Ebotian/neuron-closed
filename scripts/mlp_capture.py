@@ -131,3 +131,15 @@ def fd_check(lm, phi, coord, eps, dev='cuda:0', p50=None, norms=None):
     hi = phi({coord: eps})
     lo = phi({coord: -eps})
     return (hi - lo) / (2 * eps)
+
+
+def column_norms_dev(lm, layers, dev):
+    """||W_down[:, n]|| for every layer, computed ON THE GPU. The vendor helper does this on the CPU
+    (`.detach().float().norm(dim=0).cpu()`), which is a 2560x9216 reduction per layer - tens of seconds of CPU
+    while the GPU idles, and it is only needed as a scale factor."""
+    out = {}
+    for l in layers:
+        W = lm.layers[l].mlp.down_proj.weight.detach().to(dev).float()
+        out[l] = W.norm(dim=0).cpu()
+        del W
+    return out

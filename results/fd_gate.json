@@ -1,6 +1,6 @@
 {
  "instrument": "scripts/mlp_capture.py",
- "instrument_sha256": "c80300e449e03b140c9ef0a3a8bb7a299e1804b26bf026a510eb1fbd72cea356",
+ "instrument_sha256": "9938d74b29218d98ad21ef80c90e8af98ffecb41393ac50619f56ded9a48eedc",
  "certifies": "mlp_capture.Capture(...).dose_grad() END TO END: mode \"new\" in this script calls the shipped module, not an inline copy, so a regression inside grad_sum/dose_grad fails this gate",
  "negative_control": "mode \"old\" keeps the legacy detach capture inline on purpose",
  "summary_min_over_eps": [

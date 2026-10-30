@@ -37,7 +37,7 @@ import torch.nn.functional as F
 
 sys.path.insert(0, '/root/autodl-tmp/scripts/j2space')
 import engine as E
-from mlp_capture import Capture as _Capture
+from mlp_capture import Capture as _Capture, column_norms_dev
 
 
 def slot_ids(tok, s):
@@ -63,7 +63,7 @@ def main():
     tok, model, lm = E.load_model(a.model, dev)
     layers = list(range(32))
     p50 = E.estimate_p50(tok, model, lm, layers, dev)
-    norms = E.column_norms(lm, layers)
+    norms = column_norms_dev(lm, layers, dev)
     for q in model.parameters():
         q.requires_grad_(False)
     pad = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id

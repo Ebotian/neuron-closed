@@ -310,3 +310,136 @@ def bootstrap_kappa(S, weights, n_boot: int = 200, seed: int = 0):
     b = bootstrap_stats(S, weights, n_boot, seed)
     return {'kappa_lo': b['kappa_interval'][0], 'kappa_hi': b['kappa_interval'][1],
             'n_valid': int(b['frac_boot_g_sq_positive'] * n_boot)}
+
+
+# -----------------------------------------------------------------------------------------------------------
+# TENSORISED PATH (2026-10-30, second pass). Every ANOVA statistic is a quadratic form in indicator vectors, so
+# ALL of them are functions of ONE Gram matrix G = M M^T (n x n, n = total rollouts) and small matmuls. This
+# replaces the per-context vector loops entirely: one (n x d)(d x n) matmul on the GPU instead of O(n^2 d) work
+# on the CPU, and the intervals come from the F distribution in closed form instead of a bootstrap.
+#
+#   SSw = sum_c [ sum_{i in c} ||xi_i||^2 - ||sum_{i in c} xi_i||^2 / K_c ]
+#   SSb = sum_c K_c ||xi_bar_c - xi_bar||^2
+#   MSw = SSw/(n - C), MSb = SSb/(C - 1), tr(Sigma) = MSw, ||g||^2 = (MSb - MSw)/K
+#   ICC = (MSb - MSw)/(MSb + (K-1)*MSw),  bounded in [-1/(K-1), 1]  (proved in lean/Reliability.lean)
+# The within-context term only uses differences of rollouts, which is why a batch-level bias cancels (R1).
+# -----------------------------------------------------------------------------------------------------------
+def gram_from_scores(S, weights):
+    """G_ij = w_i w_j <x_i, x_j> over ALL rollouts (rows concatenated across contexts). One matmul on the GPU."""
+    rows = []
+    for c, Sc in enumerate(S):
+        w = torch.tensor(list(weights[c]), dtype=Sc.dtype, device=Sc.device).unsqueeze(1)
+        rows.append(Sc * w)
+    M = torch.cat(rows, 0)                       # (n, d)
+    return M @ M.T                               # (n, n)
+
+
+def icc_from_gram(G, group_sizes, k=None, alpha=0.05):
+    """Intraclass correlation and its F-based interval, from the Gram matrix alone. Pure linear algebra."""
+    import math
+    from statistics import NormalDist
+    G = G.double()
+    n = int(sum(group_sizes))
+    C = len(group_sizes)
+    if k is None:
+        k = min(group_sizes)
+    # SSw: within-context scatter, from diagonal and block sums
+    ss_w = 0.0
+    offs = 0
+    for kc in group_sizes:
+        blk = G[offs:offs + kc, offs:offs + kc]
+        ss_w += float(torch.diagonal(blk).sum()) - float(blk.sum()) / kc
+        offs += kc
+    ones = torch.ones(n, dtype=torch.float64, device=G.device)
+    tot = float(ones @ G @ ones)                 # ||sum_i xi_i||^2
+    ss_t = float(torch.diagonal(G).sum()) - tot / n
+    ss_b = ss_t - ss_w
+    df_w = n - C
+    df_b = C - 1
+    ms_w = ss_w / df_w
+    ms_b = ss_b / df_b
+    tr_sigma = ms_w
+    g_sq = (ms_b - ms_w) / k
+    denom = ms_b + (k - 1) * ms_w
+    icc = (ms_b - ms_w) / denom if denom != 0 else None
+    out = {'n': n, 'C': C, 'k': k, 'SS_w': ss_w, 'SS_b': ss_b,
+           'tr_sigma': tr_sigma, 'g_sq': g_sq, 'icc': icc,
+           'lambda_ratio': (tr_sigma / g_sq) if g_sq > 0 else None}
+    if ms_w > 0 and df_b > 0:
+        F = ms_b / ms_w
+        loF = F / float(_f_quantile(1 - alpha / 2, df_b, df_w))
+        hiF = F * float(_f_quantile(1 - alpha / 2, df_w, df_b))
+        def icc_of(Fv):
+            return (Fv - 1) / (Fv + k - 1)
+        out['F'] = F
+        out['icc_interval'] = [icc_of(loF), icc_of(hiF)]
+        out['tr_sigma_interval'] = [ms_w * loF / F, ms_w * hiF / F]
+    else:
+        out['F'] = None
+        out['icc_interval'] = None
+        out['tr_sigma_interval'] = None
+    out['unit'] = ('context is the independent unit; a different rollout seed gives independent rollouts inside the '
+                   'same contexts and does not settle context-level reproducibility')
+    out['note'] = ('ICC can be negative (signal not resolved); that is a result, not an error, and the Lean bound '
+                   'is -1/(k-1) <= ICC <= 1')
+    return out
+
+
+def _f_quantile(p, d1, d2, iters=200):
+    """Quantile of the F distribution by bisection on the regularised incomplete beta (stdlib only)."""
+    import math
+    def betacf(a, b, x):
+        MAXIT, EPS, FPMIN = 200, 3e-16, 1e-300
+        qab, qap, qam = a + b, a + 1.0, a - 1.0
+        c = 1.0
+        d = 1.0 - qab * x / qap
+        if abs(d) < FPMIN:
+            d = FPMIN
+        d = 1.0 / d
+        h = d
+        for m in range(1, MAXIT + 1):
+            m2 = 2 * m
+            aa = m * (b - m) * x / ((qam + m2) * (a + m2))
+            d = 1.0 + aa * d
+            if abs(d) < FPMIN:
+                d = FPMIN
+            c = 1.0 + aa / c
+            if abs(c) < FPMIN:
+                c = FPMIN
+            d = 1.0 / d
+            h *= d * c
+            aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2))
+            d = 1.0 + aa * d
+            if abs(d) < FPMIN:
+                d = FPMIN
+            c = 1.0 + aa / c
+            if abs(c) < FPMIN:
+                c = FPMIN
+            d = 1.0 / d
+            de = d * c
+            h *= de
+            if abs(de - 1.0) < EPS:
+                break
+        return h
+    def betai(a, b, x):
+        if x <= 0:
+            return 0.0
+        if x >= 1:
+            return 1.0
+        lbeta = math.lgamma(a) + math.lgamma(b) - math.lgamma(a + b)
+        front = math.exp(math.log(x) * a + math.log(1 - x) * b - lbeta) / a
+        if x < (a + 1) / (a + b + 2):
+            return front * betacf(a, b, x)
+        return 1.0 - math.exp(math.log(1 - x) * b + math.log(x) * a - lbeta) / b * betacf(b, a, 1 - x)
+    def cdf(f):
+        if f <= 0:
+            return 0.0
+        return betai(d1 / 2.0, d2 / 2.0, d1 * f / (d1 * f + d2))
+    lo, hi = 1e-9, 1e9
+    for _ in range(iters):
+        mid = 0.5 * (lo + hi)
+        if cdf(mid) < p:
+            lo = mid
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)

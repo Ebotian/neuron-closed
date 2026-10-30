@@ -77,7 +77,7 @@ def p_toxic(gauges, texts, dev, batch=8):
     return res
 
 
-from mlp_capture import Capture  # noqa: E402  (single corrected implementation; see its docstring)
+from mlp_capture import Capture, column_norms_dev  # noqa: E402  (single corrected implementation; see its docstring)
 
 def score_batch(model, ids, lens, weights, n_prompt, mean_over_suffix=False):
     """Weighted sum over samples of sum_t log p(t) over CONTINUATION positions only.
@@ -140,7 +140,7 @@ def main():
     tok, model, lm = E.load_model(a.model, dev)
     layers = list(range(32))
     p50 = E.estimate_p50(tok, model, lm, layers, dev)
-    norms = E.column_norms(lm, layers)
+    norms = column_norms_dev(lm, layers, dev)
     for q in model.parameters():
         q.requires_grad_(False)
     gauges = load_gauges(a.gauges, dev)
