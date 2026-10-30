@@ -1532,7 +1532,7 @@
       "kappa_implied_by_measured_r32": 217.5766423357664,
       "curve_inside_bootstrap_interval": true,
       "verdict": "kappa is of order 10^2 rollouts per context for r=0.5: median per-context 125.4, curve-implied 217.6, pooled 2238.5 (inflated by between-context scale variation, not the like-for-like quantity). Only 5 of 8 contexts have g_sq>0 at n=256.",
-      "caveats": "single seed; per-context sum||xi||^2 spans 2.62e+08..5.1e+08 (from results/noise_scale_v2_raw.json) so the pooled trace is dominated by a few contexts",
+      "caveats": "single seed; per-context sum||xi||^2 spans 261981393.55..509732278.86 (exact values from results/noise_scale_v2_raw.json) so the pooled trace is dominated by a few contexts",
       "artifacts": [
         "results/noise_scale_v2.json"
       ],
