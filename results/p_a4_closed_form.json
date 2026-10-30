@@ -1,0 +1,57 @@
+{
+ "status": "MEASURED \u2014 the two d* are different directions and the incumbent wins on ITS OWN readout by 2.2x; the comparison cannot adjudicate without a behaviour arm",
+ "criterion": "P-A'' / plan 2.43. Frozen: SELF (M u = d residual; budget==b), A cos_M, B list overlap, C realised readout at b=0.05/0.1. No behavioural verdict here.",
+ "design": {
+  "model": "Qwen3.5-4B bf16",
+  "support": "FULL 32 layers x 9216 = 294,912 coordinates",
+  "closed_form": "x_l = M_l^+ d*_l ; q = sum_l d*_l' x_l ; u = b x / sqrt(q); M_l = Gram of unit W_down columns",
+  "d_star_j2": "teacher-forced J2 gradient on the fixed prompt prefix (incumbent, plan 2.40/2.42)",
+  "d_star_pw": "pathwise term E_y[grad_u phi_path(y)], phi_path = path J2 in nats (plan 2.42)"
+ },
+ "C0_gram": {
+  "rank_per_layer": 2560,
+  "n_coordinates": 9216,
+  "fact": "M_l = Wn' Wn with Wn 2560x9216 has rank 2560 < 9216, so the FULL Gram is SINGULAR: Cholesky fails at leading minor 2559. Only 32-coordinate principal blocks are PD, which is why every committed result lives on a small support.",
+  "consequence": "the physical budget does not charge 6656 directions per layer; the number of distinguishable injection directions per layer is 2560, not 9216. The min-norm (M^+) solution is the parameter-free choice.",
+  "budget2_check": 0.998821366
+ },
+ "SELF": {
+  "residual_Mu_minus_d_over_d": {
+   "j2": 3.03e-06,
+   "pw": 9.82e-05
+  },
+  "note": "budget tolerance relaxed to 1e-2: u carries components along singular values down to 1e-6*max, so the quadratic form inherits ~1e-3 fp32 error"
+ },
+ "A": {
+  "cos_M": 0.4306,
+  "coord_cos": 0.4733,
+  "consistency": "this reproduces the gradient-level cos 0.4187 of plan 2.42 after the metric - the two independent measurements of 'what swapping d* does' agree"
+ },
+ "B": {
+  "jaccard_top64": 0.2549,
+  "shared_top64": 26,
+  "jaccard_top256": 0.222,
+  "shared_top256": 93,
+  "jaccard_top1024": 0.163,
+  "shared_top1024": 287
+ },
+ "C": {
+  "base_J2": -0.7746,
+  "j2@0.05": {
+   "dJ2": 1.74432
+  },
+  "pw@0.05": {
+   "dJ2": 0.77574
+  },
+  "ratio@0.05": 2.25,
+  "j2@0.10": {
+   "dJ2": 3.20288
+  },
+  "pw@0.10": {
+   "dJ2": 1.46685
+  },
+  "ratio@0.10": 2.18
+ },
+ "verdict": "Swapping d* rotates the budget-optimal direction by cos_M 0.4306 and replaces 38 of the top-64 positions (Jaccard 0.255). On the teacher-forced readout the incumbent wins by 2.25x at b=0.05 and 2.18x at b=0.10 - which is EXPECTED, since d*_j2 is by construction the gradient of exactly that readout under exactly that metric. So this experiment CANNOT adjudicate which d* is right: each is optimal for its own functional. The only adjudicator is behaviour, and the gradient route to it is closed (plan 2.42, r(32)=0.022).",
+ "what_follows": "The behaviour arm must be measured directly and paired (u_j2 vs u_pw at fixed b), not inferred from gradients. That is the C2 gate, and it is the only remaining knob-free question."
+}
