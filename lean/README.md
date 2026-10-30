@@ -26,12 +26,24 @@ leanm lean/Gauge.lean        # 编译 + 打印 #print axioms
 第三条比数值陈述更强：它**不**要求 `u` 是最小范数解，也不需要 Moore–Penrose（mathlib 里没有）；
 只要 `W` 满射、`M u = W† y`，结论就成立。满射在本问题里就是 `2560 ≤ 9216` 且行满秩。
 
+## `Decomposition.lean` 里的三条（计划 2.42）
+
+在**有限结果集** `Y` 上陈述（于是全部是普通有限和 + `Real.log`，不需要测度论）：
+
+| 定理 | 陈述 | 意义 |
+|---|---|---|
+| `expectation_deriv_decomp` | `d/du Σ_y p φ = Σ_y p ∂_u φ + Σ_y p φ ∂_u log p` | 期望的导数 = **pathwise 项的期望 + score 项**；2.42 只测了后者 |
+| `sum_p_score_eq_zero` | `Σ_y p ∂_u log p = 0`（只要 `Σ_y p ≡ 1`） | 平均 score 恒为零 |
+| `baseline_free` | `Σ_y p (φ−b) ∂_u log p = Σ_y p φ ∂_u log p`，对任意 `b` | **baseline 在期望里完全抵消**——它只影响方差（有限样本下才起作用） |
+
+`baseline_free` 正是我们实测里当作理所当然的那件事：`b` 的选取不改变目标，只改变估计量的方差。
+
 ## 审计（2026-10-30）
 
 - toolchain `leanprover/lean4:v4.33.0-rc1`；mathlib rev `79d0395a1825a6264ad5d269e35e60537518955e`
-- 三条全部 `propext, Classical.choice, Quot.sound`（无 `sorryAx`、无自定义 axiom）
+- 两个文件、共六条，全部 `propext, Classical.choice, Quot.sound`（无 `sorryAx`、无自定义 axiom）
 - 独立判定 `PROVED`（`opl-leancheck`，无 `--evidence-out`）
-- 数值见 `results/lean_audit.json`
+- 数值与 sha256 见 `results/lean_audit.json`
 
 ## 边界
 

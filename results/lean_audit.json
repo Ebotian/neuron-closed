@@ -1,27 +1,53 @@
 {
- "file": "lean/Gauge.lean",
- "sha256": "e44b1e78673f15bb17f93883ff9ab689b887a2cc267b8f872768ba81e46870a4",
  "toolchain": "leanprover/lean4:v4.33.0-rc1",
  "mathlib_rev": "79d0395a1825a6264ad5d269e35e60537518955e",
  "mathlib_inputRev": "v4.33.0-rc1",
- "decls": {
-  "NeuronClosed.ker_gram": [
-   "propext",
-   "Classical.choice",
-   "Quot.sound"
-  ],
-  "NeuronClosed.gauge_invariance": [
-   "propext",
-   "Classical.choice",
-   "Quot.sound"
-  ],
-  "NeuronClosed.lift_maps_back": [
-   "propext",
-   "Classical.choice",
-   "Quot.sound"
-  ]
- },
- "verdict": "PROVED (opl-leancheck, no --evidence-out, no signing key)",
+ "verdict": "PROVED for all six declarations (opl-leancheck without --evidence-out; no signing key involved)",
  "already_in_mathlib": "ContinuousLinearMap.ker_adjoint_comp_self states (T\u2020 \u2218L T).ker = T.ker, i.e. ker_gram is textbook; the load-bearing statement is lift_maps_back",
- "boundary": "formalises the algebra (kernel is a gauge; a solution's residual image is exactly y). It does NOT formalise the model, the construct, or trait fidelity."
+ "boundary": "formalises the algebra (kernel is a gauge; a solution's residual image is exactly y). It does NOT formalise the model, the construct, or trait fidelity.",
+ "files": {
+  "lean/Gauge.lean": {
+   "sha256": "e44b1e78673f15bb17f93883ff9ab689b887a2cc267b8f872768ba81e46870a4",
+   "decls": {
+    "NeuronClosed.ker_gram": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.gauge_invariance": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.lift_maps_back": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ]
+   },
+   "role": "plan 2.44: the singular metric is a gauge; a solution's residual image is exactly y"
+  },
+  "lean/Decomposition.lean": {
+   "sha256": "369354c332666db70435d77391d36bc98c1dd0d6065fc8e4c695c25d0284e2c0",
+   "decls": {
+    "NeuronClosed.expectation_deriv_decomp": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.sum_p_score_eq_zero": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.baseline_free": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ]
+   },
+   "role": "plan 2.42: the pathwise + score decomposition, and that a baseline is free in expectation"
+  }
+ },
+ "scope": "Gauge.lean = plan 2.44's algebra. Decomposition.lean = plan 2.42's identity, stated on a FINITE outcome set (ordinary finite sums + Real.log, no measure theory): d/du sum_y p phi = sum_y p dphi + sum_y p phi dlog p; the mean score vanishes; and the baseline drops out of the expectation exactly. What is NOT formalised: that phi is the right construct, any statement about the model, and any finite-sample property of the estimator (the baseline matters there, which is the point)."
 }

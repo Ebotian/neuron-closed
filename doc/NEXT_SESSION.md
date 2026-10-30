@@ -245,3 +245,8 @@ v*_l = b · ∇Φ_l / ‖∇Φ‖          ← 一行，没有 Gram、没有 Cho
 (a) `ker(W†W)=ker(W)` **mathlib 已有**（`ContinuousLinearMap.ker_adjoint_comp_self`）⇒ 2.44 的"核"那一半是教科书结论；
 (b) 真正承重的 `lift_maps_back`（`W` 满射 + `M u = W† y` ⇒ `W u = y`）**不需要**最小范数、也不需要伪逆
 （mathlib 没有 Moore–Penrose），它就是 `cos(W·u_M, ∇Φ)=1.0000` 的代数内容。
+
+**第二个文件 `lean/Decomposition.lean`（计划 2.42 的分解）**：在**有限结果集**上形式化，六条合计全部 `PROVED`：
+`expectation_deriv_decomp`（`d/du Σ p φ = Σ p ∂φ + Σ p φ ∂log p`）、`sum_p_score_eq_zero`（平均 score 为零）、
+`baseline_free`（**baseline 在期望里完全抵消**，对任意 `b`——它只影响方差，这解释了为什么"减 baseline"不是调参）。
+范围写死在文件头：不形式化"φ 是不是对的构念"，不形式化任何关于模型的断言，也不形式化估计量的有限样本方差。
