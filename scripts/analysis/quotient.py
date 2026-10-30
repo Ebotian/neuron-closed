@@ -56,20 +56,24 @@ def randomised_like(items, Wn, rng, mode='within_layer'):
                 out.append((l, n, d))
         return out
     if mode == 'across_layers':
-        shuffled = list(pairs)
-        rng.shuffle(shuffled)
+        # The audit was right about the first version: shuffling the (layer, dose) pairs only reorders the traversal, because
+        # the layer travels WITH its dose, so nothing about the layer allocation changed. This version keeps each layer's
+        # COUNT and randomises which dose lands in which layer - that is what "test the layer allocation" has to mean.
+        counts = {}
+        for l, _ in pairs:
+            counts[l] = counts.get(l, 0) + 1
+        doses = [d for _, d in pairs]
+        rng.shuffle(doses)
         out = []
-        used = {}
-        for l, d in shuffled:
+        i = 0
+        for l, cnt in counts.items():
             width = Wn[l].shape[1]
-            taken = used.setdefault(l, set())
-            if len(taken) >= width:
-                continue
-            n = rng.choice(range(width))
-            while n in taken:
-                n = rng.choice(range(width))
-            taken.add(n)
-            out.append((l, n, d))
+            neurons = rng.sample(range(width), min(cnt, width))
+            for n in neurons:
+                out.append((l, n, doses[i]))
+                i += 1
+        while i < len(doses):          # a layer narrower than its count cannot host them; drop rather than duplicate
+            i += 1
         return out
     raise ValueError(f'unknown null mode {mode}')
 

@@ -9,6 +9,7 @@ import torch
 
 from analysis.split_half import split_half_curve
 from analysis.icc import icc_from_gram_py, cross_replicate
+from core.weights import loo_weights
 
 
 def _flat(d, layers):
@@ -62,7 +63,7 @@ def summarize(layers, g_path, g_teach, g_path_in, S_all, W_all, rollouts, seed, 
         # INDEPENDENT-REPLICATE SIGNAL: split each context's rollouts into disjoint halves and form each half's estimate
         # with its OWN leave-one-out baseline inside the half. E[<gA,gB>] = ||g||^2 and 0.5 E||gA-gB||^2 = tr Cov(ghat),
         # which is the only route to a signal-to-noise on a common scale; `between_var` cannot supply it.
-        halves = _half_estimates(S_all, W_all, layers, dims=Gt.shape[1], device=Gt.device, rollouts=rollouts)
+        halves = _half_estimates(S_all, W_all, phi_all, Gt.shape[1], Gt.device, rollouts, len(S_all))
         if halves is not None:
             rec['SNR_split'] = cross_replicate(halves[0], halves[1])
     return rec
@@ -97,19 +98,28 @@ def save_gradients(path, rec, g_teach, g_pw, g_path, layers, manifest):
     return {'path': str(path), 'manifest': manifest}
 
 
-def _half_estimates(S_all, W_all, layers, dims, device, rollouts):
-    """Rebuild the score-term estimate from two DISJOINT halves of each context's rollouts.
+def _half_estimates(S_all, W_all, phi_all, dims, device, rollouts, n_ctx):
+    """Two INDEPENDENT estimates of the score term: disjoint rollouts, each half re-baselined inside itself.
 
-    The weights are recomputed inside each half (leave-one-out over that half's rollouts only), because a split taken
-    after the full-group weights exist is not two independent estimators - the audit's point about split-half.
+    THE FIRST VERSION WAS WRONG in the exact way the audit named: the docstring said the baseline was recomputed per half
+    while the code only sliced the full-group weights, so each half's weights depended on the OTHER half's rewards and the
+    two estimates were not independent - which breaks the identity E[<a,b>] = ||g||^2 that the SNR relies on. The full-group
+    weights are also normalised by K*C, so a sliced half is a fraction of an estimate rather than an estimate.
+
+    Now each context's rewards are split in two and each half gets `loo_weights(phi_half, C)`: leave-one-out inside the
+    half, normalised by m*C, which is an unbiased estimate of the same g from that half alone.
     """
     if rollouts < 4 or not S_all:
         return None
     tot = [torch.zeros(dims, dtype=torch.float64, device=device) for _ in range(2)]
-    for S, W in zip(S_all, W_all):
-        half = S.shape[0] // 2
+    off = 0
+    for S in S_all:
+        K = S.shape[0]
+        half = K // 2
+        phi = phi_all[off:off + K]
+        off += K
         for h in (0, 1):
-            blk = S[h * half:(h + 1) * half].double()
-            w = torch.tensor(W[h * half:(h + 1) * half], dtype=torch.float64, device=device).unsqueeze(1)
-            tot[h] += (w * blk).sum(0)
+            lo, hi = (0, half) if h == 0 else (half, 2 * half)
+            w = torch.tensor(loo_weights(phi[lo:hi], n_ctx), dtype=torch.float64, device=device).unsqueeze(1)
+            tot[h] += (w * S[lo:hi].double()).sum(0)
     return tot[0].flatten(), tot[1].flatten()

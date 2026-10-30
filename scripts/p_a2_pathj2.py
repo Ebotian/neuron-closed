@@ -43,8 +43,8 @@ def main():
     layers = list(range(32))
     C = f'/root/autodl-tmp/runs/cache_'        # keyed by the frozen weights, not by the run
     tag = Path(a.model).name
-    p50 = p50_cached(tok, model, lm, layers, dev, f'{C}p50_{tag}.pt', model_path=a.model)
-    norms = column_norms_cached(lm, layers, dev, f'{C}cn_{tag}.pt', model_path=a.model)
+    p50 = p50_cached(tok, model, lm, layers, dev, f'{C}p50_{tag}.pt', model_path=a.model, dtype=str(next(model.parameters()).dtype).replace('torch.',''))
+    norms = column_norms_cached(lm, layers, dev, f'{C}cn_{tag}.pt', model_path=a.model, dtype=str(next(model.parameters()).dtype).replace('torch.',''))
     SC = dose_scale(p50, norms, layers)
     for q in model.parameters():
         q.requires_grad_(False)

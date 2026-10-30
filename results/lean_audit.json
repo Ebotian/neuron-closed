@@ -185,7 +185,8 @@
  "decl_counts": {
   "files": 9,
   "declarations": 26,
-  "proved": 26,
+  "checks": 27,
+  "proved": 27,
   "failed": 0
  },
  "verdict": "PROVED for every declaration listed",

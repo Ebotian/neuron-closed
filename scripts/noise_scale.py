@@ -61,10 +61,14 @@ def main():
     rec.update(summarize(layers, None, None, None, S_all, W_all, a.rollouts, a.seed, phi_all))
     rec.pop('gram', None); rec.pop('group_sizes', None)
     icc = rec['ICC']
-    rec['K_for_r_half_via_2kappa'] = None if icc['g_sq'] <= 0 else 2 * (icc['tr_sigma'] / icc['g_sq'])
-    print('trSigma=%.4f %s  g_sq=%.5f  ICC=%.6f %s  K(r=0.5)=2*kappa=%s' % (
-        icc['tr_sigma'], icc['tr_sigma_interval'], icc['g_sq'], icc['icc'],
-        icc['icc_interval'], rec['K_for_r_half_via_2kappa']), flush=True)
+    # WITHDRAWN 2026-10-30 (plan 294/296): this script used to derive "rollouts needed for r=0.5" as 2*tr_sigma/between_var.
+    # between_var is the variance BETWEEN context means and is invariant to a common shift, so it cannot set the sample size
+    # needed to resolve the MEAN gradient: shifting every observation by v leaves the ratio unchanged while the signal changes.
+    # The sample-size claim now needs the cross-replicate identity, so nothing is emitted here until that exists.
+    print('trSigma=%.4f %s  between_var=%.5f  ICC=%.6f %s  (no sample-size inference: withdrawn, see plan 296)' % (
+        icc['tr_sigma'], icc['tr_sigma_interval'], icc['between_var'], icc['icc'],
+        icc['icc_interval']), flush=True)
+    rec['sample_size_inference'] = 'withdrawn: between_var is shift-invariant and cannot set the sample size for the mean'
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     json.dump(rec, open(a.out, 'w'))
     return 0

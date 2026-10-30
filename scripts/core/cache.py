@@ -25,7 +25,7 @@ CACHE_VERSION = 2
 IDENTITY_FILES = ('config.json', 'tokenizer_config.json', 'tokenizer.json', 'generation_config.json', 'vocab.json')
 
 
-def _fingerprint(model_path, layers, extra=None):
+def _fingerprint(model_path, layers, extra=None, dtype=None):
     """Identity of everything a cached value depends on.
 
     The audit's objection was exact: the key was the layer list and the filename was the model directory's basename, so
@@ -52,7 +52,9 @@ def _fingerprint(model_path, layers, extra=None):
     for w in weights:
         h.update(f'{w.name}:{w.stat().st_size}|'.encode())
     h.update(f'ref:{hashlib.sha256(E.REFERENCE_TEXT.encode()).hexdigest()}|'.encode())
-    h.update(f'dtype:bf16|extra:{json.dumps(extra, sort_keys=True) if extra else "-"}|'.encode())
+    # the dtype must be OBSERVED, not assumed: `--fp32` exists, and a hardcoded 'bf16' would let a float32 run reuse a
+    # bfloat16 cache. Unknown dtype is recorded as 'unknown', which still separates it from any known one.
+    h.update(f'dtype:{dtype or "unknown"}|extra:{json.dumps(extra, sort_keys=True) if extra else "-"}|'.encode())
     return h.hexdigest()
 
 
@@ -80,11 +82,11 @@ def load_or_compute(path, compute, key, layers, strict=False):
     return vals
 
 
-def p50_cached(tok, model, lm, layers, dev, path=None, strict=False, model_path=None):
-    key = _fingerprint(model_path or '', layers, {'quantity': 'p50'})
+def p50_cached(tok, model, lm, layers, dev, path=None, strict=False, model_path=None, dtype=None):
+    key = _fingerprint(model_path or '', layers, {'quantity': 'p50'}, dtype)
     return load_or_compute(path, lambda: E.estimate_p50(tok, model, lm, layers, dev), key, layers, strict)
 
 
-def column_norms_cached(lm, layers, dev, path=None, strict=False, model_path=None):
-    key = _fingerprint(model_path or '', layers, {'quantity': 'column_norms'})
+def column_norms_cached(lm, layers, dev, path=None, strict=False, model_path=None, dtype=None):
+    key = _fingerprint(model_path or '', layers, {'quantity': 'column_norms'}, dtype)
     return load_or_compute(path, lambda: column_norms_dev(lm, layers, dev), key, layers, strict)

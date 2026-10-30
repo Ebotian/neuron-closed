@@ -74,8 +74,8 @@ def main():
     tok, model, lm = load_model_fast(a.model, dev)
     layers = list(range(32))
     C, tag = '/root/autodl-tmp/runs/cache_', Path(a.model).name   # same cache p_a2 uses, so the two are comparable
-    p50 = p50_cached(tok, model, lm, layers, dev, f'{C}p50_{tag}.pt', model_path=a.model)
-    norms = column_norms_cached(lm, layers, dev, f'{C}cn_{tag}.pt', model_path=a.model)
+    p50 = p50_cached(tok, model, lm, layers, dev, f'{C}p50_{tag}.pt', model_path=a.model, dtype=str(next(model.parameters()).dtype).replace('torch.',''))
+    norms = column_norms_cached(lm, layers, dev, f'{C}cn_{tag}.pt', model_path=a.model, dtype=str(next(model.parameters()).dtype).replace('torch.',''))
     SC = dose_scale(p50, norms, layers)
     pad = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
     print(f'SETUP_S {time.time() - t0:.1f}', flush=True)

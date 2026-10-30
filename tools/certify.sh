@@ -17,6 +17,8 @@ SCP=(scp -o BatchMode=yes -o ConnectTimeout=15 -q -P "$PORT")
 
 die() { echo "CERTIFY FAILED: $*" >&2; exit 1; }
 
+STEP="${1:-all}"   # `certify.sh lean` skips the GPU half so the Lean parser can be tested in isolation
+if [ "$STEP" != "lean" ]; then
 echo "== fd_gate on $HOST =="
 "${SCP[@]}" "$ROOT/scripts/mlp_capture.py" "$ROOT/scripts/fd_gate.py" "$ROOT/scripts/verify_units.py" \
     "$ROOT/scripts/legacy_capture.py" "$HOST:/root/autodl-tmp/scripts/j2space/" \
@@ -41,6 +43,8 @@ if g.get('instrument_sha256') != h:
 print(f'  record pins instrument {h[:12]} and passes')
 PY
 
+fi
+
 echo "== Lean audit =="
 python3 - "$ROOT" "$PLUGIN" <<'PY' || exit 1
 """Audit every declaration and DERIVE the verdict. Non-zero exit if anything is not proved.
@@ -55,34 +59,48 @@ root, plugin = Path(sys.argv[1]), Path(sys.argv[2])
 lean = root / 'lean'
 ALLOWED = {'propext', 'Classical.choice', 'Quot.sound'}
 files = sorted(lean.glob('*.lean'))
+checks = 0                                     # declarations CHECKED (a file may print one twice)
 out = {'files': {}, 'checked_at': None, 'allowed_axioms': sorted(ALLOWED)}
 failures = []
 for f in files:
     decls = [l.split()[2] for l in f.read_text().splitlines() if l.startswith('#print axioms ')]
     entry = {'sha256': hashlib.sha256(f.read_bytes()).hexdigest(), 'decls': {}}
     for d in decls:
+        checks += 1
         r = subprocess.run([str(plugin / 'bin/opl-leancheck'), '--file', str(f), '--decl', d],
                            capture_output=True, text=True)
         ok = r.returncode == 0 and 'PROVED' in r.stdout
-        ax = sorted(set(re.findall(r'\b(propext|Classical\.choice|Quot\.sound|sorryAx)\b', r.stdout)))
-        if not ok:
+        # PARSE THE ACTUAL AXIOM LIST. The previous version matched only the four names it already knew, so an unknown
+        # axiom never entered the set; worse, an EMPTY match was filled in with the three allowed names, which let an
+        # injected axiom ('PROVED / axioms: [injected]') through as green. The tool reports `... ->['a', 'b']`, so take
+        # everything inside that bracket verbatim, and treat "cannot parse" as a failure rather than as a pass.
+        m = re.search(r'(?:->|→)\s*\[([^\]]*)\]', r.stdout)   # the tool prints a Unicode arrow
+        if not m:
             entry['decls'][d], status = ['FAILED'], 'FAILED'
-            failures.append(f'{f.name}:{d} did not prove (rc={r.returncode})')
-        elif 'sorryAx' in ax:
-            entry['decls'][d], status = ['FAILED'], 'FAILED'
-            failures.append(f'{f.name}:{d} proved but uses sorryAx - a hole, not a proof')
-        elif set(ax) - ALLOWED:
-            entry['decls'][d], status = sorted(ax), 'FAILED'
-            failures.append(f'{f.name}:{d} uses non-standard axioms {sorted(set(ax) - ALLOWED)}')
+            failures.append(f'{f.name}:{d} produced no parsable axiom list; refusing to infer one')
         else:
-            entry['decls'][d], status = (sorted(ax) if ax else sorted(ALLOWED)), 'PROVED'
+            ax = sorted({x.strip().strip("'\"") for x in m.group(1).split(',') if x.strip()})
+            if not ok:
+                entry['decls'][d], status = ['FAILED'], 'FAILED'
+                failures.append(f'{f.name}:{d} did not prove (rc={r.returncode})')
+            elif 'sorryAx' in ax:
+                entry['decls'][d], status = ['FAILED'], 'FAILED'
+                failures.append(f'{f.name}:{d} proved but uses sorryAx - a hole, not a proof')
+            elif set(ax) - ALLOWED:
+                entry['decls'][d], status = ax, 'FAILED'
+                failures.append(f'{f.name}:{d} uses axioms outside the whitelist: {sorted(set(ax) - ALLOWED)}')
+            elif not ax:
+                entry['decls'][d], status = ['FAILED'], 'FAILED'
+                failures.append(f'{f.name}:{d} reported an EMPTY axiom list - a proof of nothing')
+            else:
+                entry['decls'][d], status = ax, 'PROVED'
         print(f'  {status}  {f.name}  {d}')
     out['files'][str(f.relative_to(root))] = entry
 n = sum(len(v['decls']) for v in out['files'].values())
-out['decl_counts'] = {'files': len(out['files']), 'declarations': n,
-                      'proved': n - len(failures), 'failed': len(failures)}
+out['decl_counts'] = {'files': len(out['files']), 'declarations': n, 'checks': checks,
+                      'proved': checks - len(failures), 'failed': len(failures)}
 out['verdict'] = ('PROVED for every declaration listed' if not failures
-                  else f'INCOMPLETE: {len(failures)} of {n} declarations not proved')
+                  else f'INCOMPLETE: {len(failures)} of {checks} declaration checks not proved')
 out['failures'] = failures
 (root / 'results/lean_audit.json').write_text(json.dumps(out, indent=1))
 print(f'  {out["verdict"]}')
