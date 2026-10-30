@@ -1,0 +1,46 @@
+{
+ "n": 256,
+ "dim": 294912,
+ "baseline_b": -0.81036979239434,
+ "norm_xibar_sq": 0.23001620374813592,
+ "tr_sigma": 39.276544870362166,
+ "g_sq": 0.0765922003482837,
+ "kappa_pooled": 512.8008425369944,
+ "kappa_bootstrap_interval": [
+  74.97270684485207,
+  411.79037274528145
+ ],
+ "tr_sigma_interval": [
+  24.352894753112153,
+  63.040303680140276
+ ],
+ "g_sq_interval": [
+  0.0765922003482837,
+  0.7874905440046375
+ ],
+ "frac_boot_g_sq_positive": 1.0,
+ "K_for_r_half_via_2kappa": 1025.6016850739888,
+ "kappa_implied_by_measured_r32": 217.5766423357664,
+ "r32_used": 0.0685,
+ "curve_kappa_inside_bootstrap_interval": true,
+ "convention": "kappa = tr(Sigma)/||g||^2 = noise-to-signal; r(K) ~ K/(K+2*kappa)",
+ "per_ctx_sum_norm_sq": {
+  "0": 384339151.0510052,
+  "1": 399962718.6322968,
+  "2": 413333318.04719555,
+  "3": 296473571.6595426,
+  "4": 338382663.30784667,
+  "5": 378226354.9100542,
+  "6": 470331537.81772405,
+  "7": 364418922.38624805
+ },
+ "kappa_per_context": [
+  39.18996757538563,
+  61.401347541526626,
+  99.72755236218275,
+  104.56669250206345
+ ],
+ "kappa_per_context_median": 99.72755236218275,
+ "discrepancy_explained": "pooled kappa (2238) vs curve-implied kappa (217.6) is a factor ~10 and is expected: the pooled trace contains between-context variation in the per-rollout score scale, which the split-half estimator cancels by construction (it compares two halves of the SAME contexts). The median per-context kappa is reported as the like-for-like quantity.",
+ "verdict": "no \"two independent routes agree within 5%\" claim: the pooled ANOVA point estimate and the curve-implied kappa are DIFFERENT estimators of the same quantity (one pools 256 samples with a global baseline, the other uses disjoint halves per context). They are compared here only through the context-bootstrap interval, which is the honest common ground."
+}

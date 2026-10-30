@@ -10,6 +10,16 @@
   107.15218268304457,
   622.3835864962999
  ],
+ "tr_sigma_interval": [
+  25.947903565542195,
+  61.55886267426918
+ ],
+ "g_sq_interval": [
+  0.06076564474340354,
+  0.468956885965871
+ ],
+ "frac_boot_g_sq_positive": 1.0,
+ "K_for_r_half_via_2kappa": 4476.949793521352,
  "kappa_implied_by_measured_r32": 217.5766423357664,
  "r32_used": 0.0685,
  "curve_kappa_inside_bootstrap_interval": true,

@@ -89,17 +89,37 @@ def noise_scale(S, weights):
     return st
 
 
-def bootstrap_kappa(S, weights, n_boot: int = 200, seed: int = 0):
-    """Resample CONTEXTS with replacement; percentile interval for kappa (None if g_sq <= 0)."""
+def bootstrap_stats(S, weights, n_boot: int = 200, seed: int = 0):
+    """Resample CONTEXTS with replacement.
+
+    Returns percentile intervals for tr(Sigma) and ||g||^2 as well as kappa. The audit pointed out that plan
+    2.42/2.46 only ever reported an interval for kappa, so the claim "the signal is still detectable at n=256"
+    rested on a POINT estimate of ||g||^2. Both are interval quantities and both are returned here.
+    """
     rng = random.Random(seed)
-    vals = []
+    tr_v, g_v, k_v = [], [], []
     for _ in range(n_boot):
         pick = [rng.randrange(len(S)) for _ in S]
         st = _stats([S[i] for i in pick], [weights[i] for i in pick])
+        tr_v.append(st['tr_sigma'])
+        g_v.append(st['g_sq'])
         if st['g_sq'] > 0:
-            vals.append(st['tr_sigma'] / st['g_sq'])
-    if not vals:
-        return {'kappa_lo': None, 'kappa_hi': None, 'n_valid': 0}
-    vals.sort()
-    return {'kappa_lo': vals[int(0.025 * len(vals))], 'kappa_hi': vals[int(0.975 * len(vals)) - 1],
-            'n_valid': len(vals)}
+            k_v.append(st['tr_sigma'] / st['g_sq'])
+    def band(v):
+        if not v:
+            return None, None
+        v = sorted(v)
+        return v[int(0.025 * len(v))], v[int(0.975 * len(v)) - 1]
+    tr_lo, tr_hi = band(tr_v)
+    g_lo, g_hi = band(g_v)
+    k_lo, k_hi = band(k_v)
+    return {'tr_sigma_interval': [tr_lo, tr_hi], 'g_sq_interval': [g_lo, g_hi],
+            'kappa_interval': [k_lo, k_hi], 'n_boot': n_boot,
+            'frac_boot_g_sq_positive': sum(1 for x in g_v if x > 0) / len(g_v)}
+
+
+def bootstrap_kappa(S, weights, n_boot: int = 200, seed: int = 0):
+    """Backwards-compatible alias: kappa interval only."""
+    b = bootstrap_stats(S, weights, n_boot, seed)
+    return {'kappa_lo': b['kappa_interval'][0], 'kappa_hi': b['kappa_interval'][1],
+            'n_valid': int(b['frac_boot_g_sq_positive'] * n_boot)}

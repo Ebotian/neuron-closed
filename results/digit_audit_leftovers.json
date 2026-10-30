@@ -1,0 +1,24 @@
+{
+ "status": "NOT VERIFIED - pre-existing legacy decimals, recorded so they are not mistaken for verified numbers",
+ "values": [
+  0.000107,
+  0.0002,
+  0.0003,
+  0.00033,
+  1.631203e-07,
+  3.1e-07,
+  0.00036,
+  9.585372e-07
+ ],
+ "provenance": "all eight already present in doc/metadata.json at commit 1f50c279 (the commit this repair started from), verified with git show",
+ "locations": [
+  "measured/external_mlx_replication/steer_lens_scan/rate",
+  "measured/compiler_pareto_c8/result_E_tox_bert/caa_bffm",
+  "measured/lcb_rank_c8/key_numbers/K128_diff",
+  "measured/compiler_pareto_hostility12/at_b_0.05/j2",
+  "sources/g_identity_check",
+  "older current/notes prose"
+ ],
+ "why_they_are_here": "a full-document decimal sweep (every value with >=2 decimals or scientific notation, 3 significant figures, against every number in results/*.json) flags exactly these eight in metadata and therefore in the audit response that quotes them. They are outside the scope of the plan 2.40-2.46 repair (which is what this goal covers) and none of them is claimed as verified here. g_identity_check numbers live in the frozen vendor package rather than in results/.",
+ "next_step": "a separate pass would have to re-derive or retire them under the same standard; until then they must not be quoted"
+}

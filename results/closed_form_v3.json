@@ -1,4 +1,8 @@
 {
+ "SELF_residual": {
+  "j2": 2.5197274226229638e-05,
+  "pw": 1.9902501662727445e-05
+ },
  "gfile": "/root/autodl-tmp/runs/p_a2_v2.pt",
  "gfile_sha256": "5c5b6ebb2ca86a25a643e854b3a812a12ce4b19b5d1c920c668fcaba0170ae6e",
  "provenance": "d* read from the blob named above; the blob is /root/autodl-tmp/runs/p_a2_v2.pt, written by scripts/p_a2_pathj2.py on the corrected instrument (see results/reliability_242_refactor_check.json)",

@@ -1,85 +1,132 @@
 {
- "status": "MEASURED on the corrected instrument (task-6, plan 2.51); supersedes the retracted plan 2.42/2.46 numbers",
- "design": {
-  "model": "Qwen3.5-4B bf16",
-  "contexts": 8,
-  "rollouts_per_context": 32,
-  "K": 32,
-  "max_new": 24,
-  "temperature": 1.0,
-  "phi": "path J2 in nats = mean over slot tokens of [log p(slot+|x,y) - log p(slot-|x,y)] on the model's own continuation",
-  "baseline": "leave-one-out b_{-i}",
-  "normalisation": "unified (task-3); every accumulation is a mean over rollouts AND contexts"
+ "status": "MEASURED on the corrected instrument, WITH INTERVALS AND AN INDEPENDENT SAMPLE GROUP (audit round 6)",
+ "why_the_rerun": "the audit correctly noted that plan 2.42/2.46 only reported an interval for kappa, that no independent sample group was ever drawn, and that kappa was being read as the sample requirement even though r(K)=K/(K+2*kappa) makes that 2*kappa. Both seeds are now run end to end through the same script with the same parameters except the RNG seed, so they are independent GENERATED SAMPLE GROUPS (different trajectories), not two analyses of one group.",
+ "seed0": {
+  "r_K": {
+   "2": 0.006481173551491886,
+   "4": 0.009419042141753002,
+   "8": 0.017882597226514082,
+   "16": 0.03298727705421775,
+   "32": 0.0685184253328825
+  },
+  "tr_sigma": 39.726443613897914,
+  "tr_sigma_interval": [
+   25.847836917836677,
+   61.406447220308166
+  ],
+  "g_sq": 0.018912111381779784,
+  "g_sq_interval": [
+   0.060485881130198135,
+   0.47092229993082146
+  ],
+  "frac_boot_g_sq_positive": 1.0,
+  "kappa_pooled": 2100.5821514022477,
+  "kappa_interval": {
+   "tr_sigma_interval": [
+    25.847836917836677,
+    61.406447220308166
+   ],
+   "g_sq_interval": [
+    0.060485881130198135,
+    0.47092229993082146
+   ],
+   "kappa_interval": [
+    108.71158881826594,
+    610.1668663648782
+   ],
+   "n_boot": 200,
+   "frac_boot_g_sq_positive": 1.0
+  },
+  "kappa_from_curve": 217.51383109386026,
+  "cos_pw_teach": 0.6554419435251414,
+  "ratio_score_over_pw": 0.7964593200885076,
+  "cos_score_teach": -0.08026414921996258
  },
- "r_K": {
-  "2": 0.006481173551491886,
-  "4": 0.009419042141753002,
-  "8": 0.017882597226514082,
-  "16": 0.03298727705421775,
-  "32": 0.0685184253328825
+ "seed1": {
+  "r_K": {
+   "2": 0.005346419104069099,
+   "4": 0.017970167140135405,
+   "8": 0.026524211138232546,
+   "16": 0.04623297154643574,
+   "32": 0.07833809477941597
+  },
+  "tr_sigma": 39.390966413842186,
+  "tr_sigma_interval": [
+   23.951039737601413,
+   63.767852188772686
+  ],
+  "g_sq": 0.07845482362640033,
+  "g_sq_interval": [
+   0.0760337081211171,
+   0.8057937292917646
+  ],
+  "frac_boot_g_sq_positive": 1.0,
+  "kappa_pooled": 502.0846978309564,
+  "kappa_interval": {
+   "tr_sigma_interval": [
+    23.951039737601413,
+    63.767852188772686
+   ],
+   "g_sq_interval": [
+    0.0760337081211171,
+    0.8057937292917646
+   ],
+   "kappa_interval": [
+    74.2860773072023,
+    405.2151968035604
+   ],
+   "n_boot": 200,
+   "frac_boot_g_sq_positive": 1.0
+  },
+  "kappa_from_curve": 188.24290436284826,
+  "cos_pw_teach": 0.6499870319957588,
+  "ratio_score_over_pw": 0.9065342260733407,
+  "cos_score_teach": -0.1789824901861241
  },
- "kappa": {
-  "implied_by_curve": 217.51383109386026,
-  "pooled_anova": 2100.5821514022477,
-  "context_bootstrap_interval": [
-   108.71158881826594,
-   610.1668663648782
+ "noise_scale_seed0": {
+  "tr_sigma": 39.888426843248425,
+  "tr_sigma_interval": [
+   25.947903565542195,
+   61.55886267426918
+  ],
+  "g_sq": 0.017819465789395916,
+  "g_sq_interval": [
+   0.06076564474340354,
+   0.468956885965871
+  ],
+  "frac_boot_g_sq_positive": 1.0,
+  "K_for_r_half_via_2kappa": 4476.949793521352,
+  "kappa_per_context_median": 125.36804354456443,
+  "kappa_per_context": [
+   56.0027543825612,
+   103.51307397443796,
+   125.36804354456443,
+   353.4668539340407,
+   712.3775060411467
   ]
  },
- "baseline_comparison": {
-  "cos_loo_vs_insample": 0.9999999999999989,
-  "norm_ratio_loo_over_insample": 1.0322580556291738,
-  "K": 32,
-  "n_ctx": 8,
-  "predicted_bias_factor_insample": 0.96875,
-  "note": "the in-sample baseline b=mean(phi) yields E[(phi-b)s]=(1-1/K) g, so g_in underestimates g by that factor; the leave-one-out b_{-i} is unbiased"
+ "noise_scale_seed1": {
+  "tr_sigma": 39.276544870362166,
+  "tr_sigma_interval": [
+   24.352894753112153,
+   63.040303680140276
+  ],
+  "g_sq": 0.0765922003482837,
+  "g_sq_interval": [
+   0.0765922003482837,
+   0.7874905440046375
+  ],
+  "frac_boot_g_sq_positive": 1.0,
+  "K_for_r_half_via_2kappa": 1025.6016850739888
  },
- "decomposition": {
-  "cos_pathwise_teacher": 0.6554431379162895,
-  "cos_pathwise_score": 0.027751002262936943,
-  "cos_score_teacher": -0.08026414921996258,
-  "norm_pathwise": 134.11220697030828,
-  "norm_score": 106.81476297310941,
-  "ratio_score_over_pathwise": 0.7964581702600542,
-  "cos_pathwise_teacher_per_layer": {
-   "0": 0.26607129770414417,
-   "1": 0.3229957397324202,
-   "2": 0.38521492272659186,
-   "3": 0.4718587625548325,
-   "4": 0.5153931310846529,
-   "5": 0.527969787772023,
-   "6": 0.49667006565061683,
-   "7": 0.5194984618390212,
-   "8": 0.4855425443501547,
-   "9": 0.5344598445627378,
-   "10": 0.5258498393244275,
-   "11": 0.5468772557086904,
-   "12": 0.5697072677946426,
-   "13": 0.6103770070681049,
-   "14": 0.6280142519865815,
-   "15": 0.7118980540681253,
-   "16": 0.7722498904647596,
-   "17": 0.7878909579164282,
-   "18": 0.7812448330558928,
-   "19": 0.7542275153932633,
-   "20": 0.7846316718316428,
-   "21": 0.8057005057145745,
-   "22": 0.7966344036269448,
-   "23": 0.8037982835097446,
-   "24": 0.8117216182851605,
-   "25": 0.8181501924404018,
-   "26": 0.8310216561821838,
-   "27": 0.8313264035471625,
-   "28": 0.8378699529929303,
-   "29": 0.8472203926233645,
-   "30": 0.848279176928371,
-   "31": 0.9018140482652431
-  }
- },
- "verdict": "Three retracted numbers are replaced. (1) The score term is NOT 26.4x the pathwise term: it is 0.80x, i.e. the same order; the old ratio was a units artifact (last context only, double slot normalisation, 1/K vs 1/C). (2) The measure change costs cos 0.655, not 0.419, and the cost is layer-structured: 0.27 at layer 0 rising monotonically to 0.90 at layer 31, so teacher-forced gradients are a poor proxy mainly for EARLY layers. (3) The sample requirement is kappa ~ 217 rollouts per context for r=0.5 (curve-implied 217.5, inside the bootstrap interval [108.7,610.2]), not ~1500 and not the ambient dimension. The score term remains unusable at K=32 (r(32)=0.0685), which is a budget statement, not a closure of the estimator class.",
- "baseline_reading": "cos(LOO, in-sample) = 1.0000 exactly and |LOO|/|in-sample| = 1.0323 = 1/0.96875 = 1/(1-1/K): the in-sample baseline rotates the estimate not at all and biases only its magnitude, exactly by the predicted (1-1/K). The audit was right that the two baselines differ; they differ in scale only.",
- "kappa_estimator_caveat": "the pooled ANOVA point estimate (2100.6) falls OUTSIDE the context-bootstrap interval [108.7,610.2] while the curve-implied value sits inside it, so the pooled estimator is reported but not trusted (it mixes a global baseline with between-context variation). The audit section 4 objection is confirmed concretely.",
+ "what_is_stable_across_groups": "tr_sigma: 39.73 [25.85,61.41] vs 39.39 [23.95,63.77] - same value, overlapping intervals",
+ "what_is_NOT_stable": "||g||^2: 0.0189 [0.0605,0.4709] at seed 0 vs 0.0785 [0.0760,0.8058] at seed 1 - a factor 4, and the seed-0 point estimate lies BELOW its own bootstrap interval. ||g||^2 is a small difference of two larger numbers (||xibar||^2 = 0.174 minus tr(Sigma)/n = 0.155), so at 8 contexts it is not pinned down.",
+ "sample_requirement": "r=0.5 needs K = 2*kappa (not kappa). Estimates: 2*kappa = 4201 (seed 0 pooled, but see the instability above) and 1004 (seed 1); the r(K) curves imply kappa = 217.6 (seed 0) and 188.4 (seed 1), i.e. K = 435 and 377. The defensible statement is therefore ORDER 10^2-10^3 rollouts per context, not a point value, and not \"kappa rollouts\".",
+ "verdict": "the score term remains unusable at K=32 (r = 0.0685 / 0.0783), the measure change costs cos 0.655 / 0.650 with the same layer structure, and the score/pathwise ratio is 0.796 / 0.907 - i.e. the two independent groups agree on every DIRECTION quantity but disagree by a factor 4 on the SCALE quantity ||g||^2. That asymmetry is the honest result: directions are reproducible, the sample-size requirement is not, at 8 contexts.",
  "artifacts": [
-  "results/reliability_242.json"
+  "results/reliability_242.json",
+  "results/reliability_242_seed1.json",
+  "results/noise_scale_v2_raw.json",
+  "results/noise_scale_v2_seed1_raw.json"
  ]
 }

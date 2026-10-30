@@ -169,9 +169,9 @@ def main():
         W.append(wc)
         print(f'  ctx {ci} done, cumulative n={n}', flush=True)
 
-    from reliability import noise_scale as rel_noise, bootstrap_kappa
+    from reliability import noise_scale as rel_noise, bootstrap_stats
     ns = rel_noise(XI, W)
-    iv = bootstrap_kappa(XI, W)
+    iv = bootstrap_stats(XI, W)
     tr_sigma, g_sq = ns['tr_sigma'], ns['g_sq']
     kappa = ns['kappa']
     # Decompose the pooled/curve disagreement: the pooled trace mixes contexts whose per-rollout score SCALES differ,
@@ -183,11 +183,14 @@ def main():
             per_ctx_kappa.append(st['tr_sigma'] / st['g_sq'])
     per_ctx_kappa.sort()
     kappa_curve = (32 * (1 - a.r32) / (2 * a.r32)) if 0 < a.r32 < 1 else None
-    inside = (None if (kappa is None or iv['kappa_lo'] is None) else
-              bool(iv['kappa_lo'] <= kappa_curve <= iv['kappa_hi']))
+    inside = (None if (kappa_curve is None or iv['kappa_interval'][0] is None) else
+              bool(iv['kappa_interval'][0] <= kappa_curve <= iv['kappa_interval'][1]))
     out = {'n': n, 'dim': dim, 'baseline_b': b,
            'norm_xibar_sq': ns['norm_xibar_sq'], 'tr_sigma': tr_sigma, 'g_sq': g_sq,
-           'kappa_pooled': kappa, 'kappa_bootstrap_interval': [iv['kappa_lo'], iv['kappa_hi']],
+           'kappa_pooled': kappa, 'kappa_bootstrap_interval': iv['kappa_interval'],
+           'tr_sigma_interval': iv['tr_sigma_interval'], 'g_sq_interval': iv['g_sq_interval'],
+           'frac_boot_g_sq_positive': iv['frac_boot_g_sq_positive'],
+           'K_for_r_half_via_2kappa': (None if kappa is None else 2 * kappa),
            'kappa_implied_by_measured_r32': kappa_curve, 'r32_used': a.r32,
            'curve_kappa_inside_bootstrap_interval': inside,
            'convention': 'kappa = tr(Sigma)/||g||^2 = noise-to-signal; r(K) ~ K/(K+2*kappa)',

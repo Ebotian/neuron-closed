@@ -185,7 +185,11 @@ def main():
                'summary_min_over_eps': summary, 'rows': rows_out, 'verdict': verdict,
                'eps': eps_list, 'layers': want, 'topn': a.topn,
                'model': a.model, 'dtype': 'float32',
-               'criterion': 'G1 rel_err_new<0.02 for every row; G2 some legacy rel_err>0.05; G3 conjunction'},
+               'criterion': ('G1: for every COORDINATE, the minimum of rel_err_new over the tested eps values is < 0.02 '
+                             '(the per-(coordinate,eps) errors are also recorded and several exceed 0.02 at eps=1e-3, which is '
+                             'why the criterion is the min over eps and not every row); G2: some legacy coordinate shows '
+                             'min rel_err > 0.05; G3: conjunction over layers 0/13/31'),
+               'criterion_scope': 'G1 is applied per coordinate after taking the min over eps (see the criterion field)'},
               open(a.out, 'w'), indent=1)
     print('wrote', a.out, flush=True)
     return 0 if verdict['gate_passes'] else 1

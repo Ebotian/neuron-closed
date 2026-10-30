@@ -392,21 +392,25 @@ def main():
     # Reliability via scripts/reliability.py: one convention for the whole repo.
     #   split-half compares TWO DISJOINT HALVES of size K/2  =>  r(K) ~ K/(K+2*kappa)
     #   kappa = tr(Sigma)/||g||^2 with an interval from resampling CONTEXTS (the independent unit).
-    from reliability import split_half_curve, noise_scale, bootstrap_kappa
+    from reliability import split_half_curve, noise_scale, bootstrap_stats
     W_all = [w_loo_ctx[ci] for ci in range(len(ctx))]
     curve = split_half_curve([splits[ci] for ci in range(len(ctx))], W_all,
                              ks=tuple(k for k in (2, 4, 8, 16, 32) if k <= a.rollouts))
     ns = noise_scale([splits[ci] for ci in range(len(ctx))], W_all)
-    iv = bootstrap_kappa([splits[ci] for ci in range(len(ctx))], W_all)
+    iv = bootstrap_stats([splits[ci] for ci in range(len(ctx))], W_all)
     r32 = curve.get(a.rollouts, {}).get('r_mean')
     rec['R'] = {'r_of_K': curve, 'noise_scale': ns, 'kappa_interval': iv,
-                'convention': 'r(K) ~ K/(K+2*kappa); kappa != 2*kappa and is not the total sample scale',
+                'convention': 'r(K) ~ K/(K+2*kappa), so r=0.5 needs K = 2*kappa, NOT kappa. kappa is the noise-to-signal ratio.',
+                'tr_sigma_interval': iv['tr_sigma_interval'], 'g_sq_interval': iv['g_sq_interval'],
+                'frac_boot_g_sq_positive': iv['frac_boot_g_sq_positive'],
                 'r_at_Kmax': r32}
     print('R r(K)=%s' % {k: round(v['r_mean'], 4) for k, v in curve.items()}, flush=True)
-    print('R trSigma=%.4e  ||g||^2=%.4e  kappa=%s  interval=[%s, %s]' % (
-        ns['tr_sigma'], ns['g_sq'],
+    print('R trSigma=%.4e [%s, %s]  ||g||^2=%.4e [%s, %s]  kappa=%s  K(r=0.5)=2*kappa=%s' % (
+        ns['tr_sigma'], iv['tr_sigma_interval'][0], iv['tr_sigma_interval'][1],
+        ns['g_sq'], iv['g_sq_interval'][0], iv['g_sq_interval'][1],
         None if ns['kappa'] is None else round(ns['kappa'], 1),
-        iv['kappa_lo'], iv['kappa_hi']), flush=True)
+        None if ns['kappa'] is None else round(2 * ns['kappa'], 1)), flush=True)
+    print('R bootstrap: fraction of resamples with g_sq>0 = %.3f' % iv['frac_boot_g_sq_positive'], flush=True)
     if r32 is not None:
         # solve r = K/(K+2k) for k  =>  k = K(1-r)/(2r).  (The first version had it inverted: 1.2 instead of 217.)
         kappa_from_curve = (a.rollouts * (1 - r32) / (2 * r32)) if 0 < r32 < 1 else None
@@ -415,9 +419,11 @@ def main():
             'the curve-implied kappa and the pooled ANOVA kappa are different estimators (per-context halves vs one '
             'pool of 256 samples with a global baseline); report both, and treat the pooled point estimate as '
             'unreliable when it falls outside the context-bootstrap interval')
-        print('R kappa implied by r(Kmax)=%.4f is %s; pooled says %s; interval [%s, %s]' % (
+        print('R kappa implied by r(Kmax)=%.4f is %s (so K(r=0.5)=%s); pooled says %s; kappa interval [%s, %s]' % (
             r32, None if kappa_from_curve is None else round(kappa_from_curve, 1),
-            None if ns['kappa'] is None else round(ns['kappa'], 1), iv['kappa_lo'], iv['kappa_hi']), flush=True)
+            None if kappa_from_curve is None else round(2 * kappa_from_curve, 1),
+            None if ns['kappa'] is None else round(ns['kappa'], 1),
+            iv['kappa_interval'][0], iv['kappa_interval'][1]), flush=True)
 
     def flat(d):
         return torch.cat([d[l] for l in layers])

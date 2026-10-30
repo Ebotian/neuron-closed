@@ -108,6 +108,7 @@ def main():
         U[k], Qv[k], Rk[k] = solve(d)
         print(f'solve {k}: q={Qv[k]:.6e} rank_layers={Rk[k][:4]}...', flush=True)
     # SELF: the min-norm solution must actually satisfy M u = d
+    rec_res = {}
     for k in g:
         res = 0.0
         for l in layers:
@@ -117,6 +118,7 @@ def main():
             r = Wn.T @ (Wn @ ul) - g[k][l].to(dev).float() * (1.0 / math.sqrt(Qv[k]))
             res = max(res, float(r.norm() / g[k][l].to(dev).float().norm()))
             del W, Wn
+        rec_res[k] = res
         print(f'SELF residual {k}: max_l ||M u - d||/||d|| = {res:.2e}', flush=True)
 
     # SELF: budget of a unit-solution must be 1
@@ -210,7 +212,8 @@ def main():
             v = readout(U[k], b)
             res[f'{k}@{b}'] = {'J2': v, 'dJ2': v - base}
             print(f'C {k}@{b}: J2={v:+.5f} dJ2={v-base:+.5f}', flush=True)
-    out = {'gfile': a.gfile, 'gfile_sha256': gsha,
+    out = {'SELF_residual': {k: v for k, v in rec_res.items()},
+           'gfile': a.gfile, 'gfile_sha256': gsha,
            'provenance': 'd* read from the blob named above; the blob is /root/autodl-tmp/runs/p_a2_v2.pt, written by '
                          'scripts/p_a2_pathj2.py on the corrected instrument (see results/reliability_242_refactor_check.json)',
            'C0_gram': {'max_asym': sym, 'rank_per_layer': Rk['j2'][:4], 'budget2_j2': b2,
