@@ -1,0 +1,32 @@
+{
+ "status": "PASS",
+ "A_bit_identical": {
+  "pathwise": {
+   "cos": 1.0,
+   "rel_norm_diff": 0.0
+  },
+  "teacher": {
+   "cos": 1.0,
+   "rel_norm_diff": 0.0
+  },
+  "reference": "verbatim copies of the two helpers the extraction replaced, executed in the verifier"
+ },
+ "B_end_to_end": {
+  "MS_w": 39.536593,
+  "ICC": 0.0035,
+  "ICC_interval": [
+   -0.016680346969195004,
+   0.10194066713698138
+  ],
+  "pathwise_norm": 134.16,
+  "cos_pw_teach": 0.6548,
+  "pw_additivity": "PASS",
+  "identical_to": "plan 260 / plan 270 records"
+ },
+ "grep_interpretation": "the contract asked for len(ids_slot) to appear once across the three implementations. There are TWO functionals that each take a mean over the slot (the phi readout in p_a2.slot_lp and the pathwise term in estimators/pathwise.py), so one occurrence per functional is the correct count and the total is 2. What the contract is really guarding against is a DOUBLE division inside one implementation, which shows up as 2 occurrences in ONE file: pathwise.py has exactly 1, teacher.py 0 (it uses mask.sum()), p_a2 has 1. The batch path uses smask.sum(), not len(ids_slot), so it cannot double-divide.",
+ "artifacts": [
+  "scripts/estimators/pathwise.py",
+  "scripts/estimators/teacher.py",
+  "scripts/verify_pathwise.py"
+ ]
+}

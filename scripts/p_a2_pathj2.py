@@ -174,38 +174,14 @@ def main():
         print(f'SELF phi values batch={[round(float(x),4) for x in b2]} single={[round(float(x),4) for x in s2]}', flush=True)
         return 0 if ok else 1
 
-    def pathwise_term(sq, ids_slot, sgn, weight):
-        """d/du of weight * sgn * (mean over the slot's own tokens of log p(t | x, seq)).
+    from estimators.pathwise import pathwise_grad, slotted_mean_logp
+    from estimators.teacher import teacher_grad
 
-        ONE implementation: the main loop and --branch-selftest both call this, so the gate cannot certify a copy.
-        Returns per-layer dose-scaled gradients.
-        """
-        full = sq + ids_slot
-        j1 = torch.tensor([full], dtype=torch.long, device=dev)
-        with Cap() as cap:
-            model.zero_grad(set_to_none=True)
-            out = model(input_ids=j1, use_cache=False)
-            lp = F.log_softmax(out.logits[:, :-1].float(), -1)
-            pos = torch.arange(len(sq), len(full), device=dev)
-            tgt = torch.tensor(ids_slot, device=dev)
-            coef = sgn * weight * ((1.0 / len(ids_slot)) if a.inject_double_division else 1.0)
-            (lp[0, pos - 1, tgt].mean() * coef).backward()
-            raw = cap.grad_sum()
-        return {l: raw[l].to(dev) * SC[l].to(dev) for l in layers}
+    def pathwise_term(sq, ids_slot, sgn, weight):
+        return pathwise_grad(model, lm, layers, p50, norms, sq, ids_slot, sgn, weight, dev, scale=SC)
 
     def teacher_term(prompt, slot_txt, sgn, weight):
-        """d/du of weight * sgn * (MEAN over suffix tokens of log p(slot | prompt)) — the teacher-forced readout."""
-        rid, rpre, rsuf = E.candidate_ids(tok, prompt, slot_txt, dev, 384)
-        i1 = (rid.to(dev) if torch.is_tensor(rid) else torch.tensor(rid, device=dev)).view(1, -1).long()
-        with Cap() as cap:
-            model.zero_grad(set_to_none=True)
-            out = model(input_ids=i1, use_cache=False)
-            lp = F.log_softmax(out.logits[:, :-1].float(), -1).gather(-1, i1[:, 1:].unsqueeze(-1)).squeeze(-1)
-            mask = torch.zeros_like(lp)
-            mask[:, int(rpre) - 1:] = 1.0
-            ((lp * mask).sum() / mask.sum() * (sgn * weight)).backward()
-            raw = cap.grad_sum()
-        return {l: raw[l].to(dev) * SC[l].to(dev) for l in layers}
+        return teacher_grad(model, lm, tok, layers, p50, norms, prompt, slot_txt, sgn, weight, dev, scale=SC)
 
     if a.branch_selftest:
         """REAL gate for the four defects fixed in plan 2.48, replacing the vacuous one.
@@ -345,40 +321,15 @@ def main():
             g_path_in[l] += (torch.tensor(w_in, device=dev).double().unsqueeze(1) * blk).sum(0)
             off += d
         if a.pathwise:
-            # TENSORISED: all 2K (rollout, slot-sign) pairs in ONE padded batch and ONE backward. The per-sample
-            # gradients come out of the same delta leaf (grad_per_sample), so this replaces 64 single-sequence
-            # backwards per context with a single batched one.
+            from estimators.pathwise import pathwise_batch
             ip, ineg = slot_ids(tok, r['positive']), slot_ids(tok, r['negative'])
             items = []
-            for i_, sq in enumerate(seqs):
-                items.append((sq + ip, +1.0, len(ip)))
-                items.append((sq + ineg, -1.0, len(ineg)))
-            CHUNK = 8    # memory, not FLOPs, is the binding constraint at 31.5 GiB
-            Tmax = max(len(x) for x, _, _ in items)
-            for c0 in range(0, len(items), CHUNK):
-                part = items[c0:c0 + CHUNK]
-                bid = torch.full((len(part), Tmax), pad, dtype=torch.long, device=dev)
-                am = torch.zeros_like(bid)
-                smask = torch.zeros_like(bid)
-                sign_w = torch.zeros(len(part), dtype=torch.float64, device=dev)
-                for b_, (full, sgn, nslot) in enumerate(part):
-                    bid[b_, :len(full)] = torch.tensor(full, device=dev)
-                    am[b_, :len(full)] = 1
-                    smask[b_, len(full) - nslot:len(full)] = 1
-                    # `per` above is already the MEAN over the slot's tokens, so no further /nslot here
-                    sign_w[b_] = sgn / (len(seqs) * len(ctx))
-                with Cap() as cap:
-                    model.zero_grad(set_to_none=True)
-                    out = model(input_ids=bid, attention_mask=am, use_cache=False)
-                    lp = torch.log_softmax(out.logits[:, :-1].float(), -1).gather(
-                        -1, bid[:, 1:].unsqueeze(-1)).squeeze(-1)
-                    per = (lp * smask[:, 1:].float()).sum(1) / smask[:, 1:].float().sum(1).clamp(min=1)
-                    (per * sign_w).sum().backward()
-                    gps = cap._c.grad_per_sample()
-                for l in layers:
-                    g_pw[l] += (gps[l].sum(0) * SC[l].to(dev))
-                del out, lp, gps, bid, am, smask
-                torch.cuda.empty_cache()
+            for sq in seqs:
+                items.append((sq, ip, +1.0, 1.0 / (len(seqs) * len(ctx))))
+                items.append((sq, ineg, -1.0, 1.0 / (len(seqs) * len(ctx))))
+            acc = pathwise_batch(model, lm, layers, p50, norms, items, pad, dev, scale=SC, chunk=8)
+            for l in layers:
+                g_pw[l] += acc[l]
             pw_snap[ci] = {l: g_pw[l].clone() for l in layers}
         splits[ci] = S
         print(f'  [{ci}] {len(seqs)} per-rollout scores stored', flush=True)
