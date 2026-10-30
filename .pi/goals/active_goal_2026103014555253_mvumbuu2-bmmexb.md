@@ -5,13 +5,13 @@
   "status": "active",
   "autoContinue": true,
   "usage": {
-    "tokensUsed": 264903,
-    "activeSeconds": 496
+    "tokensUsed": 288949,
+    "activeSeconds": 776
   },
   "sisyphus": false,
-  "revision": 44,
+  "revision": 56,
   "createdAt": "2026-10-30T06:55:52.538Z",
-  "updatedAt": "2026-10-30T07:04:27.655Z",
+  "updatedAt": "2026-10-30T07:09:12.970Z",
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
@@ -66,8 +66,10 @@
       {
         "id": "task-5",
         "title": "analysis/icc.py：纯数学层，不依赖 torch 张量尺寸 d",
-        "status": "pending",
-        "verificationContract": "输入仅 (Gram, group_sizes, k)，输出 ICC 与 F 区间；对已存的 256×256 Gram 重算，MS_w/ICC/区间端点与 results/reliability_242.json 逐位一致；不加载模型即可运行（make check 的无 torch 项能跑它）"
+        "status": "complete",
+        "verificationContract": "输入仅 (Gram, group_sizes, k)，输出 ICC 与 F 区间；对已存的 256×256 Gram 重算，MS_w/ICC/区间端点与 results/reliability_242.json 逐位一致；不加载模型即可运行（make check 的无 torch 项能跑它）",
+        "completedAt": "2026-10-30T07:04:37.997Z",
+        "evidence": "analysis/icc.py pure-python (input only Gram/group_sizes/k, imports math only); reliability.icc_from_gram now a thin adapter; verify_icc.py runs on plain python3 (no torch/model): from results/gram_25"
       },
       {
         "id": "task-6",
@@ -109,8 +111,8 @@
 - Status: running
 - Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 8m16s
-- Tokens used: 265K (264,903) tokens
+- Time spent: 12m56s
+- Tokens used: 289K (288,949) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->
@@ -118,7 +120,7 @@
 - [x] task-2: estimators/score.py：score 项的唯一实现 — evidence: estimators/score.py single impl; verify: per-rollout cos 1.000000, norm ratio diff 0.00e+00 vs old inline; full run reproduces plan260 ICC 0.003454 with byte-identical interval, MS_w 39.536593; result
 - [x] task-3: estimators/pathwise.py 与 estimators/teacher.py：各自唯一实现，常数同一来源 — evidence: pathwise.py + teacher.py extracted; verify_pathwise.py: pathwise cos 1.000000 rel_norm 0.00e+00, teacher cos 1.000000 rel_norm 0.00e+00 (vs verbatim old helpers); full run reproduces MS_w 39.536593, I
 - [x] task-4: analysis/split_half.py：只留 Gram 版，删除 fast/slow 两份 — evidence: analysis/split_half.py single impl (reliability.py re-exports); verify vs brute-force half-sums: n=150/150, max per-split diff 1.11e-16 (<1e-12); caught one-sided Gram regression (n=38, 4e-2 off) and 
-- [ ] task-5: analysis/icc.py：纯数学层，不依赖 torch 张量尺寸 d — contract: 输入仅 (Gram, group_sizes, k)，输出 ICC 与 F 区间；对已存的 256×256 Gram 重算，MS_w/ICC/区间端点与 results/reliability_242.json 逐位一致；不加载模型即可运行（make check 的无 torch 项能跑它）
+- [x] task-5: analysis/icc.py：纯数学层，不依赖 torch 张量尺寸 d — evidence: analysis/icc.py pure-python (input only Gram/group_sizes/k, imports math only); reliability.icc_from_gram now a thin adapter; verify_icc.py runs on plain python3 (no torch/model): from results/gram_25
 - [ ] task-6: 现役脚本降为薄壳（组装 + 冻结判据 + 写 results，每个 ≤120 行） — contract: p_a2_pathj2 / p_a_reinforce / noise_scale / p_a4_closed_form 各自 ≤120 行且只 import core/estimators/analysis；每个逗号跑一次 8×32 与已提交数字逐值对比，差异必须为零或明确记录原因
 - [ ] task-7: bug 清理：把重构中暴露的每一处写成表并全部修掉 — contract: doc/refactor-bugs.md 列出：双重除以|slot|（两次）、Gram 单边加权、g_pw 循环内重置、device 不匹配（四处）、str.replace 子串命中、split-half 两份、假独立样本组表述、fd_gate 证书未绑定仪器、旧 sha 失效；每条给发现方式与修法，全部已修且有对应回归证据
 - [ ] task-8: 性能：清掉所有逐 rollout 循环与 CPU 分析，达标 60%/60 s — contract: results/perf_8x32.json 记录 nvidia-smi 每 3 s 采样的均值与峰值、墙钟；同一基准连续跑两次；GPU 均值 ≥60% 且墙钟 ≤60 s
