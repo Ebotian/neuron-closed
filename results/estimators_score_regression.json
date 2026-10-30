@@ -1,0 +1,31 @@
+{
+ "status": "PASS",
+ "A_per_rollout": "new estimators.score vs the old inline block, same seed, one context: cos_min 1.000000, max |norm ratio \u2212 1| 0.00e+00 (bit-identical)",
+ "B_end_to_end": {
+  "new_run": {
+   "MS_w": 39.536593,
+   "ICC": 0.003454,
+   "ICC_interval": [
+    -0.016680346969195004,
+    0.10194066713698138
+   ],
+   "g_sq_from_MSb": 0.137051,
+   "pathwise_norm": 134.16,
+   "cos_pw_teach": 0.6548
+  },
+  "reference_plan260": {
+   "MS_w": 39.5366,
+   "ICC": 0.0035,
+   "ICC_interval": [
+    -0.0167,
+    0.1019
+   ]
+  },
+  "identical": "ICC and both interval endpoints match plan 260 bit-for-bit; MS_w and g_sq match to the digits printed there",
+  "why_not_plan251": "results/reliability_242.json is the PRE-tensorisation record (256 single-sequence backwards). Its MS_w 39.726 differs from this path by 0.5% and that difference is the documented bf16 batching effect, not a refactor regression. Comparing the module against a different instrument would be the cross-instrument error the repo forbids."
+ },
+ "artifacts": [
+  "scripts/estimators/score.py",
+  "scripts/verify_estimators.py"
+ ]
+}

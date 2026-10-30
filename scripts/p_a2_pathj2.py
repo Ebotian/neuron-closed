@@ -329,33 +329,8 @@ def main():
 
         base = sum(ph) / len(ph)
         # Per-rollout score vectors: needed for the reliability curve r(K). 302 MB total, fine.
-        S = torch.zeros((len(seqs), sum(lm.layers[l].mlp.down_proj.weight.shape[1] for l in layers)),
-                        dtype=torch.float32, device=dev)
-        # ONE batched backward for all K rollouts of this context. The delta leaf is (B, T, d) and each element
-        # belongs to exactly one sample, so delta.grad already carries per-sample derivatives; summing over the time
-        # axis gives each rollout's score vector. This replaces K single-sequence backwards with one, which is what
-        # makes the GPU busy instead of the Python loop (the console showed 0% GPU / 1200% CPU).
-        Tmax = max(len(x) for x in seqs)
-        bid = torch.full((len(seqs), Tmax), pad, dtype=torch.long, device=dev)
-        am = torch.zeros_like(bid)
-        sm = torch.zeros_like(bid)
-        for i_, x in enumerate(seqs):
-            bid[i_, :len(x)] = torch.tensor(x, device=dev)
-            am[i_, :len(x)] = 1
-            sm[i_, len(pre):len(x)] = 1
-        with Cap() as cap:
-            model.zero_grad(set_to_none=True)
-            out = model(input_ids=bid, attention_mask=am, use_cache=False)
-            lp = torch.log_softmax(out.logits[:, :-1].float(), -1).gather(
-                -1, bid[:, 1:].unsqueeze(-1)).squeeze(-1)
-            ((lp * sm[:, 1:].float()).sum()).backward()
-            gps = cap._c.grad_per_sample()
-        off = 0
-        for l in layers:
-            d_ = int(lm.layers[l].mlp.down_proj.weight.shape[1])
-            S[:, off:off + d_] = (gps[l] * SC[l].to(dev)).float()
-            off += d_
-
+        from estimators.score import per_rollout_scores   # the ONE implementation of the score term
+        S = per_rollout_scores(model, lm, layers, p50, norms, seqs, pad, dev, len(pre), scale=SC)
         # --- task-4: two baselines from the SAME per-rollout scores
         K_ = len(seqs)
         w_in = [(x - base) / (K_ * len(ctx)) for x in ph]

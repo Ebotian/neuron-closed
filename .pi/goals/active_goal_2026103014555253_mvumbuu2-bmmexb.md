@@ -5,13 +5,13 @@
   "status": "active",
   "autoContinue": true,
   "usage": {
-    "tokensUsed": 194433,
-    "activeSeconds": 102
+    "tokensUsed": 214110,
+    "activeSeconds": 215
   },
   "sisyphus": false,
-  "revision": 18,
+  "revision": 24,
   "createdAt": "2026-10-30T06:55:52.538Z",
-  "updatedAt": "2026-10-30T06:57:42.710Z",
+  "updatedAt": "2026-10-30T06:59:38.358Z",
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
@@ -34,8 +34,10 @@
       {
         "id": "task-1",
         "title": "闸门：禁止旧写法回流（inline p50/norms、detach 抓取、双份 split-half）",
-        "status": "pending",
-        "verificationContract": "tools/check.py 新增一条 grep 类闸门：scripts/ 下不得出现 `p50[l] / norms[l]` 字面量、不得出现 detach-then-clone 抓叶子（fd_gate 的阴性对照白名单除外）、不得同时存在 split_half 与 split_half_fast；人为造一个违规 → make check 报 FAIL，修复后转绿"
+        "status": "complete",
+        "verificationContract": "tools/check.py 新增一条 grep 类闸门：scripts/ 下不得出现 `p50[l] / norms[l]` 字面量、不得出现 detach-then-clone 抓叶子（fd_gate 的阴性对照白名单除外）、不得同时存在 split_half 与 split_half_fast；人为造一个违规 → make check 报 FAIL，修复后转绿",
+        "completedAt": "2026-10-30T06:57:54.160Z",
+        "evidence": "make check has [noregress] with 3 rules; first version passed an injected p50[0]/norms[0] (too narrow), regex version FAILS it and restores green; migrations to core.units done in mlp_capture/p_a4/p_a"
       },
       {
         "id": "task-2",
@@ -101,12 +103,12 @@
 - Status: running
 - Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 1m42s
-- Tokens used: 194K (194,433) tokens
+- Time spent: 3m35s
+- Tokens used: 214K (214,110) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->
-- [ ] task-1: 闸门：禁止旧写法回流（inline p50/norms、detach 抓取、双份 split-half） — contract: tools/check.py 新增一条 grep 类闸门：scripts/ 下不得出现 `p50[l] / norms[l]` 字面量、不得出现 detach-then-clone 抓叶子（fd_gate 的阴性对照白名单除外）、不得同时存在 split_half 与 split_half_fast；人为造一个违规 → make check 报 FAIL，修复后转绿
+- [x] task-1: 闸门：禁止旧写法回流（inline p50/norms、detach 抓取、双份 split-half） — evidence: make check has [noregress] with 3 rules; first version passed an injected p50[0]/norms[0] (too narrow), regex version FAILS it and restores green; migrations to core.units done in mlp_capture/p_a4/p_a
 - [ ] task-2: estimators/score.py：score 项的唯一实现 — contract: 单一函数返回逐 rollout 未加权 score；归一化常数只从 core.units 取；对照已提交的 results/reliability_242.json：用相同种子重算的逐 rollout score 与仓内存档逐值一致（cos=1.000000，范数相对差 <1e-6），并在 results/ 写一条回归记录
 - [ ] task-3: estimators/pathwise.py 与 estimators/teacher.py：各自唯一实现，常数同一来源 — contract: 两者返回已 Dose 缩放的逐样本梯度；对同一序列，新实现与 p_a2 现有路径输出向量 cos=1.000000 且相对范数差 <1e-6；三份实现里 len(ids_slot) 只允许出现一次（grep 计数）
 - [ ] task-4: analysis/split_half.py：只留 Gram 版，删除 fast/slow 两份 — contract: 同一份已存 Gram 上，新实现的 r(K) 与手算值逐值一致（|差|<1e-12）；仓内 grep 不存在第二份 split-half 实现；旧的两份从 scripts/ 删除并在 metadata 记明
