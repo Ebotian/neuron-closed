@@ -28,6 +28,8 @@ from typing import Sequence
 import torch
 import torch.nn.functional as F
 
+from analysis.split_half import split_half_curve as split_half_curve_fast  # single implementation
+
 
 def _flat(x):
     return x.reshape(-1).double()
@@ -232,51 +234,6 @@ def bootstrap_stats_fast(S, weights, n_boot: int = 400, seed: int = 0, device=No
             'path': 'fast (context summaries + one matmul)',
             'unit_note': 'resampling unit is the CONTEXT; a different rollout seed gives independent rollouts inside '
                          'the SAME contexts and does not settle context-level reproducibility'}
-
-
-def split_half_curve_fast(S, weights, ks=(2, 4, 8, 16, 32), n_split: int = 200, seed: int = 0, device=None):
-    """Split-half cosine from ONE Gram per context, batched.
-
-    G_ij = w_i <x_i, x_j> is computed once per context (one (K x d)(d x K) matmul, i.e. O(K^2 d) total for the run
-    instead of O(n_splits * K * d)). A split is then a pair of 0/1 indicator vectors over the context's rollouts and
-    the cosine is a quadratic form; all n_splits splits are done as two batched matmuls so the GPU does the work.
-    """
-    import torch as _t
-    rng = random.Random(seed)
-    out = {}
-    Grams = []
-    for c, Sc in enumerate(S):
-        dev = Sc.device if device is None else device
-        M = Sc.double().to(dev)
-        w = _t.tensor(list(weights[c]), dtype=_t.float64, device=dev)
-        Grams.append((M * w.unsqueeze(1)) @ M.T)      # (Kc, Kc) once per context
-    for K in ks:
-        vals = []
-        for c, Sc in enumerate(S):
-            Kc = Sc.shape[0]
-            if Kc < K or K < 2:
-                continue
-            G = Grams[c]
-            PA = _t.zeros(n_split, Kc, dtype=_t.float64, device=G.device)
-            PB = _t.zeros(n_split, Kc, dtype=_t.float64, device=G.device)
-            for t in range(n_split):
-                order = list(range(Kc))
-                rng.shuffle(order)
-                PA[t, order[:K // 2]] = 1.0
-                PB[t, order[K // 2:K]] = 1.0
-            VA = PA @ G                                # (n_split, Kc)
-            VB = PB @ G
-            ab = (VA * PB).sum(1)
-            aa = (VA * PA).sum(1)
-            bb = (VB * PB).sum(1)
-            ok = (aa > 0) & (bb > 0)
-            cs = (ab[ok] / (aa[ok].sqrt() * bb[ok].sqrt())).cpu().tolist()
-            vals.extend(cs)
-        if vals:
-            vals.sort()
-            out[K] = {'r_mean': sum(vals) / len(vals), 'r_p10': vals[int(0.1 * len(vals))], 'n': len(vals),
-                      'path': 'fast (one Gram per context, batched splits)'}
-    return out
 
 
 def bootstrap_kappa(S, weights, n_boot: int = 200, seed: int = 0):

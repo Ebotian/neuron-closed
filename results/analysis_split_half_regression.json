@@ -1,0 +1,13 @@
+{
+ "status": "PASS",
+ "verifier": "scripts/verify_split_half.py: brute-force construction of the two half-sums (explicit vectors, d=64) vs the Gram path, same splits",
+ "result": {
+  "n_splits_each": 150,
+  "max_per_split_abs_diff": 1.11e-16,
+  "max_abs_cos": 0.267785,
+  "threshold": "1e-12"
+ },
+ "bug_found_by_this_verifier": "the implementation that moved into analysis/split_half.py still carried ONE-SIDED Gram weights (G_ij = w_i <x_i,x_j>), so p^T G p was not a squared norm: the first run gave n=38 of 150 splits surviving the (aa>0)&(bb>0) filter and a mean 4e-2 away from the brute force, and earlier runs printed \"cosines\" of 1.82 and 4.71. I had fixed this once, lost it when the function was rewritten wholesale for batching, and the brute-force verifier is what caught the recurrence.",
+ "fix": "Grams.append(Mw @ Mw.T) with Mw = M * w.unsqueeze(1)",
+ "unaffected": "the ICC / MS_w numbers came from gram_from_scores (two-sided) and are unchanged"
+}
