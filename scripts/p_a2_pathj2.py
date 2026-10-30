@@ -25,7 +25,6 @@ from estimators.teacher import teacher_grad
 from analysis.split_half import split_half_curve
 from analysis.report import summarize
 
-
 def main():
     ap = argparse.ArgumentParser()
     A = ap.add_argument

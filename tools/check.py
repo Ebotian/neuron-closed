@@ -215,8 +215,15 @@ def check_no_regressions():
         txt = p.read_text(encoding='utf8', errors='replace')
         if re.search(r'p50\[[^\]]+\]\s*/\s*norms\[', txt):
             bad.append(f'scripts/{name}: inline dose unit - use core.units.dose_scale')
+        # the legacy control is allowed in exactly ONE named file, and fd_gate must not re-implement it
         if 'detach().clone().requires_grad_' in txt and name != 'fd_gate.py':
             bad.append(f'scripts/{name}: detach-then-clone capture - use mlp_capture.Capture')
+    legacy_ok = {'legacy_capture.py'}
+    for p in scripts.rglob('*.py'):
+        if p.name in legacy_ok:
+            continue
+        if 'detach().clone().requires_grad_' in p.read_text(encoding='utf8', errors='replace'):
+            bad.append(f'scripts/{p.name}: detach-then-clone capture outside legacy_capture.py')
     defs = [p.name for p in scripts.rglob('*.py')
             if p.name in LIVE_CHAIN and 'def split_half' in p.read_text(encoding='utf8', errors='replace')]
     if len(defs) > 1:

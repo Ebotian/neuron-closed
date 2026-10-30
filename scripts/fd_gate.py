@@ -1,27 +1,10 @@
 #!/usr/bin/env python3
-"""Instrument calibration gate: does the capture actually return dPhi/d(dose)?
+"""Finite-difference calibration gate for the gradient readout: does it return dPhi/d(dose)?
 
-WHY. audit-response-2026-10-30.md §12.1-2. The gradient readout was wrong in three scripts
-(detach-then-clone cut the residual-carrier paths), which silently invalidated plans 2.40/2.42/2.43/2.46.
-Before ANY science number may be reported again, this gate must pass, and its last-pass record is what
-`make check` looks at.
-
-WHAT IT DOES. In fp32 (bf16 finite differences are swamped by precision noise - measured: the same
-coordinate gave -71.9 at eps=1e-3 and -4.7 at eps=1e-2), for layers 0, 13 and 31 and the top-2 |dose
-gradient| coordinates of each:
-  analytic = mlp_capture.Capture(...).dose_grad()          (the instrument under test)
-  legacy   = the old detach-then-clone capture             (kept only to document the bug's signature)
-  FD       = central difference of phi in dose units at eps = 1e-3 and 1e-2
-phi is the teacher-forced sum log-probability of a fixed slot after a fixed prompt+completion, i.e. the
-same kind of readout the plans use, with the injection applied at the coordinate under test.
-
-FROZEN CRITERION (written before the run)
-  G1  the instrument passes iff, for EVERY tested coordinate, min over eps of
-      |FD - analytic| / max(|analytic|, 1e-6) < 0.02.
-  G2  the legacy method must NOT pass: at least one coordinate must show > 0.05 relative error, otherwise
-      this gate is not actually able to see the bug and the gate itself is uninformative.
-  G3  layers 0/13/31 are reported separately; the recorded verdict is the conjunction over all three.
-Output: results/fd_gate.json (and the same JSON on the box), consumed by tools/check.py.
+Runs in fp32 (bf16 FD is swamped by precision noise), at layers 0/13/31, two step sizes. The shipped module is tested
+through `Capture(...).dose_grad()`; the legacy detach readout comes from `legacy_capture.py` as the negative control, so
+the gate fails if it stops being able to SEE the bug. Criterion G1: min over eps of the relative error < 2% for every
+coordinate; G2: the legacy method must show > 5% somewhere; G3: conjunction over the layers.
 """
 from __future__ import annotations
 import argparse, json, sys
@@ -96,31 +79,9 @@ def main():
                 out[L] = flat[off:off + d_].clone()
                 off += d_
             return out
-        hs, cap_, = [], {}
-        for L in list(want):
-            def build(idx):
-                def hook(_m, args):
-                    x = args[0]
-                    if idx in cap_:
-                        return None
-                    xx = x.detach().clone().requires_grad_(True)   # the legacy (wrong) readout, deliberately kept
-                    cap_[idx] = xx
-                    return (xx,) + tuple(args[1:])
-                return hook
-            hs.append(lm.layers[L].mlp.down_proj.register_forward_pre_hook(build(L)))
-        try:
-            model.zero_grad(set_to_none=True)
-            o = model(input_ids=ids, use_cache=False)
-            lp = F.log_softmax(o.logits[:, :-1].float(), -1)
-            lp[0, pos - 1, torch.tensor(slot, device=dev)].mean().backward()   # MEAN: the same functional the gate's phi uses
-            out = {}
-            for L in want:
-                g = cap_[L].grad
-                out[L] = g.sum(dim=tuple(range(g.dim() - 1))).double().cpu() * SC[L].cpu()
-            return out
-        finally:
-            for h in hs:
-                h.remove()
+        from legacy_capture import legacy_capture_grads
+        return legacy_capture_grads(model, lm, want, ids, pos, slot, SC, dev)
+
 
     want = [int(x) for x in a.layers.split(',')]
     eps_list = [float(x) for x in a.eps.split(',')]
@@ -131,7 +92,7 @@ def main():
     summary = []
     print(f'{"L":>3} {"n":>6} {"analytic":>12} {"legacy":>12} {"FD(eps)":>12} {"eps":>7} {"relerr_new":>11} {"relerr_legacy":>13}')
     for L in want:
-        for n in torch.topk(cur[L].abs(), a.topn).indices.tolist():
+       for n in torch.topk(cur[L].abs(), a.topn).indices.tolist():
             best = best_leg = None
             for eps in eps_list:
                 fd = (phi({(L, n): eps}) - phi({(L, n): -eps})) / (2 * eps)
