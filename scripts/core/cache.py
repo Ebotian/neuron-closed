@@ -11,6 +11,8 @@ stale or corrupt cache surfaces as a mismatch instead of a silent drift.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 from pathlib import Path
 
 import torch
@@ -18,17 +20,48 @@ import torch
 import engine as E
 from core.units import column_norms_dev
 
+# Bump when the ALGORITHM that produces a cached value changes (p50 readout, reference text handling, precision).
+CACHE_VERSION = 2
+IDENTITY_FILES = ('config.json', 'tokenizer_config.json', 'tokenizer.json', 'generation_config.json', 'vocab.json')
 
-def _key(layers):
-    return ','.join(str(int(l)) for l in layers)
+
+def _fingerprint(model_path, layers, extra=None):
+    """Identity of everything a cached value depends on.
+
+    The audit's objection was exact: the key was the layer list and the filename was the model directory's basename, so
+    the same directory name with different weights, a changed tokenizer or a changed reference text would silently reuse
+    an old p50. Here the key binds
+      * the model path and the config/tokenizer file CONTENTS (small, hashed),
+      * the weight FILES by name and size,
+      * the reference text that p50 is computed from, the dtype, the layer list and CACHE_VERSION.
+    STATED LIMIT: the 8.8 GB of weights are identified by name and size, not by content hash, because hashing them costs
+    more than the computation being cached. Two snapshots with identical file names and sizes but different contents would
+    collide; that is a deliberate trade and it is written down rather than assumed away.
+    """
+    h = hashlib.sha256()
+    mp = Path(model_path)
+    h.update(f'v{CACHE_VERSION}|{mp.resolve()}|{".".join(map(str, layers))}|'.encode())
+    for name in IDENTITY_FILES:
+        f = mp / name
+        if f.exists():
+            h.update(f'{name}:{hashlib.sha256(f.read_bytes()).hexdigest()}|'.encode())
+    index = mp / 'model.safetensors.index.json'
+    weights = sorted(mp.glob('*.safetensors'))
+    if index.exists():
+        h.update(f'index:{hashlib.sha256(index.read_bytes()).hexdigest()}|'.encode())
+    for w in weights:
+        h.update(f'{w.name}:{w.stat().st_size}|'.encode())
+    h.update(f'ref:{hashlib.sha256(E.REFERENCE_TEXT.encode()).hexdigest()}|'.encode())
+    h.update(f'dtype:bf16|extra:{json.dumps(extra, sort_keys=True) if extra else "-"}|'.encode())
+    return h.hexdigest()
 
 
-def load_or_compute(path, compute, layers, strict=False):
+def load_or_compute(path, compute, key, layers, strict=False):
     """Return `compute()`'s value, from `path` when possible. `strict` re-verifies a cache hit against a fresh compute."""
     p = Path(path) if path else None
     if p is not None and p.exists():
         blob = torch.load(p)
-        if blob.get('key') == _key(layers):
+        if blob.get('key') == key:
             vals = blob['values']
             if not strict:
                 return vals
@@ -43,13 +76,15 @@ def load_or_compute(path, compute, layers, strict=False):
     vals = compute()
     if p is not None:
         p.parent.mkdir(parents=True, exist_ok=True)
-        torch.save({'key': _key(layers), 'values': vals}, p)
+        torch.save({'key': key, 'cache_version': CACHE_VERSION, 'layers': list(layers), 'values': vals}, p)
     return vals
 
 
-def p50_cached(tok, model, lm, layers, dev, path=None, strict=False):
-    return load_or_compute(path, lambda: E.estimate_p50(tok, model, lm, layers, dev), layers, strict)
+def p50_cached(tok, model, lm, layers, dev, path=None, strict=False, model_path=None):
+    key = _fingerprint(model_path or '', layers, {'quantity': 'p50'})
+    return load_or_compute(path, lambda: E.estimate_p50(tok, model, lm, layers, dev), key, layers, strict)
 
 
-def column_norms_cached(lm, layers, dev, path=None, strict=False):
-    return load_or_compute(path, lambda: column_norms_dev(lm, layers, dev), layers, strict)
+def column_norms_cached(lm, layers, dev, path=None, strict=False, model_path=None):
+    key = _fingerprint(model_path or '', layers, {'quantity': 'column_norms'})
+    return load_or_compute(path, lambda: column_norms_dev(lm, layers, dev), key, layers, strict)

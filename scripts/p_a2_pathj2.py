@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Plan 2.42 re-run: a thin shell that assembles modules and writes results. No measurement logic lives here.
-FROZEN: doc/plan-2.42-frozen.md (phi = path J2 in nats; 1 batched backward per context; 2K pairs in chunks of 8; LOO
-weights so E[(phi-b_-i)s_i]=g; ICC from the Gram)."""
+FROZEN: doc/plan-2.42-frozen.md (phi = path J2 in nats; 1 batched backward per context; 2K pairs in chunks of 8;
+LOO weights; ICC from the Gram)."""
 from __future__ import annotations
 import argparse
 import json, sys
@@ -22,14 +22,14 @@ from estimators.score import per_rollout_scores, loo_weights, insample_weights
 from estimators.pathwise import pathwise_batch
 from estimators.teacher import teacher_grad
 from analysis.split_half import split_half_curve
-from analysis.report import summarize
+from analysis.report import summarize, save_gradients, print_headline
 
 def main():
     ap = argparse.ArgumentParser()
     A = ap.add_argument
     A('--model', default='/root/autodl-tmp/Qwen3.5-4B'); A('--probes', default='/root/autodl-tmp/scripts/j2space/contrasts_v3.jsonl')
     A('--n-ctx', type=int, default=8); A('--rollouts', type=int, default=32); A('--max-new', type=int, default=24)
-    A('--temp', type=float, default=1.0); A('--seed', type=int, default=0); A('--save-gram', default=None)
+    A('--temp', type=float, default=1.0); A('--seed', type=int, default=0); A('--save-gram', default=None); A('--save-gradients', default=None)
     A('--pathwise', action='store_true'); A('--fp32', action='store_true'); A('--out', default='/root/autodl-tmp/runs/p_a2.json')
     a = ap.parse_args()
     dev = 'cuda:0'
@@ -43,8 +43,8 @@ def main():
     layers = list(range(32))
     C = f'/root/autodl-tmp/runs/cache_'        # keyed by the frozen weights, not by the run
     tag = Path(a.model).name
-    p50 = p50_cached(tok, model, lm, layers, dev, f'{C}p50_{tag}.pt')
-    norms = column_norms_cached(lm, layers, dev, f'{C}cn_{tag}.pt')
+    p50 = p50_cached(tok, model, lm, layers, dev, f'{C}p50_{tag}.pt', model_path=a.model)
+    norms = column_norms_cached(lm, layers, dev, f'{C}cn_{tag}.pt', model_path=a.model)
     SC = dose_scale(p50, norms, layers)
     for q in model.parameters():
         q.requires_grad_(False)
@@ -103,16 +103,13 @@ def main():
                                 'max_dev_from_sum_of_increments': max(float((g_pw[l] - sum(x[l] for x in inc)).abs().max()) for l in layers),
                                 'max_dev_from_last_increment': max(float((g_pw[l] - inc[-1][l]).abs().max()) for l in layers)}
     if a.save_gram:
-        json.dump({'G': rec['gram'], 'group_sizes': rec['group_sizes'], 'k': a.rollouts, 'seed': a.seed},
-                  open(a.save_gram, 'w'))
+        json.dump({'G': rec['gram'], 'group_sizes': rec['group_sizes'], 'k': a.rollouts, 'seed': a.seed}, open(a.save_gram, 'w'))
+    if a.save_gradients:      # p_a4 consumes these; until this flag existed the blob had no producer in the live chain
+        rec['gradients_file'] = save_gradients(a.save_gradients, rec, g_teach, g_pw, g_path, layers,
+                                               {k: getattr(a, k) for k in ('model', 'seed', 'n_ctx', 'rollouts')})
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     json.dump(rec, open(a.out, 'w'))
-    icc = rec['ICC']
-    print('ICC  MSw=%.6f ICC=%.6f %s' % (icc['tr_sigma'], icc['icc'], [round(x, 4) for x in icc['icc_interval']]), flush=True)
-    if a.pathwise:
-        print('C2 cos(pw,teach)=%+.4f |pw|=%.2f ratio=%.3f' % (
-            rec['C2_split']['cos_pathwise_teach'], rec['C2_split']['norm_pathwise'],
-            rec['C2_split']['ratio_score_over_pathwise']), flush=True)
+    print_headline(rec)
     return 0
 
 if __name__ == '__main__':

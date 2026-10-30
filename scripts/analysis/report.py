@@ -68,6 +68,35 @@ def summarize(layers, g_path, g_teach, g_path_in, S_all, W_all, rollouts, seed, 
     return rec
 
 
+def print_headline(rec):
+    """One place for the numbers a run prints, so the shell keeps no formatting logic of its own."""
+    i = rec['ICC']
+    print('ICC  MSw=%.6f between_var=%.6f icc=%.6f %s'
+          % (i['tr_sigma'], i['between_var'], i['icc'], [round(x, 4) for x in i['icc_interval']]), flush=True)
+    if rec.get('SNR_split'):
+        v = rec['SNR_split']
+        print('SNR  signal_sq=%.2f noise=%.2f snr=%.4f' % (v['signal_sq'], v['noise_trace'], v['snr']), flush=True)
+    if rec.get('C2_split'):
+        c = rec['C2_split']
+        print('C2 cos(pw,teach)=%+.4f |pw|=%.2f ratio=%.3f'
+              % (c['cos_pathwise_teach'], c['norm_pathwise'], c['ratio_score_over_pathwise']), flush=True)
+    if rec.get('C4_decomposition'):
+        d = rec['C4_decomposition']
+        print('C4 cos(A,B)=%+.4f A-teach=%+.4f B-teach=%+.4f A+B-teach=%+.4f'
+              % (d['cos_A_B'], d['cos_A_teacher'], d['cos_B_teacher'], d['cos_A_plus_B_teacher']), flush=True)
+
+
+def save_gradients(path, rec, g_teach, g_pw, g_path, layers, manifest):
+    """Write the gradient blob that p_a4 consumes, with a manifest naming the run it came from.
+
+    The audit's point was that `p_a2_v2.pt` had no producer in the live chain, so `gfile_sha256` verified the identity of an
+    input nobody could rebuild. The blob now carries its own provenance instead of relying on the caller remembering it.
+    """
+    import torch
+    torch.save({'g_teach': g_teach, 'g_pw': g_pw, 'g_score': g_path, 'layers': layers, 'manifest': manifest}, path)
+    return {'path': str(path), 'manifest': manifest}
+
+
 def _half_estimates(S_all, W_all, layers, dims, device, rollouts):
     """Rebuild the score-term estimate from two DISJOINT halves of each context's rollouts.
 

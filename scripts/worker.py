@@ -46,8 +46,8 @@ def main():
     tok, model, lm = load_model_fast(a.model, dev)
     layers = list(range(32))
     C, tag = '/root/autodl-tmp/runs/cache_', Path(a.model).name
-    p50 = p50_cached(tok, model, lm, layers, dev, f'{C}p50_{tag}.pt')
-    norms = column_norms_cached(lm, layers, dev, f'{C}cn_{tag}.pt')
+    p50 = p50_cached(tok, model, lm, layers, dev, f'{C}p50_{tag}.pt', model_path=a.model)
+    norms = column_norms_cached(lm, layers, dev, f'{C}cn_{tag}.pt', model_path=a.model)
     SC = dose_scale(p50, norms, layers)
     pad = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
     probes = [r for r in map(json.loads, open(a.probes)) if r['trait'] == 'hostility']

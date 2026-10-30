@@ -1,0 +1,52 @@
+{
+ "what": "p_a2 --save-gradients -> p_a4 --gfile, i.e. the closed-form experiment run from a blob produced by the live chain",
+ "why": "the audit found that p_a4 read p_a2_v2.pt while no current script wrote it: gfile_sha256 verified the identity of an input nobody could rebuild. p_a2 now writes the blob with its own manifest.",
+ "chain": [
+  "p_a2_pathj2.py --save-gradients grads_v2.pt (7.1 MB, keys g_teach/g_pw/g_score/layers/manifest)",
+  "p_a4_closed_form.py --gfile grads_v2.pt"
+ ],
+ "blob_manifest": {
+  "model": "/dev/shm/qwen",
+  "seed": 0,
+  "n_ctx": 8,
+  "rollouts": 32
+ },
+ "p_a2_side_check": {
+  "norm_pathwise": 134.1488,
+  "norm_score": 106.4878,
+  "cos_pathwise_teach": 0.6547,
+  "note": "the blob was written by this same run, so |pw| 134.1488 is the input p_a4 saw"
+ },
+ "p_a4_result": {
+  "SELF_residual": {
+   "j2": 2.5197274226229638e-05,
+   "pw": 1.9946974134654738e-05
+  },
+  "budget2": 0.9988328027473619,
+  "cos_M": 0.6559177544036006,
+  "ratios": {
+   "b0.05": 1.3071,
+   "b0.10": 1.1506
+  }
+ },
+ "determinism_check": {
+  "what": "the same blob was fed to p_a4 twice",
+  "result": "identical (1.307 / 1.151 both times) -> p_a4 is a deterministic function of its blob"
+ },
+ "run_to_run_band": {
+  "stored_record": {
+   "ratios": [
+    1.313,
+    1.1505
+   ]
+  },
+  "this_run": {
+   "ratios": [
+    1.307,
+    1.151
+   ]
+  },
+  "cause": "a DIFFERENT pathwise run: |pw| moved only 2e-4 relative (134.1488 vs 134.1485) yet dJ2 moved 0.45%, because dJ2 is a nonlinear readout of the gradient direction. So p_a4 numbers carry a ~0.5% run-to-run band and must be quoted with it rather than to four decimals",
+  "not_claimed": "this is measured, not explained: the mechanism (pathwise reduction order) is plausible and unproven"
+ }
+}
