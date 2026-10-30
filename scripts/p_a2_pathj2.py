@@ -87,6 +87,7 @@ def main():
     ap.add_argument('--out', default='/root/autodl-tmp/runs/p_a2_path.json')
     ap.add_argument('--selftest', action='store_true')
     ap.add_argument('--pathwise', action='store_true')
+    ap.add_argument('--save-gram', default=None, help='write the n x n Gram to this JSON path')
     ap.add_argument('--fp32', action='store_true', help='run the model in float32: removes the shared bf16 batch bias that moves r(K)')
     ap.add_argument('--inject-double-division', action='store_true',
                     help='sensitivity test: put the L^-2 slot normalisation back, so --branch-selftest must FAIL')
@@ -367,6 +368,9 @@ def main():
     G = gram_from_scores([splits[ci] for ci in range(len(ctx))], W_all)
     icc = icc_from_gram(G, [int(splits[ci].shape[0]) for ci in range(len(ctx))], k=a.rollouts)
     rec['ICC'] = icc
+    if a.save_gram:
+        json.dump({'G': G.cpu().tolist(), 'group_sizes': [int(splits[ci].shape[0]) for ci in range(len(ctx))],
+                   'k': a.rollouts, 'seed': a.seed}, open(a.save_gram, 'w'))
     print('ICC  MSw=%.6f [%s]  MSb-derived ||g||^2=%.6f  ICC=%s interval=%s' % (
         icc['tr_sigma'], icc['tr_sigma_interval'], icc['g_sq'],
         None if icc['icc'] is None else round(icc['icc'], 4),

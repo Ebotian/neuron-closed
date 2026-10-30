@@ -266,54 +266,10 @@ def gram_from_scores(S, weights):
 
 
 def icc_from_gram(G, group_sizes, k=None, alpha=0.05):
-    """Intraclass correlation and its F-based interval, from the Gram matrix alone. Pure linear algebra."""
-    import math
-    from statistics import NormalDist
-    G = G.double()
-    n = int(sum(group_sizes))
-    C = len(group_sizes)
-    if k is None:
-        k = min(group_sizes)
-    # SSw: within-context scatter, from diagonal and block sums
-    ss_w = 0.0
-    offs = 0
-    for kc in group_sizes:
-        blk = G[offs:offs + kc, offs:offs + kc]
-        ss_w += float(torch.diagonal(blk).sum()) - float(blk.sum()) / kc
-        offs += kc
-    ones = torch.ones(n, dtype=torch.float64, device=G.device)
-    tot = float(ones @ G @ ones)                 # ||sum_i xi_i||^2
-    ss_t = float(torch.diagonal(G).sum()) - tot / n
-    ss_b = ss_t - ss_w
-    df_w = n - C
-    df_b = C - 1
-    ms_w = ss_w / df_w
-    ms_b = ss_b / df_b
-    tr_sigma = ms_w
-    g_sq = (ms_b - ms_w) / k
-    denom = ms_b + (k - 1) * ms_w
-    icc = (ms_b - ms_w) / denom if denom != 0 else None
-    out = {'n': n, 'C': C, 'k': k, 'SS_w': ss_w, 'SS_b': ss_b,
-           'tr_sigma': tr_sigma, 'g_sq': g_sq, 'icc': icc,
-           'lambda_ratio': (tr_sigma / g_sq) if g_sq > 0 else None}
-    if ms_w > 0 and df_b > 0:
-        F = ms_b / ms_w
-        loF = F / float(_f_quantile(1 - alpha / 2, df_b, df_w))
-        hiF = F * float(_f_quantile(1 - alpha / 2, df_w, df_b))
-        def icc_of(Fv):
-            return (Fv - 1) / (Fv + k - 1)
-        out['F'] = F
-        out['icc_interval'] = [icc_of(loF), icc_of(hiF)]
-        out['tr_sigma_interval'] = [ms_w * loF / F, ms_w * hiF / F]
-    else:
-        out['F'] = None
-        out['icc_interval'] = None
-        out['tr_sigma_interval'] = None
-    out['unit'] = ('context is the independent unit; a different rollout seed gives independent rollouts inside the '
-                   'same contexts and does not settle context-level reproducibility')
-    out['note'] = ('ICC can be negative (signal not resolved); that is a result, not an error, and the Lean bound '
-                   'is -1/(k-1) <= ICC <= 1')
-    return out
+    """Thin adapter: the ALGORITHM lives in analysis/icc.py (pure Python, re-derivable from a stored Gram). Two
+    implementations of one estimator is the pattern this refactor exists to remove, so this only converts tensors."""
+    from analysis.icc import icc_from_gram_py
+    return icc_from_gram_py(G.cpu().tolist() if hasattr(G, 'cpu') else G, group_sizes, k=k, alpha=alpha)
 
 
 def _f_quantile(p, d1, d2, iters=200):
