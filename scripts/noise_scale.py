@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+"""Plan 2.46: replace the (wrong) isotropy assumption with the measured noise-to-signal ratio.
+
+WHY. lean/Dimension.lean originally explained the flat split-half curve of the score gradient by
+assuming isotropic per-rollout score vectors (cos ~ 0 at every K, K ~ d*v/s^2). doc/references/
+isotropy-and-noise-scale.md records that this is the wrong premise: anisotropy of representations and
+gradients is measured and called inherent (arXiv:2401.12143), LLM gradient signals have a spike holding
+~1.5% of directions while dominating second-order statistics (arXiv:2602.11185), and gradient subspaces
+are low-rank (arXiv:2407.11239; Aghajanyan et al. 2021). The general statement is the gradient noise
+scale (McCandlish et al.):  cos ~ ||g||^2 / (||g||^2 + tr(Sigma)/K),  crossover K ~ tr(Sigma)/||g||^2.
+
+WHAT THIS RUN MEASURES. With xi_i := (phi_i - b) * s_i the per-rollout score contributions (s_i the
+dose-unit gradient taken along rollout i), the estimator at sample size K is ghat = (1/K) sum xi_i, so
+    E ||ghat||^2 = ||g||^2 + tr(Sigma)/K.
+From n samples we estimate tr(Sigma) and ||g||^2 with the usual ANOVA split:
+    tr(Sigma) ~ (sum_i ||xi_i||^2 - n ||xibar||^2)/(n-1),     ||g||^2 ~ ||xibar||^2 - tr(Sigma)/n.
+Storage trick: the trace only needs the SCALAR norms plus the running sum, so nothing 256 x 294912 large
+is written.
+
+FROZEN CRITERION (written before the run)
+  N0  the estimator is usable only if ||g||^2 > 0, i.e. the signal survives the ANOVA correction at this
+      n. If ||g||^2 <= 0 the honest statement is "the signal is NOT detectable at n=256", which is a
+      result, not a failure.
+  N1  if N0 holds, the predicted crossover K* = tr(Sigma)/||g||^2 must agree with the K* implied by the
+      measured r(K) curve of plan 2.42 within a factor of 10 to count as "the same mechanism".
+  N2  DESCRIPTIVE: predicted r(K) = ||g||^2/(||g||^2 + tr(Sigma)/K) for K = 2,4,8,16,32 against the
+      measured r(K) = 0.002, 0.005, 0.016, 0.015, 0.022.
+Sample unit = rollout (256). b = global mean phi, as in the run being explained (b is itself estimated;
+that bias is not corrected here and is noted).
+"""
+from __future__ import annotations
+import argparse, json, sys
+from pathlib import Path
+
+import torch
+import torch.nn.functional as F
+
+sys.path.insert(0, '/root/autodl-tmp/scripts/j2space')
+import engine as E
+
+
+def slot_ids(tok, s):
+    txt = s if isinstance(s, str) else (s[0] if isinstance(s, (list, tuple)) else str(s))
+    return tok(txt, add_special_tokens=False).input_ids
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--model', default='/root/autodl-tmp/Qwen3.5-4B')
+    ap.add_argument('--probes', default='/root/autodl-tmp/scripts/j2space/contrasts_v3.jsonl')
+    ap.add_argument('--n-ctx', type=int, default=8)
+    ap.add_argument('--rollouts', type=int, default=32)
+    ap.add_argument('--max-new', type=int, default=24)
+    ap.add_argument('--seed', type=int, default=0)
+    ap.add_argument('--out', default='/root/autodl-tmp/runs/noise_scale.json')
+    a = ap.parse_args()
+    dev = 'cuda:0'
+    rows = [json.loads(l) for l in open(a.probes)]
+    ctx = [r for r in rows if r['trait'] == 'hostility'][:a.n_ctx]
+    tok, model, lm = E.load_model(a.model, dev)
+    layers = list(range(32))
+    p50 = E.estimate_p50(tok, model, lm, layers, dev)
+    norms = E.column_norms(lm, layers)
+    for q in model.parameters():
+        q.requires_grad_(False)
+    pad = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
+    dim = sum(lm.layers[l].mlp.down_proj.weight.shape[1] for l in layers)
+
+    class Cap:
+        def __init__(self):
+            self.cap, self.h = {}, []
+
+        def __enter__(self):
+            for l in layers:
+                def build(idx):
+                    def hook(_m, args):
+                        x = args[0]
+                        if idx in self.cap:
+                            return None
+                        x = x.detach().clone().requires_grad_(True)
+                        self.cap[idx] = x
+                        return (x,) + tuple(args[1:])
+                    return hook
+                self.h.append(lm.layers[l].mlp.down_proj.register_forward_pre_hook(build(l)))
+            return self
+
+        def dose_grad(self):
+            out = torch.zeros(dim, dtype=torch.float64)
+            off = 0
+            for l in layers:
+                t = self.cap[l]
+                g = t.grad
+                v = (g.sum(dim=tuple(range(g.dim() - 1))).double().cpu() if g is not None
+                     else torch.zeros(t.shape[-1], dtype=torch.float64))
+                d = lm.layers[l].mlp.down_proj.weight.shape[1]
+                out[off:off + d] = v * (p50[l] / norms[l].clamp(min=1e-12)).double()
+                off += d
+            return out
+
+        def __exit__(self, *x):
+            for h in self.h:
+                h.remove()
+
+    def slot_lp(seq, ids_slot):
+        n_s = len(ids_slot)
+        full = seq + ids_slot
+        ids = torch.tensor([full], dtype=torch.long, device=dev)
+        out = model(input_ids=ids, use_cache=False)
+        lp = F.log_softmax(out.logits.float(), -1)
+        pos = torch.arange(len(seq), len(full), device=dev)
+        vals = lp[0, pos - 1, torch.tensor(ids_slot, device=dev)]
+        return float(vals.mean())
+
+    # pass 1: phi for every rollout
+    phi_by_ctx, seqs_by_ctx, pre_by_ctx = {}, {}, {}
+    for ci, r in enumerate(ctx):
+        torch.manual_seed(a.seed * 1000 + ci)
+        pre = E.prompt_prefix(tok, r['prompt'])
+        ids = torch.tensor([pre], dtype=torch.long, device=dev)
+        with torch.inference_mode():
+            o = model.generate(input_ids=ids, do_sample=True, temperature=1.0, top_p=1.0,
+                               max_new_tokens=a.max_new, use_cache=True,
+                               num_return_sequences=a.rollouts, pad_token_id=pad)
+        seqs = []
+        for g in o[:, ids.shape[1]:].tolist():
+            if tok.eos_token_id in g:
+                g = g[:g.index(tok.eos_token_id) + 1]
+            seqs.append(pre + (g or [tok.eos_token_id]))
+        ip, ineg = slot_ids(tok, r['positive']), slot_ids(tok, r['negative'])
+        with torch.inference_mode():
+            phi = [slot_lp(s, ip) - slot_lp(s, ineg) for s in seqs]
+        phi_by_ctx[ci] = phi
+        seqs_by_ctx[ci] = seqs
+        pre_by_ctx[ci] = len(pre)
+        print(f'  ctx {ci} phi mean={sum(phi)/len(phi):+.3f}', flush=True)
+
+    allphi = [p for ci in phi_by_ctx for p in phi_by_ctx[ci]]
+    b = sum(allphi) / len(allphi)
+    print(f'baseline b = mean phi = {b:+.4f}', flush=True)
+
+    # pass 2: xi_i and its statistics
+    n = 0
+    sum_norm_sq = 0.0
+    xibar = torch.zeros(dim, dtype=torch.float64)
+    per_ctx_norm = {}
+    for ci, r in enumerate(ctx):
+        phi, seqs, np_ = phi_by_ctx[ci], seqs_by_ctx[ci], pre_by_ctx[ci]
+        acc = 0.0
+        for i, sq in enumerate(seqs):
+            w = phi[i] - b
+            i1 = torch.tensor([sq], dtype=torch.long, device=dev)
+            with Cap() as cap:
+                model.zero_grad(set_to_none=True)
+                out = model(input_ids=i1, use_cache=False)
+                lp = F.log_softmax(out.logits[:, :-1].float(), -1).gather(-1, i1[:, 1:].unsqueeze(-1)).squeeze(-1)
+                mask = torch.zeros_like(lp)
+                mask[:, np_ - 1:] = 1.0
+                ((lp * mask).sum() * w).backward()
+                xi = cap.dose_grad()
+            xibar += xi
+            nn = float(xi @ xi)
+            sum_norm_sq += nn
+            acc += nn
+            n += 1
+        per_ctx_norm[ci] = acc
+        print(f'  ctx {ci} done, cumulative n={n}', flush=True)
+
+    xibar /= n
+    tr_sigma = (sum_norm_sq - n * float(xibar @ xibar)) / (n - 1)
+    g_sq = float(xibar @ xibar) - tr_sigma / n
+    out = {'n': n, 'dim': dim, 'baseline_b': b,
+           'sum_norm_sq': sum_norm_sq, 'norm_xibar_sq': float(xibar @ xibar),
+           'tr_sigma': tr_sigma, 'g_sq': g_sq,
+           'noise_to_signal': (tr_sigma / g_sq) if g_sq > 0 else None,
+           'pred_r': {str(K): (g_sq / (g_sq + tr_sigma / K)) if g_sq > 0 else None
+                      for K in (2, 4, 8, 16, 32)},
+           'measured_r': {'2': 0.002, '4': 0.005, '8': 0.016, '16': 0.015, '32': 0.022},
+           'per_ctx_sum_norm_sq': per_ctx_norm}
+    print(json.dumps({k: v for k, v in out.items() if k != 'per_ctx_sum_norm_sq'}, indent=1), flush=True)
+    json.dump(out, open(a.out, 'w'), indent=1)
+    print('wrote', a.out, flush=True)
+
+
+if __name__ == '__main__':
+    main()
