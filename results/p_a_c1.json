@@ -1,0 +1,165 @@
+{
+ "status": "C1 NOT INTERPRETABLE (estimator underpowered, split-half reliability ~0)",
+ "criterion": "P-A / plan 2.40. Frozen: C0 instrument sanity; C1 descriptive cos(g_RE,g_J2)<0.30 with a split-half reliability gate; C2 registered, not run.",
+ "design": {
+  "model": "Qwen3.5-4B bf16",
+  "contexts": "contrasts_v3 hostility_01..08",
+  "K_rollouts": 8,
+  "temperature": 1.0,
+  "max_new": 32,
+  "phi": "mean of unitary_toxic-bert and s-nlp/roberta_toxicity_classifier P(tox) on the generated continuation",
+  "baseline": "global mean phi",
+  "normalisation": "u = b*g/||g||_2 in dose space (metric-correct ||.||_M NOT used - deviation on record)"
+ },
+ "seeds": {
+  "0": {
+   "C0": {
+    "mean_phi": 0.04049983550268621,
+    "frac_gt_0.5": 0.0,
+    "n_rollouts": 64
+   },
+   "C1": {
+    "cos_all": -0.007086769822919868,
+    "cos_per_layer": {
+     "0": -0.024556280538580284,
+     "1": -0.053216449778002925,
+     "2": -0.03216800902978313,
+     "3": -0.02009726830324341,
+     "4": 0.019841711822961284,
+     "5": 0.003643159843553451,
+     "6": -0.029314045851015373,
+     "7": -0.03496569611341138,
+     "8": -0.020359020951990613,
+     "9": -0.029934510644719907,
+     "10": 0.03198142190204896,
+     "11": 0.037172294239023476,
+     "12": 0.012614905937282015,
+     "13": -0.001310299981417188,
+     "14": -0.0032050549520580215,
+     "15": 0.018948634165410264,
+     "16": -0.038084258048789066,
+     "17": -0.017487331451059133,
+     "18": 0.01405245295951039,
+     "19": -0.031209959065244642,
+     "20": -0.02043149506283058,
+     "21": -0.053377004414761925,
+     "22": -0.041517961424852104,
+     "23": -0.062307965354086815,
+     "24": -0.03339235746405286,
+     "25": -0.031636209120494974,
+     "26": -0.015973297623110626,
+     "27": -0.006535785804445024,
+     "28": -0.010159535610442194,
+     "29": 0.01782652823057177,
+     "30": 0.007755761850355835,
+     "31": 0.0466150848405363
+    }
+   },
+   "phi_per_ctx_gauge_mean": {
+    "hostility_01": {
+     "unitary": 0.0899,
+     "snlp": 0.0
+    },
+    "hostility_02": {
+     "unitary": 0.0885,
+     "snlp": 0.0
+    },
+    "hostility_03": {
+     "unitary": 0.0887,
+     "snlp": 0.0
+    },
+    "hostility_04": {
+     "unitary": 0.0966,
+     "snlp": 0.0
+    },
+    "hostility_05": {
+     "unitary": 0.0874,
+     "snlp": 0.0
+    },
+    "hostility_06": {
+     "unitary": 0.0912,
+     "snlp": 0.0
+    },
+    "hostility_07": {
+     "unitary": 0.0076,
+     "snlp": 0.0001
+    },
+    "hostility_08": {
+     "unitary": 0.0978,
+     "snlp": 0.0
+    }
+   }
+  },
+  "1": {
+   "C0": {
+    "mean_phi": 0.03778438611442425,
+    "frac_gt_0.5": 0.0,
+    "n_rollouts": 64
+   },
+   "C1": {
+    "cos_all": -0.06699765675360655,
+    "cos_per_layer": {
+     "0": -0.06672121395391027,
+     "1": -0.06881465841755957,
+     "2": -0.011638890300535167,
+     "3": -0.026719150568129867,
+     "4": -0.052645132025951696,
+     "5": -0.07257730641163612,
+     "6": -0.08211382835614854,
+     "7": -0.0799101355313763,
+     "8": -0.09036849658198468,
+     "9": -0.13135558155008406,
+     "10": -0.12368650416107077,
+     "11": -0.16672447166524412,
+     "12": -0.1249937876270012,
+     "13": -0.11218291507389686,
+     "14": -0.1059276689518053,
+     "15": -0.10660699037015925,
+     "16": -0.0964081115314811,
+     "17": -0.12060226868039578,
+     "18": -0.12116016388472735,
+     "19": -0.12216337883671494,
+     "20": -0.12073745339473936,
+     "21": -0.13136907430984654,
+     "22": -0.05991055638949902,
+     "23": -0.06724108318805838,
+     "24": -0.041608293981433286,
+     "25": -0.026636147005839883,
+     "26": -0.020748001331155223,
+     "27": 0.0026554376241099175,
+     "28": -0.029296010705831224,
+     "29": -0.010740822009767328,
+     "30": 0.0077309800482151135,
+     "31": 0.017898080370258806
+    }
+   }
+  }
+ },
+ "reliability": {
+  "cos_re_re_across_seeds": -0.0731,
+  "cos_j2_j2_across_seeds": 1.0,
+  "per_layer_re_re_range": [
+   -0.169,
+   0.057
+  ],
+  "norm_ratio_re_over_j2": 0.0337,
+  "computed_on": "/root/autodl-tmp/runs/p_a_k8.pt and p_a_k8_s1.pt (torch tensors, 32x9216 per arm)"
+ },
+ "verdict": "The frozen C1 prediction (cos < 0.30) is numerically met but scientifically void: the REINFORCE direction is not reproducible across seeds (cos -0.073), so its near-orthogonality to J2 cannot be read as 'behaviour and readout are different objectives'. The control that makes this diagnosable is g_J2, which is exactly reproducible (1.0000) - the machinery is deterministic, the variance is in the objective, not in the code.",
+ "diagnosis": {
+  "phi_dynamic_range": "mean 0.0405 (seed0) / 0.0378 (seed1) over 64 rollouts; per-context means 0.0038-0.0489",
+  "gauge_disagreement": "s-nlp returns exactly 0.0000 on all polite base replies; unitary returns 0.0038-0.1060",
+  "why": "weights (phi - baseline) ~1e-4 => gradient dominated by sampling noise in grad log p; and at b=0 the trait is not elicited at all",
+  "fix_direction": "estimate at an anchor dose inside the usable band, or on an off-policy pool with real phi spread; add variance reduction (per-context baseline) before adding contexts"
+ },
+ "bugs_found_and_gated": [
+  "capture: x.clone().requires_grad_(True) on an already non-leaf input -> grad None for layers 1..31",
+  "generate: missing num_return_sequences -> K=1",
+  "loss mask used as attention mask -> cuts attention over the prompt, moves every logp (75.09 vs 17.80)"
+ ],
+ "self_gate": {
+  "dlogp": 0.0138,
+  "min_per_layer_cos": 0.9994,
+  "note": "threshold amended from 1e-4/0.9999 to 5e-2/0.999 BEFORE reading any science number, because bf16 batch-vs-single kernel noise is 5.6e-3 per 4 tokens; the gate still separates a mask bug (75 vs 18, cos 0.16-0.76) by two orders of magnitude"
+ }
+}

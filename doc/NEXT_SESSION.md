@@ -75,3 +75,34 @@ State is in the repo, not in a chat log. Everything below is committed.
 1. **集合级目标**：若要"能命名的位置"，必须优化他们那种集合级/阈值型目标（行为验证），而不是在局部展开上加阶数。
 2. **混合规则**：先用单点效应初筛（他们发布的 ±0.8 KL 或我们的单坐标 `|g|`），再用 `Q` 去冗余；需要一次测量才能定优劣。
 3. **`results/` 的 tag 化**：每篇对外结论对应一个 tag + `results/*` 的 sha256 清单（见 `AGENTS.md` MUST 第 2 条）。
+
+## 2026-10-30：计划 2.40 第一次 P-A 运行（trait = 路径泛函）——**C1 不可解释**
+
+**做了什么**：把 `d*` 从"教师强制 log-mass 梯度"换成路径泛函的 score-function 梯度
+（`T(u)=E_{x~D}E_{y~p^u}[φ(y)]`，`∇_u T = E[(φ−b)∇_u log p^u]`），其余代数（`u=ŴB⁻¹d*`、`Q(S)`、贪心、预算）
+一律不动。模型 Qwen3.5-4B bf16，8 条 hostility 上下文 × K=8 rollouts，T=1，max_new=32，φ = 两个毒性判官的 P(tox) 均值。
+
+**结果**（`results/p_a_c1.json`、`results/p_a_reinforce_pilot.json`、`metadata.measured.plan240_p_a`）：
+
+| 量 | 值 | 读法 |
+|---|---|---|
+| C0 | mean φ = 0.0405 / 0.0378（两 seed），frac>0.5 = 0 | 仪器可用，基线回复确实"正常" |
+| **cos(g_RE,g_J2)** | **−0.0071 / −0.0670** | 数值上满足冻结的 "<0.30"，**但无效** |
+| **cos(g_RE, g_RE′) 跨 seed** | **−0.0731** | **方向不可复现 ⇒ 上面那行是噪声** |
+| cos(g_J2, g_J2′) 跨 seed | **1.0000** | 控制：机器确定性的，方差在目标函数里，不在代码里 |
+| ‖g_RE‖/‖g_J2‖ | 0.034 | RE 梯度小 30 倍 |
+
+**诊断（可测，不是猜）**：φ 在 b=0 几乎没有动态范围——均值 0.0405、逐上下文 0.0038–0.0489，
+且 **s-nlp 在 64 条礼貌回复上全部恰好 0.0000**，unitary 给 0.0038–0.1060。于是权重 `(φ−b)` 量级 1e-4，
+梯度被 `∇log p` 的采样噪声淹没。**根因是设计而非实现：b=0 时特性根本没有被诱发，所以它的梯度不可测。**
+
+**修好的三个 bug（现在由 SELF 门守住，`|Δlogp| 1.4e-2`、逐层 cos ≥ 0.9994）**：
+1. 抓取必须 `detach()` 后再 `clone()`（第一个注入点之上的输入已经是非叶子 ⇒ `t.grad=None`，只剩 layer 0）；
+2. `generate` 必须给 `num_return_sequences`（否则 K=1）；
+3. **损失 mask 不是 attention mask**——拿它当 attention 会切断对 prompt 的注意力，每一个 logp 都变（75.09 vs 17.80）。
+
+**下一步（按证据）**：
+1. **在诱发点上估**：把 anchor 设在可用带内（b≈0.1）或用一个 φ 真有方差的离线池子，先让 split-half cos ≥ 0.5
+   再谈 cos(g_RE,g_J2)；否则任何"行为≠读数"的结论都是噪声。
+2. 方差缩减优先于加上下文：per-context baseline、common random numbers、或对已有生成做重要性采样。
+3. C2（同预算行为臂 ≥7/8）在 g_RE 可靠之前**不得**开跑。

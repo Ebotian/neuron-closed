@@ -1,0 +1,131 @@
+{
+ "status": "PILOT \u2014 NOT A MEASUREMENT (transport invalid)",
+ "why_invalid": "capture hook used x.clone().requires_grad_(True) on inputs that were ALREADY non-leaf (because layer 0's injected leaf keeps the graph alive upward), so t.grad was None for layers 1-31 and the REINFORCE gradient is non-zero only at layer 0; and K=1 rollout per context because num_return_sequences was not passed to generate. Both bugs identified and fixed in scripts/p_a_reinforce.py AFTER this run; the fixed version (n-ctx 8, K=8) was launched and did not finish before the box shut down.",
+ "what_is_still_valid": [
+  "C0 instrument sanity on real generations (mean phi 0.0410, 8 contexts, 1 rollout each)",
+  "the gauge stack loads and scores (unitary + s-nlp), and s-nlp gives 0.000 on all 8 base replies"
+ ],
+ "C0": {
+  "mean_phi": 0.041002152958526494,
+  "frac_gt_0.5": 0.0,
+  "n_rollouts": 8
+ },
+ "C1": {
+  "cos_all": 0.019701554487205952,
+  "cos_per_layer": {
+   "0": 0.019701554487205952,
+   "1": 0.0,
+   "2": 0.0,
+   "3": 0.0,
+   "4": 0.0,
+   "5": 0.0,
+   "6": 0.0,
+   "7": 0.0,
+   "8": 0.0,
+   "9": 0.0,
+   "10": 0.0,
+   "11": 0.0,
+   "12": 0.0,
+   "13": 0.0,
+   "14": 0.0,
+   "15": 0.0,
+   "16": 0.0,
+   "17": 0.0,
+   "18": 0.0,
+   "19": 0.0,
+   "20": 0.0,
+   "21": 0.0,
+   "22": 0.0,
+   "23": 0.0,
+   "24": 0.0,
+   "25": 0.0,
+   "26": 0.0,
+   "27": 0.0,
+   "28": 0.0,
+   "29": 0.0,
+   "30": 0.0,
+   "31": 0.0
+  },
+  "norm_re": 28.676498488547683,
+  "norm_j2": 285.48453783543243
+ },
+ "ctx": [
+  "hostility_01",
+  "hostility_02",
+  "hostility_03",
+  "hostility_04",
+  "hostility_05",
+  "hostility_06",
+  "hostility_07",
+  "hostility_08"
+ ],
+ "phi": {
+  "hostility_01": {
+   "unitary": [
+    0.10600633919239044
+   ],
+   "snlp": [
+    3.8147318264236674e-05
+   ]
+  },
+  "hostility_02": {
+   "unitary": [
+    0.07784160226583481
+   ],
+   "snlp": [
+    4.36065201938618e-05
+   ]
+  },
+  "hostility_03": {
+   "unitary": [
+    0.08908913284540176
+   ],
+   "snlp": [
+    3.539984027156606e-05
+   ]
+  },
+  "hostility_04": {
+   "unitary": [
+    0.10380886495113373
+   ],
+   "snlp": [
+    3.722900146385655e-05
+   ]
+  },
+  "hostility_05": {
+   "unitary": [
+    0.06681465357542038
+   ],
+   "snlp": [
+    3.9108457713155076e-05
+   ]
+  },
+  "hostility_06": {
+   "unitary": [
+    0.1024196445941925
+   ],
+   "snlp": [
+    3.4716395020950586e-05
+   ]
+  },
+  "hostility_07": {
+   "unitary": [
+    0.0037791808135807514
+   ],
+   "snlp": [
+    4.768637882079929e-05
+   ]
+  },
+  "hostility_08": {
+   "unitary": [
+    0.1059625893831253
+   ],
+   "snlp": [
+    3.654580359579995e-05
+   ]
+  }
+ },
+ "prompts": "/root/autodl-tmp/scripts/j2space/contrasts_v3.jsonl, trait=hostility, first 8 (hostility_01..08)",
+ "model": "Qwen3.5-4B bf16",
+ "remote": "/root/autodl-tmp/runs/p_a_reinforce.json"
+}
