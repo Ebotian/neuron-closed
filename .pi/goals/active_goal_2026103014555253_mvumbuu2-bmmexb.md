@@ -5,13 +5,13 @@
   "status": "active",
   "autoContinue": true,
   "usage": {
-    "tokensUsed": 384396,
-    "activeSeconds": 1792
+    "tokensUsed": 409013,
+    "activeSeconds": 1910
   },
   "sisyphus": false,
-  "revision": 86,
+  "revision": 91,
   "createdAt": "2026-10-30T06:55:52.538Z",
-  "updatedAt": "2026-10-30T07:26:23.428Z",
+  "updatedAt": "2026-10-30T07:28:23.907Z",
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
@@ -82,8 +82,10 @@
       {
         "id": "task-7",
         "title": "bug 清理：把重构中暴露的每一处写成表并全部修掉",
-        "status": "pending",
-        "verificationContract": "doc/refactor-bugs.md 列出：双重除以|slot|（两次）、Gram 单边加权、g_pw 循环内重置、device 不匹配（四处）、str.replace 子串命中、split-half 两份、假独立样本组表述、fd_gate 证书未绑定仪器、旧 sha 失效；每条给发现方式与修法，全部已修且有对应回归证据"
+        "status": "complete",
+        "verificationContract": "doc/refactor-bugs.md 列出：双重除以|slot|（两次）、Gram 单边加权、g_pw 循环内重置、device 不匹配（四处）、str.replace 子串命中、split-half 两份、假独立样本组表述、fd_gate 证书未绑定仪器、旧 sha 失效；每条给发现方式与修法，全部已修且有对应回归证据",
+        "completedAt": "2026-10-30T07:26:38.432Z",
+        "evidence": "doc/refactor-bugs.md lists 16 defects with discovery method, fix and regression evidence, covering every contract item (double |slot| x2, one-sided Gram x2, g_pw reset, 5 device mismatches, str.replac"
       },
       {
         "id": "task-8",
@@ -94,8 +96,10 @@
       {
         "id": "task-9",
         "title": "文档与证书：ARCHITECTURE.md + make certify",
-        "status": "pending",
-        "verificationContract": "ARCHITECTURE.md 说明三层边界与“一个泛函一份实现”规则；make certify 一条命令重跑 fd_gate + Lean 审计并重写 records（不再靠人记得），且能检测某一层被改动时失败"
+        "status": "complete",
+        "verificationContract": "ARCHITECTURE.md 说明三层边界与“一个泛函一份实现”规则；make certify 一条命令重跑 fd_gate + Lean 审计并重写 records（不再靠人记得），且能检测某一层被改动时失败",
+        "completedAt": "2026-10-30T07:26:38.432Z",
+        "evidence": "doc/ARCHITECTURE.md states three layers + one-rule + verification ladder; tools/certify.sh + make certify re-derive fd_gate and the Lean audit and rewrite the records; tested end to end (11 decls PROV"
       }
     ],
     "blockCompletion": true,
@@ -113,8 +117,8 @@
 - Status: running
 - Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 29m52s
-- Tokens used: 384K (384,396) tokens
+- Time spent: 31m50s
+- Tokens used: 409K (409,013) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->
@@ -124,7 +128,7 @@
 - [x] task-4: analysis/split_half.py：只留 Gram 版，删除 fast/slow 两份 — evidence: analysis/split_half.py single impl (reliability.py re-exports); verify vs brute-force half-sums: n=150/150, max per-split diff 1.11e-16 (<1e-12); caught one-sided Gram regression (n=38, 4e-2 off) and 
 - [x] task-5: analysis/icc.py：纯数学层，不依赖 torch 张量尺寸 d — evidence: analysis/icc.py pure-python (input only Gram/group_sizes/k, imports math only); reliability.icc_from_gram now a thin adapter; verify_icc.py runs on plain python3 (no torch/model): from results/gram_25
 - [x] task-6: 现役脚本降为薄壳（组装 + 冻结判据 + 写 results，每个 ≤120 行） — evidence: p_a2 120, p_a_reinforce 97, noise_scale 73, p_a4 90 lines; each imports only core/estimators/analysis; verified vs preceding commit: p_a2 MS_w 39.536595/ICC 0.003454; p_a_reinforce 0.0397/0.1972/0.013
-- [ ] task-7: bug 清理：把重构中暴露的每一处写成表并全部修掉 — contract: doc/refactor-bugs.md 列出：双重除以|slot|（两次）、Gram 单边加权、g_pw 循环内重置、device 不匹配（四处）、str.replace 子串命中、split-half 两份、假独立样本组表述、fd_gate 证书未绑定仪器、旧 sha 失效；每条给发现方式与修法，全部已修且有对应回归证据
+- [x] task-7: bug 清理：把重构中暴露的每一处写成表并全部修掉 — evidence: doc/refactor-bugs.md lists 16 defects with discovery method, fix and regression evidence, covering every contract item (double |slot| x2, one-sided Gram x2, g_pw reset, 5 device mismatches, str.replac
 - [ ] task-8: 性能：清掉所有逐 rollout 循环与 CPU 分析，达标 60%/60 s — contract: results/perf_8x32.json 记录 nvidia-smi 每 3 s 采样的均值与峰值、墙钟；同一基准连续跑两次；GPU 均值 ≥60% 且墙钟 ≤60 s
-- [ ] task-9: 文档与证书：ARCHITECTURE.md + make certify — contract: ARCHITECTURE.md 说明三层边界与“一个泛函一份实现”规则；make certify 一条命令重跑 fd_gate + Lean 审计并重写 records（不再靠人记得），且能检测某一层被改动时失败
+- [x] task-9: 文档与证书：ARCHITECTURE.md + make certify — evidence: doc/ARCHITECTURE.md states three layers + one-rule + verification ladder; tools/certify.sh + make certify re-derive fd_gate and the Lean audit and rewrite the records; tested end to end (11 decls PROV
 
