@@ -23,6 +23,28 @@ rollouts) - no judge, no threshold, no dose convention. So cos(g_path, g_teacher
 measurement of "how much does the measure change cost", which is exactly the trait-vs-behaviour gap
 in its cleanest available form.
 
+UNIFIED FUNCTIONAL AND NORMALISATION (plan 2.48, task-3 of audit-response §12).
+Every quantity in this file is an average over rollouts i = 1..K and over contexts c = 1..C, and every
+readout is a mean over the slot's own tokens. Written once, here, and nothing else is allowed:
+
+    phi(y)          = (1/|s+|) sum_{t in s+} log p(t | x, y)  -  (1/|s-|) sum_{t in s-} log p(t | x, y)
+                      ------------------------------------        ------------------------------------
+                          mean over the POSITIVE slot tokens              mean over the NEGATIVE slot tokens
+    g_path          = (1/C) sum_c (1/K) sum_i grad_u phi(y_ci)
+    g_score         = (1/C) sum_c (1/K) sum_i ( phi(y_ci) - b ) grad_u log p(y_ci)
+    g_teach         = (1/C) sum_c grad_u [ mean over SUFFIX tokens of ( log p(s+|x) - log p(s-|x) ) ]
+
+Two distinctions that look like inconsistencies and are NOT, so nobody "fixes" them later:
+  * g_score uses grad_u log p(y) with log p the density of the WHOLE sequence (a SUM over tokens), because
+    the measure is over complete sequences; the readouts phi and g_teach divide by their own token counts.
+  * b is a single scalar baseline shared by all contexts, so that (1/C)sum_c(1/K)sum_i(phi-b)s is the
+    estimator of the same 1/C sum_c grad E[phi].
+
+WHAT WAS WRONG BEFORE THIS (audit-response §2-3): the pathwise branch divided by |slot| a second time on top
+of .mean() (so L^-2 while phi is L^-1), the teacher branch summed instead of averaging over suffix tokens,
+the score branch carried 1/K but not 1/C, and g_pw was re-initialised inside the context loop so only the
+last context survived. All four are fixed here.
+
 FROZEN CRITERIA (written 2026-10-30 before the run)
   C0  phi must have dynamic range: total sd(phi) >= 0.05 nat AND within-context sd >= 0.01 nat.
       Violated -> the functional is again near-constant, STOP and say so (no knob turning).
@@ -64,6 +86,8 @@ def main():
     ap.add_argument('--out', default='/root/autodl-tmp/runs/p_a2_path.json')
     ap.add_argument('--selftest', action='store_true')
     ap.add_argument('--pathwise', action='store_true')
+    ap.add_argument('--phi-selftest', action='store_true',
+                    help='task-3 gate: the two code paths for phi must agree to <1e-6 (run in fp32)')
     a = ap.parse_args()
     dev = 'cuda:0'
     torch.manual_seed(a.seed)
@@ -142,8 +166,48 @@ def main():
         print(f'SELF phi values batch={[round(float(x),4) for x in b2]} single={[round(float(x),4) for x in s2]}', flush=True)
         return 0 if ok else 1
 
+    if a.phi_selftest:
+        # task-3 gate: phi must be the SAME functional whether it is evaluated batched (phi_of, used for the
+        # weights) or per-row with the pathwise branch's own expression. fp32 is used because bf16 batching
+        # noise (~5e-3) would dominate the 1e-6 tolerance the criterion asks for.
+        model = model.float()
+        lm = E.model_lm(model)
+        p50 = E.estimate_p50(tok, model, lm, layers, dev)
+        norms = E.column_norms(lm, layers)
+        p_ = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
+        r = ctx[0]
+        pre = E.prompt_prefix(tok, r['prompt'])
+        torch.manual_seed(0)
+        ids = torch.tensor([pre], dtype=torch.long, device=dev)
+        with torch.inference_mode():
+            o = model.generate(input_ids=ids, do_sample=True, temperature=1.0, top_p=1.0,
+                               max_new_tokens=12, use_cache=True, num_return_sequences=3, pad_token_id=p_)
+        seqs = [pre + g for g in o[:, ids.shape[1]:].tolist()]
+        with torch.inference_mode():
+            # A must be evaluated with the SAME batch shape as the branch (one row at a time). Batching
+            # three rows changes the cuBLAS kernel and moves a 151,936-way fp32 softmax by ~5e-4, which
+            # would swamp the 1e-6 tolerance for a reason that has nothing to do with the functional.
+            A = [float(phi_of([sq], r)[0]) for sq in seqs]
+            A_batched = [float(x) for x in phi_of(seqs, r)]
+        ip, ineg = slot_ids(tok, r['positive']), slot_ids(tok, r['negative'])
+        B = []
+        for sq in seqs:
+            tot = 0.0
+            for ids_slot, sgn in ((ip, +1.0), (ineg, -1.0)):
+                tot += sgn * float(slot_lp([sq], None, ids_slot)[0])
+            B.append(tot)
+        d = max(abs(x - y) for x, y in zip(A, B))
+        d_batch = max(abs(x - y) for x, y in zip(A_batched, A))
+        print(f'PHI-SELFTEST fp32  same-batch-shape: phi_of={[round(x,9) for x in A]} '
+              f'branch={[round(x,9) for x in B]}  |max diff|={d:.2e}', flush=True)
+        print(f'PHI-SELFTEST (reported, not gated) batched-vs-single kernel effect |max diff|={d_batch:.2e}', flush=True)
+        print('PHI-SELFTEST', 'PASS' if d < 1e-6 else 'FAIL', flush=True)
+        return 0 if d < 1e-6 else 1
+
     g_path = {l: torch.zeros(lm.layers[l].mlp.down_proj.weight.shape[1], dtype=torch.float64) for l in layers}
     g_teach = {l: torch.zeros_like(g_path[l]) for l in layers}
+    g_path_in = {l: torch.zeros_like(g_path[l]) for l in layers}  # in-sample baseline (biased by 1-1/K)
+    g_pw = {l: torch.zeros_like(g_path[l]) for l in layers}
     rec = {'ctx': [], 'phi': {}, 'texts': {}}
     splits = {}
     allphi = []
@@ -173,10 +237,8 @@ def main():
         # Per-rollout score vectors: needed for the reliability curve r(K). 302 MB total, fine.
         S = torch.zeros((len(seqs), sum(lm.layers[l].mlp.down_proj.weight.shape[1] for l in layers)),
                         dtype=torch.float32)
-        g_pw = {l: torch.zeros_like(g_path[l]) for l in layers}
         for i, sq in enumerate(seqs):
             off = 0
-            w = (ph[i] - base) / len(seqs)
             i1 = torch.tensor([sq], dtype=torch.long, device=dev)
             with Cap() as cap:
                 model.zero_grad(set_to_none=True)
@@ -184,14 +246,28 @@ def main():
                 lp = F.log_softmax(out.logits[:, :-1].float(), -1).gather(-1, i1[:, 1:].unsqueeze(-1)).squeeze(-1)
                 mask = torch.zeros_like(lp)
                 mask[:, len(pre) - 1:] = 1.0
-                ((lp * mask).sum() * w).backward()
+                # weight 1: store the RAW per-rollout score s_i, apply the baseline afterwards. The gradient
+                # is linear in the weight, so one backward per rollout serves the in-sample AND the
+                # leave-one-out variant, which is what task-4 needs to compare them on identical data.
+                ((lp * mask).sum()).backward()
                 gg = cap.grad_sum()
             for l in layers:
                 v = gg[l] * (p50[l] / norms[l].clamp(min=1e-12))
-                g_path[l] += v
                 d = lm.layers[l].mlp.down_proj.weight.shape[1]
                 S[i, off:off + d] = v.float()
                 off += d
+        # --- task-4: two baselines from the SAME per-rollout scores
+        K_ = len(seqs)
+        w_in = [(x - base) / (K_ * len(ctx)) for x in ph]
+        phi_sum = sum(ph)
+        w_loo = [(x - (phi_sum - x) / max(K_ - 1, 1)) / (K_ * len(ctx)) for x in ph]
+        off = 0
+        for l in layers:
+            d = lm.layers[l].mlp.down_proj.weight.shape[1]
+            blk = S[:, off:off + d].double()
+            g_path[l] += (torch.tensor(w_loo).double().unsqueeze(1) * blk).sum(0)
+            g_path_in[l] += (torch.tensor(w_in).double().unsqueeze(1) * blk).sum(0)
+            off += d
         if a.pathwise:
             for i, sq in enumerate(seqs):
                 i1 = torch.tensor([sq], dtype=torch.long, device=dev)
@@ -206,7 +282,7 @@ def main():
                         lp = F.log_softmax(out.logits[:, :-1].float(), -1)
                         pos = torch.arange(len(sq), len(full), device=dev)
                         tgt = torch.tensor(ids_slot, device=dev)
-                        term = lp[0, pos - 1, tgt].mean() * (sgn / len(ids_slot) / len(seqs))
+                        term = lp[0, pos - 1, tgt].mean() * (sgn / (len(seqs) * len(ctx)))
                         term.backward()
                         gg = cap.grad_sum()
                     for l in layers:
@@ -226,7 +302,7 @@ def main():
                 lp = F.log_softmax(out.logits[:, :-1].float(), -1).gather(-1, i1[:, 1:].unsqueeze(-1)).squeeze(-1)
                 mask = torch.zeros_like(lp)
                 mask[:, int(rpre) - 1:] = 1.0
-                ((lp * mask).sum() * (sgn / len(ctx))).backward()
+                ((lp * mask).sum() / mask.sum() * (sgn / len(ctx))).backward()
                 gg = cap.grad_sum()
             for l in layers:
                 g_teach[l] += gg[l] * (p50[l] / norms[l].clamp(min=1e-12))
@@ -280,6 +356,17 @@ def main():
     gp, gt = flat(g_path), flat(g_teach)
     cos = float(F.cosine_similarity(gp.unsqueeze(0), gt.unsqueeze(0)))
     per = {l: float(F.cosine_similarity(g_path[l].unsqueeze(0), g_teach[l].unsqueeze(0))) for l in layers}
+    gpi = flat(g_path_in)
+    rec['baseline_compare'] = {
+        'cos_loo_vs_insample': float(F.cosine_similarity(gp.unsqueeze(0), gpi.unsqueeze(0))),
+        'norm_ratio_loo_over_insample': float(gp.norm() / gpi.norm()) if float(gpi.norm()) > 0 else None,
+        'K': a.rollouts, 'n_ctx': len(ctx),
+        'predicted_bias_factor_insample': 1.0 - 1.0 / a.rollouts,
+        'note': 'the in-sample baseline b=mean(phi) yields E[(phi-b)s]=(1-1/K) g, so g_in underestimates g by that factor; the leave-one-out b_{-i} is unbiased'}
+    print('BASE cos(loo,in-sample)=%+.6f  |loo|/|in|=%.6f  predicted(1-1/K)=%.6f' % (
+        rec['baseline_compare']['cos_loo_vs_insample'],
+        rec['baseline_compare']['norm_ratio_loo_over_insample'] or 0.0,
+        rec['baseline_compare']['predicted_bias_factor_insample']), flush=True)
     rec['C1p'] = {'cos_path_teach': cos, 'cos_per_layer': per,
                   'norm_path': float(gp.norm()), 'norm_teach': float(gt.norm())}
     if a.pathwise:

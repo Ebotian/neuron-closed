@@ -230,8 +230,12 @@ def main():
         ids = torch.full((len(seqs), T), pad, dtype=torch.long, device=dev)
         for i, x in enumerate(seqs):
             ids[i, :len(x)] = torch.tensor(x, device=dev)
-        w = torch.tensor([(phi[i] - base) / len(seqs) for i in range(len(seqs))],
-                         dtype=torch.float32, device=dev)
+        # task-4: leave-one-out baseline b_{-i} = mean_{j != i} phi_j, which is unbiased because b_{-i} is
+        # independent of rollout i and E[s_i] = 0. The in-sample mean would give E[(phi-b)s] = (1-1/K) g.
+        K_ = len(seqs)
+        psum = sum(phi)
+        w = torch.tensor([(phi[i] - (psum - phi[i]) / max(K_ - 1, 1)) / (K_ * len(ctx))
+                          for i in range(K_)], dtype=torch.float32, device=dev)
         with Capture(lm, layers) as cap:
             model.zero_grad(set_to_none=True)
             loss, per = score_batch(model, ids, [len(x) for x in seqs], w, len(prefix))
