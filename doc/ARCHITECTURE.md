@@ -30,7 +30,7 @@ analysis/       只吃 Gram/数值，不吃模型
   fd.py           有限差分判据本身（G1 逐坐标 min-over-eps < 2%，G2 旧法必须 > 5% 可见）
 scripts/        现役薄壳（全部 ≤120 行）：组装 + 冻结判据 + 写 results
   p_a2_pathj2.py 119      p_a_reinforce.py 98     noise_scale.py 74
-  p_a4_closed_form.py 91  fd_gate.py 120          quotient_compare_v2.py 74
+  p_a4_closed_form.py 91  fd_gate.py 120          quotient_compare_v2.py 76
   reliability.py 21（弃用 shim）                  legacy_capture.py 42（唯一的阴性对照）
   worker.py 79    常驻模型，按 stdin 每行跑一次 pass（见下文）
   bench_8x32.py 99  两次 pass + PASS_START/PASS_END 打点
