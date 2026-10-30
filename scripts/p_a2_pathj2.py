@@ -185,7 +185,7 @@ def main():
             coef = sgn * weight * ((1.0 / len(ids_slot)) if a.inject_double_division else 1.0)
             (lp[0, pos - 1, tgt].mean() * coef).backward()
             raw = cap.grad_sum()
-        return {l: raw[l] * (p50[l] / norms[l].clamp(min=1e-12)).double() for l in layers}
+        return {l: raw[l].to(dev) * (p50[l] / norms[l].clamp(min=1e-12)).to(dev).double() for l in layers}
 
     def teacher_term(prompt, slot_txt, sgn, weight):
         """d/du of weight * sgn * (MEAN over suffix tokens of log p(slot | prompt)) — the teacher-forced readout."""
@@ -199,7 +199,7 @@ def main():
             mask[:, int(rpre) - 1:] = 1.0
             ((lp * mask).sum() / mask.sum() * (sgn * weight)).backward()
             raw = cap.grad_sum()
-        return {l: raw[l] * (p50[l] / norms[l].clamp(min=1e-12)).double() for l in layers}
+        return {l: raw[l].to(dev) * (p50[l] / norms[l].clamp(min=1e-12)).to(dev).double() for l in layers}
 
     if a.branch_selftest:
         """REAL gate for the four defects fixed in plan 2.48, replacing the vacuous one.
@@ -290,7 +290,7 @@ def main():
                   open(a.out.replace('.json', '_branch_selftest.json'), 'w'), indent=1)
         return 0 if ok else 1
 
-    g_path = {l: torch.zeros(lm.layers[l].mlp.down_proj.weight.shape[1], dtype=torch.float64) for l in layers}
+    g_path = {l: torch.zeros(lm.layers[l].mlp.down_proj.weight.shape[1], dtype=torch.float64, device=dev) for l in layers}
     g_teach = {l: torch.zeros_like(g_path[l]) for l in layers}
     g_path_in = {l: torch.zeros_like(g_path[l]) for l in layers}  # in-sample baseline (biased by 1-1/K)
     g_pw = {l: torch.zeros_like(g_path[l]) for l in layers}
@@ -324,26 +324,32 @@ def main():
         base = sum(ph) / len(ph)
         # Per-rollout score vectors: needed for the reliability curve r(K). 302 MB total, fine.
         S = torch.zeros((len(seqs), sum(lm.layers[l].mlp.down_proj.weight.shape[1] for l in layers)),
-                        dtype=torch.float32)
-        for i, sq in enumerate(seqs):
-            off = 0
-            i1 = torch.tensor([sq], dtype=torch.long, device=dev)
-            with Cap() as cap:
-                model.zero_grad(set_to_none=True)
-                out = model(input_ids=i1, use_cache=False)
-                lp = F.log_softmax(out.logits[:, :-1].float(), -1).gather(-1, i1[:, 1:].unsqueeze(-1)).squeeze(-1)
-                mask = torch.zeros_like(lp)
-                mask[:, len(pre) - 1:] = 1.0
-                # weight 1: store the RAW per-rollout score s_i, apply the baseline afterwards. The gradient
-                # is linear in the weight, so one backward per rollout serves the in-sample AND the
-                # leave-one-out variant, which is what task-4 needs to compare them on identical data.
-                ((lp * mask).sum()).backward()
-                gg = cap.grad_sum()
-            for l in layers:
-                v = gg[l] * (p50[l] / norms[l].clamp(min=1e-12))
-                d = lm.layers[l].mlp.down_proj.weight.shape[1]
-                S[i, off:off + d] = v.float()
-                off += d
+                        dtype=torch.float32, device=dev)
+        # ONE batched backward for all K rollouts of this context. The delta leaf is (B, T, d) and each element
+        # belongs to exactly one sample, so delta.grad already carries per-sample derivatives; summing over the time
+        # axis gives each rollout's score vector. This replaces K single-sequence backwards with one, which is what
+        # makes the GPU busy instead of the Python loop (the console showed 0% GPU / 1200% CPU).
+        Tmax = max(len(x) for x in seqs)
+        bid = torch.full((len(seqs), Tmax), pad, dtype=torch.long, device=dev)
+        am = torch.zeros_like(bid)
+        sm = torch.zeros_like(bid)
+        for i_, x in enumerate(seqs):
+            bid[i_, :len(x)] = torch.tensor(x, device=dev)
+            am[i_, :len(x)] = 1
+            sm[i_, len(pre):len(x)] = 1
+        with Cap() as cap:
+            model.zero_grad(set_to_none=True)
+            out = model(input_ids=bid, attention_mask=am, use_cache=False)
+            lp = torch.log_softmax(out.logits[:, :-1].float(), -1).gather(
+                -1, bid[:, 1:].unsqueeze(-1)).squeeze(-1)
+            ((lp * sm[:, 1:].float()).sum()).backward()
+            gps = cap._c.grad_per_sample()
+        off = 0
+        for l in layers:
+            d_ = int(lm.layers[l].mlp.down_proj.weight.shape[1])
+            S[:, off:off + d_] = (gps[l] * (p50[l] / norms[l].clamp(min=1e-12)).to(dev).double()).float()
+            off += d_
+
         # --- task-4: two baselines from the SAME per-rollout scores
         K_ = len(seqs)
         w_in = [(x - base) / (K_ * len(ctx)) for x in ph]
@@ -354,8 +360,8 @@ def main():
         for l in layers:
             d = lm.layers[l].mlp.down_proj.weight.shape[1]
             blk = S[:, off:off + d].double()
-            g_path[l] += (torch.tensor(w_loo).double().unsqueeze(1) * blk).sum(0)
-            g_path_in[l] += (torch.tensor(w_in).double().unsqueeze(1) * blk).sum(0)
+            g_path[l] += (torch.tensor(w_loo, device=dev).double().unsqueeze(1) * blk).sum(0)
+            g_path_in[l] += (torch.tensor(w_in, device=dev).double().unsqueeze(1) * blk).sum(0)
             off += d
         if a.pathwise:
             ip, ineg = slot_ids(tok, r['positive']), slot_ids(tok, r['negative'])
@@ -392,16 +398,18 @@ def main():
     # Reliability via scripts/reliability.py: one convention for the whole repo.
     #   split-half compares TWO DISJOINT HALVES of size K/2  =>  r(K) ~ K/(K+2*kappa)
     #   kappa = tr(Sigma)/||g||^2 with an interval from resampling CONTEXTS (the independent unit).
-    from reliability import split_half_curve, noise_scale, bootstrap_stats
+    from reliability import split_half_curve_fast, noise_scale, bootstrap_stats_fast
     W_all = [w_loo_ctx[ci] for ci in range(len(ctx))]
-    curve = split_half_curve([splits[ci] for ci in range(len(ctx))], W_all,
+    curve = split_half_curve_fast([splits[ci] for ci in range(len(ctx))], W_all,
                              ks=tuple(k for k in (2, 4, 8, 16, 32) if k <= a.rollouts))
     ns = noise_scale([splits[ci] for ci in range(len(ctx))], W_all)
-    iv = bootstrap_stats([splits[ci] for ci in range(len(ctx))], W_all)
+    iv = bootstrap_stats_fast([splits[ci] for ci in range(len(ctx))], W_all)
     r32 = curve.get(a.rollouts, {}).get('r_mean')
     rec['R'] = {'r_of_K': curve, 'noise_scale': ns, 'kappa_interval': iv,
                 'convention': 'r(K) ~ K/(K+2*kappa), so r=0.5 needs K = 2*kappa, NOT kappa. kappa is the noise-to-signal ratio.',
                 'tr_sigma_interval': iv['tr_sigma_interval'], 'g_sq_interval': iv['g_sq_interval'],
+                'tr_sigma_bca': iv['tr_sigma_bca'], 'g_sq_bca': iv['g_sq_bca'], 'kappa_bca': iv['kappa_bca'],
+                'tr_sigma_bca': iv['tr_sigma_bca'], 'g_sq_bca': iv['g_sq_bca'], 'kappa_bca': iv['kappa_bca'],
                 'frac_boot_g_sq_positive': iv['frac_boot_g_sq_positive'],
                 'r_at_Kmax': r32}
     print('R r(K)=%s' % {k: round(v['r_mean'], 4) for k, v in curve.items()}, flush=True)

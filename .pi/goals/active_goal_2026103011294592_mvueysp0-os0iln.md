@@ -2,33 +2,24 @@
   "version": 3,
   "id": "mvueysp0-os0iln",
   "objective": "按 doc/audit-response-2026-10-30.md §12 的顺序修好梯度测量仪器、用 fp32 有限差分证明修好了，并在此仪器上重跑 2.40/2.42/2.43/2.46 与被降级的 2.45，把所有数字重记为可信版本。",
-  "status": "active",
-  "autoContinue": true,
+  "status": "paused",
+  "autoContinue": false,
   "usage": {
-    "tokensUsed": 776877,
-    "activeSeconds": 5801
+    "tokensUsed": 807614,
+    "activeSeconds": 6143
   },
   "sisyphus": false,
   "createdAt": "2026-10-30T03:29:45.924Z",
-  "updatedAt": "2026-10-30T05:07:24.357Z",
+  "updatedAt": "2026-10-30T05:56:33.765Z",
   "activePath": ".pi/goals/active_goal_2026103011294592_mvueysp0-os0iln.md",
-  "revision": 135,
+  "revision": 149,
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
-    "generation": "32d2e493-9d18-4070-a9d4-7c400457a8d7",
+    "generation": "79660e32-5481-499c-95ca-2076a0951156",
     "used": 1,
-    "phase": "running",
-    "repairUsed": false,
-    "decision": {
-      "kind": "ready",
-      "purpose": "ready"
-    },
-    "dispatch": {
-      "id": "608f6cd7-4c67-4d64-9761-1bd8db0f6a80",
-      "kind": "ready",
-      "claimedAt": 1793330985953
-    }
+    "phase": "idle",
+    "repairUsed": false
   },
   "taskList": {
     "tasks": [
@@ -123,7 +114,8 @@
     ],
     "blockCompletion": true,
     "proposedAt": "2026-10-30T03:29:31.601Z"
-  }
+  },
+  "stopReason": "user"
 }
 
 # Goal Prompt
@@ -132,11 +124,11 @@
 
 ## Progress
 
-- Status: running
-- Auto-continue: on
+- Status: paused
+- Auto-continue: off
 - Sisyphus mode: no
-- Time spent: 1h36m41s
-- Tokens used: 777K (776,877) tokens
+- Time spent: 1h42m23s
+- Tokens used: 808K (807,614) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->

@@ -79,6 +79,24 @@ class Capture:
             d.grad = None
         return out
 
+    def grad_per_sample(self) -> dict[int, torch.Tensor]:
+        """Per-sample gradients from ONE batched backward.
+
+        Each element of the delta leaf belongs to exactly one sample of the batch, so `delta.grad` already carries
+        per-sample derivatives - it only needs summing over the time axis. This is what makes a batched rollout pass
+        possible: 8 backwards for 8 contexts instead of 256 backwards for 256 rollouts, i.e. the GPU actually runs.
+        """
+        out = {}
+        for l in self.layers:
+            d = self.delta[l]
+            g = d.grad
+            if g is None:
+                out[l] = None
+                continue
+            out[l] = g.sum(dim=1).double()      # (B, d): sum over the time axis, keep the sample axis
+            d.grad = None
+        return out
+
     def dose_grad(self, p50=None, norms=None) -> torch.Tensor:
         p50 = self.p50 if p50 is None else p50
         norms = self.norms if norms is None else norms

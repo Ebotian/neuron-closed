@@ -185,7 +185,7 @@ def main():
 
     rec = {'ctx': [], 'phi': {}, 'texts': {}}
     keep = {}
-    g_re = {l: torch.zeros(lm.layers[l].mlp.down_proj.weight.shape[1], dtype=torch.float64) for l in layers}
+    g_re = {l: torch.zeros(lm.layers[l].mlp.down_proj.weight.shape[1], dtype=torch.float64, device=dev) for l in layers}
     g_j2 = {l: torch.zeros_like(g_re[l]) for l in layers}
     all_phi = []
     for ci, r in enumerate(ctx):
@@ -246,7 +246,7 @@ def main():
         psum = sum(phi)
         w = torch.tensor([(phi[i] - (psum - phi[i]) / max(K_ - 1, 1)) / (K_ * len(ctx))
                           for i in range(K_)], dtype=torch.float32, device=dev)
-        S = torch.zeros((K_, per_dim), dtype=torch.float64)
+        S = torch.zeros((K_, per_dim), dtype=torch.float64, device=dev)
         for i, sq in enumerate(seqs):
             i1 = torch.tensor([sq], dtype=torch.long, device=dev)
             with Capture(lm, layers) as cap:
@@ -258,11 +258,11 @@ def main():
                 ((lp * mask).sum()).backward()   # weight 1: store the raw score, weight afterwards
                 g = cap.grad_sum()
             for l, o_, d_ in offs:
-                S[i, o_:o_ + d_] = (g[l] * (p50[l] / norms[l].clamp(min=1e-12))).double()
+                S[i, o_:o_ + d_] = (g[l] * (p50[l] / norms[l].clamp(min=1e-12))).to(dev).double()
         wloo = [float(w[i]) for i in range(K_)]
         for i in range(K_):
             for l, o_, d_ in offs:
-                g_re[l] += wloo[i] * S[i, o_:o_ + d_]
+                g_re[l] += wloo[i] * S[i, o_:o_ + d_].double()
         S_all.append(S)
         W_all.append(wloo)
         print(f'  RE ctx {ci} K={K_} w_loo={[round(x,5) for x in wloo]}', flush=True)
@@ -281,18 +281,20 @@ def main():
                 loss1.backward()
                 g = cap.grad_sum()
             for l in layers:
-                g_j2[l] += g[l] * (p50[l] / norms[l].clamp(min=1e-12))
+                g_j2[l] += g[l].to(dev) * (p50[l] / norms[l].clamp(min=1e-12)).to(dev).double()
         print(f'  J2 ctx {ci} done', flush=True)
 
-    from reliability import split_half_curve, noise_scale, bootstrap_kappa
-    rel = {'split_half': split_half_curve(S_all, W_all, ks=(2, 4, 8)),
+    from reliability import split_half_curve_fast, noise_scale, bootstrap_stats_fast
+    rel = {'split_half': split_half_curve_fast(S_all, W_all, ks=(2, 4, 8)),
            'noise_scale': noise_scale(S_all, W_all),
-           'interval': bootstrap_kappa(S_all, W_all)}
+           'interval': bootstrap_stats_fast(S_all, W_all)}
     rec['reliability'] = rel
-    print('REL r(K)=%s kappa=%s interval=[%s, %s]' % (
-        {k: round(v['r_mean'], 4) for k, v in rel['split_half'].items()},
-        None if rel['noise_scale']['kappa'] is None else round(rel['noise_scale']['kappa'], 1),
-        rel['interval']['kappa_lo'], rel['interval']['kappa_hi']), flush=True)
+    iv = rel['interval']
+    print('REL r(K)=%s' % {k: round(v['r_mean'], 4) for k, v in rel['split_half'].items()}, flush=True)
+    print('REL trSigma=%.4f %s (BCa %s)  ||g||^2=%.5f %s (BCa %s)  kappa=%s  K(r=0.5)=2kappa=%s' % (
+        iv['tr_sigma'], iv['tr_sigma_interval'], iv['tr_sigma_bca'],
+        iv['g_sq'], iv['g_sq_interval'], iv['g_sq_bca'], iv['kappa'],
+        None if iv['kappa'] is None else round(2 * iv['kappa'], 1)), flush=True)
 
     def flat(d):
         return torch.cat([d[l] for l in layers])

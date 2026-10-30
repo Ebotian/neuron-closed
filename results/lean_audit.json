@@ -2,7 +2,7 @@
  "toolchain": "leanprover/lean4:v4.33.0-rc1",
  "mathlib_rev": "79d0395a1825a6264ad5d269e35e60537518955e",
  "mathlib_inputRev": "v4.33.0-rc1",
- "verdict": "PROVED for all eleven declarations across three files (opl-leancheck without --evidence-out)",
+ "verdict": "PROVED for all thirteen declarations across four files (opl-leancheck without --evidence-out)",
  "already_in_mathlib": "ContinuousLinearMap.ker_adjoint_comp_self states (T\u2020 \u2218L T).ker = T.ker, i.e. ker_gram is textbook; the load-bearing statement is lift_maps_back",
  "boundary": "formalises the algebra (kernel is a gauge; a solution's residual image is exactly y). It does NOT formalise the model, the construct, or trait fidelity.",
  "files": {
@@ -79,6 +79,22 @@
    },
    "role": "plan 2.42's algebra: for a pairwise orthogonal equal-norm family the split-half inner product is (|S|^2 - K c^2)/4 for EVERY split, hence split-independent. The earlier 'isotropy => cos ~ 0 => K ~ d' reading is RETRACTED: see doc/references/isotropy-and-noise-scale.md - anisotropy is inherent (arXiv:2401.12143, 2602.11185, 2407.11239) and the correct scaling quantity is the noise-to-signal ratio tr(Sigma)/|g|^2, not the ambient dimension.",
    "note": "sha updated 2026-10-30 after a docstring-only edit (the retraction of the isotropy reading); the five declarations were re-audited with opl-leancheck and report PROVED with axioms {propext, Classical.choice, Quot.sound}"
+  },
+  "lean/Reliability.lean": {
+   "sha256": "feba8c53f2d606c0aeae18f4be66ca0c309cd2817cf9f197c62a1af1e68baff4",
+   "decls": {
+    "NeuronClosed.ssw_shift_invariant": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.icc_bounds": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ]
+   },
+   "role": "the estimator that replaces the half-sum cosine: (R1) the within-group sum of squares is EXACTLY invariant under a common-mode shift, which is the property the plug-in cosine lacks; (R2) the intraclass correlation is bounded in [-1/(n-1), 1], so a perturbation of the variance components cannot move the estimate out of a fixed range. Lean caught a statement error: at MSb = 0 the ICC EQUALS the lower bound, so that side is \u2264, not <"
   }
  },
  "scope": "Gauge.lean = 2.44's algebra. Decomposition.lean = 2.42's pathwise+score identity on a finite outcome set. Dimension.lean = 2.42's algebra of split-half quantities (orthogonal families). NOT formalised: construct fidelity, any model claim, and the noise-scale relation itself (doc/references/isotropy-and-noise-scale.md records why isotropy is the wrong assumption).",

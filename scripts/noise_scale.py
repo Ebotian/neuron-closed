@@ -136,14 +136,14 @@ def main():
     # pass 2: xi_i and its statistics
     n = 0
     sum_norm_sq = 0.0
-    xibar = torch.zeros(dim, dtype=torch.float64)
+    xibar = torch.zeros(dim, dtype=torch.float64, device=dev)
     per_ctx_norm = {}
     XI = []          # per-context [K, dim] of xi_i, for scripts/reliability.py
     W = []
     for ci, r in enumerate(ctx):
         phi, seqs, np_ = phi_by_ctx[ci], seqs_by_ctx[ci], pre_by_ctx[ci]
         acc = 0.0
-        Xc = torch.zeros((len(seqs), dim), dtype=torch.float64)
+        Xc = torch.zeros((len(seqs), dim), dtype=torch.float64, device=dev)
         wc = list(W_loo[ci])
         for i, sq in enumerate(seqs):
             # store the UNWEIGHTED per-rollout score; reliability.py applies W (one place, one convention).
@@ -158,6 +158,7 @@ def main():
                 mask[:, np_ - 1:] = 1.0
                 ((lp * mask).sum()).backward()
                 xi = cap.dose_grad()
+            xi = xi.to(dev)
             xibar += xi
             Xc[i] = xi
             nn = float(xi @ xi)
@@ -169,9 +170,9 @@ def main():
         W.append(wc)
         print(f'  ctx {ci} done, cumulative n={n}', flush=True)
 
-    from reliability import noise_scale as rel_noise, bootstrap_stats
+    from reliability import noise_scale as rel_noise, bootstrap_stats_fast
     ns = rel_noise(XI, W)
-    iv = bootstrap_stats(XI, W)
+    iv = bootstrap_stats_fast(XI, W)
     tr_sigma, g_sq = ns['tr_sigma'], ns['g_sq']
     kappa = ns['kappa']
     # Decompose the pooled/curve disagreement: the pooled trace mixes contexts whose per-rollout score SCALES differ,
@@ -189,6 +190,8 @@ def main():
            'norm_xibar_sq': ns['norm_xibar_sq'], 'tr_sigma': tr_sigma, 'g_sq': g_sq,
            'kappa_pooled': kappa, 'kappa_bootstrap_interval': iv['kappa_interval'],
            'tr_sigma_interval': iv['tr_sigma_interval'], 'g_sq_interval': iv['g_sq_interval'],
+           'tr_sigma_bca': iv['tr_sigma_bca'], 'g_sq_bca': iv['g_sq_bca'], 'kappa_bca': iv['kappa_bca'],
+           'tr_sigma_bca': iv['tr_sigma_bca'], 'g_sq_bca': iv['g_sq_bca'], 'kappa_bca': iv['kappa_bca'],
            'frac_boot_g_sq_positive': iv['frac_boot_g_sq_positive'],
            'K_for_r_half_via_2kappa': (None if kappa is None else 2 * kappa),
            'kappa_implied_by_measured_r32': kappa_curve, 'r32_used': a.r32,
@@ -197,9 +200,11 @@ def main():
            'per_ctx_sum_norm_sq': per_ctx_norm,
            'kappa_per_context': per_ctx_kappa,
            'kappa_per_context_median': (per_ctx_kappa[len(per_ctx_kappa) // 2] if per_ctx_kappa else None),
-           'discrepancy_explained': ('pooled kappa (2238) vs curve-implied kappa (217.6) is a factor ~10 and is expected: the pooled trace '
-               'contains between-context variation in the per-rollout score scale, which the split-half estimator cancels by construction '
-               '(it compares two halves of the SAME contexts). The median per-context kappa is reported as the like-for-like quantity.'),
+           'discrepancy_explained': ("pooled kappa (%s) vs the curve-implied kappa (%s) built from THIS run r32 (%s): the "
+               "pooled trace contains between-context variation in the per-rollout score scale, which the split-half estimator "
+               "cancels by construction because it compares two halves of the SAME contexts. The median per-context kappa is the "
+               "like-for-like quantity." % (None if kappa is None else round(kappa, 1),
+                                            None if kappa_curve is None else round(kappa_curve, 2), a.r32)),
            'verdict': ('no "two independent routes agree within 5%" claim: the pooled ANOVA point estimate and the '
                        'curve-implied kappa are DIFFERENT estimators of the same quantity (one pools 256 samples with a global '
                        'baseline, the other uses disjoint halves per context). They are compared here only through the '
