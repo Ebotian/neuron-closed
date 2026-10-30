@@ -216,3 +216,27 @@ v*_l = b · ∇Φ_l / ‖∇Φ‖          ← 一行，没有 Gram、没有 Cho
 保留的一点点信号：2 层小列表约 3× 高于零分布，与既有小 K 富集（7×/21×）一致。
 
 ⇒ 结论回到那条一致的老图景：**社区坐标由另一个目标选出，差异是方向性的，不是表示性的**。
+
+## 2026-10-30：环境备忘——Lean 4 + mathlib（**公共目录，不在本仓**）
+
+本仓是纯 Python；Lean 环境是为了把 2.44 的代数结论写成机器可检定理才装上的。位置与版本：
+
+| 项 | 值 |
+|---|---|
+| 路径 | **`/home/ebt/lean/mathlib-v4.33.0-rc1`**（7.5 GB，公共目录，**不属于任何项目**） |
+| Lean | `v4.33.0-rc1`（与 `~/.elan/toolchains` 里同名 toolchain 匹配；elan 由 `~/.elan/bin` 提供） |
+| mathlib | rev `79d0395a1825a6264ad5d269e35e60537518955e`（`inputRev: v4.33.0-rc1`），**已预编译** |
+| 来源 | `/home/ebt/Downloads/emsx.tar.zst` 里的 `emsx/leanproof`，2026-10-30 解出并搬出项目目录 |
+| 说明 | 该目录内 `README.local.md` 记了来源、rev、用法与约束 |
+| 快捷命令 | **`leanm FILE.lean`**（`~/.local/bin/leanm`，已在 PATH）＝ `cd 该目录 && lake env lean FILE.lean` |
+| 连带 | `~/Downloads/kimi-research/plugin/lean` 符号链接已改指该目录 ⇒ `opl-leancheck` 默认项目可用 |
+
+**三条硬约束（写进该目录的 README.local.md）**：
+1. **不要改该目录的 `lean-toolchain`**——olean 是工具链锁定的，改了即全部失效；
+2. 该目录**不是 git 仓**、也不要提交（7.5 GB 第三方快照，按 `AGENTS.md` 只记来源与版本）；
+3. 换 mathlib 版本就**新建目录**，别在原地升级。
+
+**还没有的**：`opl-leancheck` 的签名密钥（需 `cd ~/Downloads/kimi-research/plugin && ./bin/opl-sign init`）；
+本仓内也没有任何 `.lean` 文件。要检查一个 Lean 文件的公理依赖，两种做法等价，后者多一条带
+`file_sha256` + `toolchain` 的 `opl.evidence/1` 记录：
+`leanm x.lean`（文件内自行 `#print axioms thm`） vs `opl-leancheck --file x.lean --decl thm`。
