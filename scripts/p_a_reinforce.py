@@ -77,7 +77,8 @@ def p_toxic(gauges, texts, dev, batch=8):
     return res
 
 
-from mlp_capture import Capture, column_norms_dev  # noqa: E402  (single corrected implementation; see its docstring)
+from mlp_capture import Capture, column_norms_dev  # noqa: E402
+from core.units import dose_scale  # noqa: E402  (single corrected implementation; see its docstring)
 
 def score_batch(model, ids, lens, weights, n_prompt, mean_over_suffix=False):
     """Weighted sum over samples of sum_t log p(t) over CONTINUATION positions only.
@@ -141,6 +142,7 @@ def main():
     layers = list(range(32))
     p50 = E.estimate_p50(tok, model, lm, layers, dev)
     norms = column_norms_dev(lm, layers, dev)
+    SC = dose_scale(p50, norms, layers)
     for q in model.parameters():
         q.requires_grad_(False)
     gauges = load_gauges(a.gauges, dev)
@@ -258,7 +260,7 @@ def main():
                 ((lp * mask).sum()).backward()   # weight 1: store the raw score, weight afterwards
                 g = cap.grad_sum()
             for l, o_, d_ in offs:
-                S[i, o_:o_ + d_] = (g[l] * (p50[l] / norms[l].clamp(min=1e-12))).to(dev).double()
+                S[i, o_:o_ + d_] = (g[l].to(dev) * SC[l]).double()
         wloo = [float(w[i]) for i in range(K_)]
         for i in range(K_):
             for l, o_, d_ in offs:
@@ -281,7 +283,7 @@ def main():
                 loss1.backward()
                 g = cap.grad_sum()
             for l in layers:
-                g_j2[l] += g[l].to(dev) * (p50[l] / norms[l].clamp(min=1e-12)).to(dev).double()
+                g_j2[l] += g[l].to(dev) * SC[l]
         print(f'  J2 ctx {ci} done', flush=True)
 
     from reliability import (split_half_curve_fast, noise_scale, bootstrap_stats_fast,

@@ -190,6 +190,40 @@ def check_instruments():
     return bad
 
 
+LIVE_CHAIN = ('p_a2_pathj2.py', 'p_a_reinforce.py', 'noise_scale.py', 'p_a4_closed_form.py',
+              'mlp_capture.py', 'reliability.py', 'fd_gate.py', 'quotient_compare_v2.py')
+
+
+def check_no_regressions():
+    """Grep gate: one functional, one implementation - the exact regressions this refactor removed.
+
+    Three rules, each of which cost a debugging round:
+      1. the dose unit `p50/‖W_col‖` may only be formed in scripts/core/units.py (it was inline in thirteen files,
+         which is how the same functional acquired three normalisations);
+      2. a detach-then-clone leaf capture is forbidden anywhere except fd_gate.py's deliberate negative control
+         (it silently cut the residual-carrier paths);
+      3. at most ONE split-half implementation may exist (two copies produced the one-sided Gram weighting).
+    Scope is the live measurement chain: the historical experiment scripts are frozen records and are not checked.
+    """
+    bad = []
+    scripts = ROOT / 'scripts'
+    for name in LIVE_CHAIN:
+        p = scripts / name
+        if not p.exists():
+            bad.append(f'{name}: missing (live chain)')
+            continue
+        txt = p.read_text(encoding='utf8', errors='replace')
+        if re.search(r'p50\[[^\]]+\]\s*/\s*norms\[', txt):
+            bad.append(f'scripts/{name}: inline dose unit - use core.units.dose_scale')
+        if 'detach().clone().requires_grad_' in txt and name != 'fd_gate.py':
+            bad.append(f'scripts/{name}: detach-then-clone capture - use mlp_capture.Capture')
+    defs = [p.name for p in scripts.rglob('*.py')
+            if p.name in LIVE_CHAIN and 'def split_half' in p.read_text(encoding='utf8', errors='replace')]
+    if len(defs) > 1:
+        bad.append(f'split-half implemented in {defs} - keep exactly one (analysis/split_half.py)')
+    return bad
+
+
 def check_compile():
     bad = []
     files = [p for p in ROOT.rglob('*.py') if '.venv' not in p.parts and 'node_modules' not in p.parts]
@@ -304,6 +338,8 @@ def main():
         bad, n = check_dedup(); results[f'dedup ({n})'] = bad
     if cmd in ('all', 'ledger'):
         bad = check_ledger(); results[f'ledger ({len(json.loads((ROOT / "evidence/ledger.json").read_text(encoding="utf8"))["verdicts"])} verdicts)'] = bad
+    if cmd in ('all', 'noregress'):
+        results['noregress (one functional, one implementation)'] = check_no_regressions()
     if cmd in ('all', 'instruments'):
         results['instruments (lean sha + fd gate)'] = check_instruments()
     if cmd in ('all', 'git'):

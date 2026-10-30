@@ -33,34 +33,8 @@ def _flat(x):
     return x.reshape(-1).double()
 
 
-def split_half_curve(S: Sequence[torch.Tensor], weights: Sequence[Sequence[float]],
-                     ks=(2, 4, 8, 16, 32), n_split: int = 200, seed: int = 0):
-    """S[c]: [K, dim] unweighted per-rollout scores; weights[c]: [K]. Disjoint halves of size K//2."""
-    rng = random.Random(seed)
-    out = {}
-    for K in ks:
-        vals = []
-        for c, Sc in enumerate(S):
-            Kc = Sc.shape[0]
-            if Kc < K or K < 2:
-                continue
-            w = torch.tensor(list(weights[c]), dtype=torch.float64)
-            for _ in range(n_split):
-                idx = list(range(Kc))
-                rng.shuffle(idx)
-                A = torch.zeros(Sc.shape[1], dtype=torch.float64)
-                B = torch.zeros(Sc.shape[1], dtype=torch.float64)
-                for i in idx[:K // 2]:
-                    A += w[i] * Sc[i].double()
-                for i in idx[K // 2:K]:
-                    B += w[i] * Sc[i].double()
-                if float(A.norm()) > 0 and float(B.norm()) > 0:
-                    vals.append(float(F.cosine_similarity(A.unsqueeze(0), B.unsqueeze(0))))
-        if vals:
-            vals.sort()
-            out[K] = {'r_mean': sum(vals) / len(vals), 'r_p10': vals[int(0.1 * len(vals))], 'n': len(vals)}
-    return out
-
+## `split_half_curve` (the CPU, per-split vector version) was deleted in the refactor: two implementations of one
+## estimator were the source of the one-sided Gram weighting bug. `split_half_curve_fast` below is the only one.
 
 def _stats(S, weights):
     n = 0

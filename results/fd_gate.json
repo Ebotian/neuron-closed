@@ -1,32 +1,32 @@
 {
  "instrument": "scripts/mlp_capture.py",
- "instrument_sha256": "9938d74b29218d98ad21ef80c90e8af98ffecb41393ac50619f56ded9a48eedc",
+ "instrument_sha256": "dab6e488537079423de60adbd8277414c04917bbd094e5cfb4e95600ef62396e",
  "certifies": "mlp_capture.Capture(...).dose_grad() END TO END: mode \"new\" in this script calls the shipped module, not an inline copy, so a regression inside grad_sum/dose_grad fails this gate",
  "negative_control": "mode \"old\" keeps the legacy detach capture inline on purpose",
  "summary_min_over_eps": [
   {
    "layer": 0,
    "neuron": 1946,
-   "min_rel_err_new": 0.004654397100188484,
-   "min_rel_err_legacy": 0.13923779705402634
+   "min_rel_err_new": 0.004165662707738278,
+   "min_rel_err_legacy": 0.1397971853619441
   },
   {
    "layer": 0,
    "neuron": 1362,
-   "min_rel_err_new": 0.0004246629807974932,
-   "min_rel_err_legacy": 0.24186325959033406
+   "min_rel_err_new": 0.0064332224594788765,
+   "min_rel_err_legacy": 0.23439828023030979
   },
   {
    "layer": 13,
    "neuron": 5458,
-   "min_rel_err_new": 0.00385995580894672,
-   "min_rel_err_legacy": 0.0041403505057837015
+   "min_rel_err_new": 0.0004983323901168738,
+   "min_rel_err_legacy": 0.0075289721536499574
   },
   {
    "layer": 13,
    "neuron": 6820,
-   "min_rel_err_new": 0.0003897548098218407,
-   "min_rel_err_legacy": 0.20713036877443777
+   "min_rel_err_new": 0.00013282718104486648,
+   "min_rel_err_legacy": 0.23756480016201847
   },
   {
    "layer": 31,
@@ -47,20 +47,20 @@
    "neuron": 1946,
    "analytic": -17.561826996921923,
    "legacy": -15.343668657654689,
-   "fd": -17.696380615234375,
+   "fd": -18.05877685546875,
    "eps": 0.001,
-   "rel_err_new": 0.007661709589556691,
-   "rel_err_legacy": 0.15333438241355393
+   "rel_err_new": 0.028297161715232028,
+   "rel_err_legacy": 0.17695299985897053
   },
   {
    "layer": 0,
    "neuron": 1946,
    "analytic": -17.561826996921923,
    "legacy": -15.343668657654689,
-   "fd": -17.480087280273438,
+   "fd": -17.488670349121094,
    "eps": 0.01,
-   "rel_err_new": 0.004654397100188484,
-   "rel_err_legacy": 0.13923779705402634
+   "rel_err_new": 0.004165662707738278,
+   "rel_err_legacy": 0.1397971853619441
   },
   {
    "layer": 0,
@@ -77,10 +77,10 @@
    "neuron": 1362,
    "analytic": -15.93541708406292,
    "legacy": -12.82641207019708,
-   "fd": -15.92864990234375,
+   "fd": -15.832901000976562,
    "eps": 0.01,
-   "rel_err_new": 0.0004246629807974932,
-   "rel_err_legacy": 0.24186325959033406
+   "rel_err_new": 0.0064332224594788765,
+   "rel_err_legacy": 0.23439828023030979
   },
   {
    "layer": 13,
@@ -97,30 +97,30 @@
    "neuron": 5458,
    "analytic": -21.163615057355514,
    "legacy": -20.99499778876293,
-   "fd": -21.081924438476562,
+   "fd": -21.15306854248047,
    "eps": 0.01,
-   "rel_err_new": 0.00385995580894672,
-   "rel_err_legacy": 0.0041403505057837015
+   "rel_err_new": 0.0004983323901168738,
+   "rel_err_legacy": 0.0075289721536499574
   },
   {
    "layer": 13,
    "neuron": 6820,
    "analytic": 20.04393740411649,
    "legacy": 16.194121731476457,
-   "fd": 19.548416137695312,
+   "fd": 20.3399658203125,
    "eps": 0.001,
-   "rel_err_new": 0.024721752838811582,
-   "rel_err_legacy": 0.20713036877443777
+   "rel_err_new": 0.014768975288019638,
+   "rel_err_legacy": 0.2560091962738418
   },
   {
    "layer": 13,
    "neuron": 6820,
    "analytic": 20.04393740411649,
    "legacy": 16.194121731476457,
-   "fd": 20.03612518310547,
+   "fd": 20.041275024414062,
    "eps": 0.01,
-   "rel_err_new": 0.0003897548098218407,
-   "rel_err_legacy": 0.23724679333250429
+   "rel_err_new": 0.00013282718104486648,
+   "rel_err_legacy": 0.23756480016201847
   },
   {
    "layer": 31,

@@ -189,11 +189,14 @@ def main():
             for h in hs:
                 h.remove()
 
+    from core.units import dose_scale
+    SC4 = {l: v.to(dev) for l, v in dose_scale(p50, norms, layers).items()}
+
     def readout(d, b):
         alpha = {}
         if d is not None:
             for l in layers:
-                alpha[l] = ((b * d[l]) * (p50[l] / norms[l].to(d[l].dtype))).float().to(dev)
+                alpha[l] = ((b * d[l]) * SC4[l]).float().to(dev)
         ctxm = steer(alpha) if d is not None else contextlib.nullcontext()
         tot = 0.0
         with ctxm:

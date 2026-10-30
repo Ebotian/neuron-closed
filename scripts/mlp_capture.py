@@ -102,13 +102,14 @@ class Capture:
         norms = self.norms if norms is None else norms
         if p50 is None or norms is None:
             raise ValueError('dose_grad needs p50 and norms (pass them to Capture or here)')
+        from core.units import dose_scale      # the ONE owner of the dose unit (imported lazily: scripts/ vs scripts/core/)
         raw = self.grad_sum()
+        SC = dose_scale(p50, norms, self.layers)
         out = torch.zeros(self.dim, dtype=torch.float64)
         off = 0
         for l in self.layers:
             d = int(self.lm.layers[l].mlp.down_proj.weight.shape[1])
-            scale = (p50[l] / norms[l].clamp(min=1e-12)).double()
-            out[off:off + d] = raw[l] * scale
+            out[off:off + d] = raw[l] * SC[l]
             off += d
         return out
 

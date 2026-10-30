@@ -68,11 +68,14 @@ def main():
     T = ids.shape[1]
     pos = torch.arange(n_slot_start, T, device=dev)
 
+    from core.units import dose_scale
+    SC = {l: v.to(dev) for l, v in dose_scale(p50, norms, layers).items()}
+
     def phi(doses):
         hs = []
         for (L, n), d in doses.items():
             vec = torch.zeros(lm.layers[L].mlp.down_proj.weight.shape[1], device=dev, dtype=torch.float32)
-            vec[n] = d * p50[L] / float(norms[L][n])
+            vec[n] = float(d * SC[L].float()[n])
             def mk(v):
                 def hook(_m, inp):
                     act = inp[0].clone()
@@ -129,8 +132,7 @@ def main():
             out = {}
             for L in want:
                 g = cap_[L].grad
-                out[L] = g.sum(dim=tuple(range(g.dim() - 1))).double().cpu() * \
-                    (p50[L] / norms[L].clamp(min=1e-12)).double()
+                out[L] = g.sum(dim=tuple(range(g.dim() - 1))).double().cpu() * SC[L].cpu()
             return out
         finally:
             for h in hs:
