@@ -1,0 +1,65 @@
+{
+ "status": "REDONE (task-9, plan 2.54); replaces the downgraded plan 2.45",
+ "fixes_applied": [
+  "direct-sum cosine over ALL 32 layers (no layer filtering in the denominator)",
+  "matched random null for EACH compared list separately (>=40 draws), matching that list per-layer counts AND its own dose magnitudes with their signs sampled from the list itself",
+  "each neuronary recipe compared SEPARATELY, never summed across traits",
+  "strata by the frozen L1/L2 map of scripts/tag_level_dose.py"
+ ],
+ "n_recipes_qwen35_4b": 191,
+ "lists": {
+  "positions_K64.csv": {
+   "n_coords": 64,
+   "median": 0.0,
+   "iqr": [
+    0.0,
+    0.0
+   ],
+   "max": 0.12490240607583325,
+   "null_p95": 0.019506006381362368,
+   "null_max": 0.040800941365126374,
+   "frac_recipes_above_null_p95": 0.020942408376963352,
+   "strata_median": {
+    "L1_only": 0.0,
+    "L2_only": 0.0,
+    "other": 0.0
+   },
+   "strata_n": {
+    "L1_only": 38,
+    "L2_only": 49,
+    "other": 104
+   }
+  },
+  "positions_all32_K1024_pairs.csv": {
+   "n_coords": 1024,
+   "median": -0.00026291089789588166,
+   "iqr": [
+    -0.0029833904742009834,
+    0.001923939616561148
+   ],
+   "max": 0.030860247878281812,
+   "null_p95": 0.007316849064674114,
+   "null_max": 0.012942878133102789,
+   "frac_recipes_above_null_p95": 0.07853403141361257,
+   "strata_median": {
+    "L1_only": 0.0004684889740043587,
+    "L2_only": -0.00029971567910702125,
+    "other": -0.0005383604523968856
+   },
+   "strata_n": {
+    "L1_only": 38,
+    "L2_only": 49,
+    "other": 104
+   }
+  }
+ },
+ "verdict": "\"no high alignment\" for both lists, by the frozen Q3 rule (median over recipes must exceed the matched null p95). Medians are 0.000 (K=64, a two-layer list: with a strict direct-sum cosine, disjoint layer support makes the cosine exactly zero) and -0.0003 (32-layer K=1024). Only 2.1% and 7.9% of the 191 recipes exceed their own null p95, against a 5% nominal rate, i.e. indistinguishable from chance. Stratum medians are 0 in every L1/L2 group.",
+ "wording_limits": [
+  "this is evidence against HIGH alignment in this particular comparison; it is NOT a proof that position sets are unreproducible in principle",
+  "the null is matched on our list histogram, not on the structural prior that the community used",
+  "tags come from the community and are a folksonomy (plan 2.41), so the L1/L2 strata are coarse"
+ ],
+ "artifacts": [
+  "results/quotient_compare_v2.json"
+ ]
+}
