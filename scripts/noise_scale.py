@@ -54,6 +54,8 @@ def main():
     ap.add_argument('--max-new', type=int, default=24)
     ap.add_argument('--seed', type=int, default=0)
     ap.add_argument('--out', default='/root/autodl-tmp/runs/noise_scale.json')
+    ap.add_argument('--r32', type=float, default=0.0685,
+                    help='measured split-half r at K=32 from the plan 2.51 run, for the same-convention comparison')
     a = ap.parse_args()
     dev = 'cuda:0'
     rows = [json.loads(l) for l in open(a.probes)]
@@ -125,9 +127,13 @@ def main():
     sum_norm_sq = 0.0
     xibar = torch.zeros(dim, dtype=torch.float64)
     per_ctx_norm = {}
+    XI = []          # per-context [K, dim] of xi_i, for scripts/reliability.py
+    W = []
     for ci, r in enumerate(ctx):
         phi, seqs, np_ = phi_by_ctx[ci], seqs_by_ctx[ci], pre_by_ctx[ci]
         acc = 0.0
+        Xc = torch.zeros((len(seqs), dim), dtype=torch.float64)
+        wc = []
         for i, sq in enumerate(seqs):
             w = phi[i] - b
             i1 = torch.tensor([sq], dtype=torch.long, device=dev)
@@ -140,24 +146,36 @@ def main():
                 ((lp * mask).sum() * w).backward()
                 xi = cap.dose_grad()
             xibar += xi
+            Xc[i] = xi
+            wc.append(1.0)          # xi already carries the weight (phi_i - b)
             nn = float(xi @ xi)
             sum_norm_sq += nn
             acc += nn
             n += 1
         per_ctx_norm[ci] = acc
+        XI.append(Xc)
+        W.append(wc)
         print(f'  ctx {ci} done, cumulative n={n}', flush=True)
 
-    xibar /= n
-    tr_sigma = (sum_norm_sq - n * float(xibar @ xibar)) / (n - 1)
-    g_sq = float(xibar @ xibar) - tr_sigma / n
+    from reliability import noise_scale as rel_noise, bootstrap_kappa
+    ns = rel_noise(XI, W)
+    iv = bootstrap_kappa(XI, W)
+    tr_sigma, g_sq = ns['tr_sigma'], ns['g_sq']
+    kappa = ns['kappa']
+    kappa_curve = (32 * (1 - a.r32) / (2 * a.r32)) if 0 < a.r32 < 1 else None
+    inside = (None if (kappa is None or iv['kappa_lo'] is None) else
+              bool(iv['kappa_lo'] <= kappa_curve <= iv['kappa_hi']))
     out = {'n': n, 'dim': dim, 'baseline_b': b,
-           'sum_norm_sq': sum_norm_sq, 'norm_xibar_sq': float(xibar @ xibar),
-           'tr_sigma': tr_sigma, 'g_sq': g_sq,
-           'noise_to_signal': (tr_sigma / g_sq) if g_sq > 0 else None,
-           'pred_r': {str(K): (g_sq / (g_sq + tr_sigma / K)) if g_sq > 0 else None
-                      for K in (2, 4, 8, 16, 32)},
-           'measured_r': {'2': 0.002, '4': 0.005, '8': 0.016, '16': 0.015, '32': 0.022},
-           'per_ctx_sum_norm_sq': per_ctx_norm}
+           'norm_xibar_sq': ns['norm_xibar_sq'], 'tr_sigma': tr_sigma, 'g_sq': g_sq,
+           'kappa_pooled': kappa, 'kappa_bootstrap_interval': [iv['kappa_lo'], iv['kappa_hi']],
+           'kappa_implied_by_measured_r32': kappa_curve, 'r32_used': a.r32,
+           'curve_kappa_inside_bootstrap_interval': inside,
+           'convention': 'kappa = tr(Sigma)/||g||^2 = noise-to-signal; r(K) ~ K/(K+2*kappa)',
+           'per_ctx_sum_norm_sq': per_ctx_norm,
+           'verdict': ('no "two independent routes agree within 5%" claim: the pooled ANOVA point estimate and the '
+                       'curve-implied kappa are DIFFERENT estimators of the same quantity (one pools 256 samples with a global '
+                       'baseline, the other uses disjoint halves per context). They are compared here only through the '
+                       'context-bootstrap interval, which is the honest common ground.')}
     print(json.dumps({k: v for k, v in out.items() if k != 'per_ctx_sum_norm_sq'}, indent=1), flush=True)
     json.dump(out, open(a.out, 'w'), indent=1)
     print('wrote', a.out, flush=True)

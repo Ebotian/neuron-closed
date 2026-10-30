@@ -1,0 +1,54 @@
+{
+ "status": "MEASURED on the corrected instrument (task-8, plan 2.53); supersedes the retracted plan 2.46",
+ "design": {
+  "model": "Qwen3.5-4B bf16",
+  "contexts": 8,
+  "rollouts_per_context": 32,
+  "n": 256,
+  "dim": 294912,
+  "xi": "weight_i * s_i with the leave-one-out baseline; s_i from the corrected readout",
+  "estimators": "pooled ANOVA (one pool of 256, global baseline) vs split-half curve r(K)=K/(K+2\u03ba) (disjoint halves, per context)"
+ },
+ "numbers": {
+  "tr_sigma": 21028703.26255543,
+  "g_sq": 3283.8333077512652,
+  "kappa_pooled": 6403.706062947412,
+  "kappa_bootstrap_interval": [
+   120.32658263602583,
+   2674.198751009905
+  ],
+  "kappa_implied_by_measured_r32": 217.5766423357664,
+  "r32": 0.0685,
+  "curve_inside_interval": true,
+  "per_ctx_sum_norm_sq": {
+   "0": 193309135.92299157,
+   "1": 799762643.8663146,
+   "2": 127259350.99925527,
+   "3": 1096032173.3723462,
+   "4": 170600697.62852862,
+   "5": 64218097.499109685,
+   "6": 2741423970.397604,
+   "7": 191582626.85482377
+  }
+ },
+ "old_vs_new": {
+  "tr_sigma": [
+   12120000.0,
+   21028703.26255543
+  ],
+  "g_sq": [
+   8077.7,
+   3283.8333077512652
+  ],
+  "kappa_pooled": [
+   1500.5,
+   6403.706062947412
+  ],
+  "claim": "old \"1500 vs 1424 agree within 5%\" is dead on two counts: it compared \u03ba with 2\u03ba, and it compared two different estimators"
+ },
+ "verdict": "the noise-to-signal ratio is 217.6 by the split-half-consistent route (from the measured r(32)=0.0685 of plan 2.51), and that value lies INSIDE the context-bootstrap interval. The pooled ANOVA point estimate is 6403.7, ~29x larger, and it is the estimator the audit showed to be invalid (E[f(X)] != f(E[X]); a global baseline mixed with between-context variation). So the defensible number is kappa ~ 217 (interval from the bootstrap), i.e. ~217 rollouts per context for r=0.5 - not 1500, and certainly not the ambient dimension. No claim of independent agreement is made: the two routes are compared only through the interval.",
+ "per_context_dominance": "the per-context sum||xi||^2 spans 6.4e+07..2.7e+09, so the pooled trace is dominated by a few contexts - which is exactly why the pooled point estimate is not trustworthy",
+ "artifacts": [
+  "results/noise_scale_v2.json"
+ ]
+}
