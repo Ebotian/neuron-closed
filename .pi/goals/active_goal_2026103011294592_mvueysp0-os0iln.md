@@ -5,14 +5,14 @@
   "status": "active",
   "autoContinue": true,
   "usage": {
-    "tokensUsed": 509266,
-    "activeSeconds": 535
+    "tokensUsed": 516894,
+    "activeSeconds": 1288
   },
   "sisyphus": false,
   "createdAt": "2026-10-30T03:29:45.924Z",
-  "updatedAt": "2026-10-30T03:38:56.070Z",
+  "updatedAt": "2026-10-30T03:51:32.342Z",
   "activePath": ".pi/goals/active_goal_2026103011294592_mvueysp0-os0iln.md",
-  "revision": 35,
+  "revision": 43,
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
@@ -121,8 +121,8 @@
 - Status: running
 - Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 8m55s
-- Tokens used: 509K (509,266) tokens
+- Time spent: 21m28s
+- Tokens used: 517K (516,894) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->

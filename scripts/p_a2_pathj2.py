@@ -210,6 +210,7 @@ def main():
     g_pw = {l: torch.zeros_like(g_path[l]) for l in layers}
     rec = {'ctx': [], 'phi': {}, 'texts': {}}
     splits = {}
+    w_loo_ctx = {}
     allphi = []
     for ci, r in enumerate(ctx):
         torch.manual_seed(a.seed * 1000 + ci)
@@ -261,6 +262,7 @@ def main():
         w_in = [(x - base) / (K_ * len(ctx)) for x in ph]
         phi_sum = sum(ph)
         w_loo = [(x - (phi_sum - x) / max(K_ - 1, 1)) / (K_ * len(ctx)) for x in ph]
+        w_loo_ctx[ci] = w_loo
         off = 0
         for l in layers:
             d = lm.layers[l].mlp.down_proj.weight.shape[1]
@@ -319,36 +321,35 @@ def main():
     rec['C0'] = {'phi_mean': mu, 'phi_sd_total': sd, 'phi_sd_within_mean': within}
     print(f'C0 phi mean={mu:+.4f} sd_total={sd:.4f} sd_within={within:.4f}', flush=True)
 
-    # Reliability curve r(K): split-half cos over K rollouts per context, 200 random disjoint splits.
-    import random
-    random.seed(0)
-    curve = {}
-    for K in (2, 4, 8, 16, 32):
-        if K > a.rollouts:
-            continue
-        vals = []
-        for ci in range(len(ctx)):
-            S = splits[ci]
-            if S.shape[0] < K:
-                continue
-            for _ in range(200):
-                idx = list(range(S.shape[0]))
-                random.shuffle(idx)
-                A = torch.stack([S[i] for i in idx[:K // 2]]).sum(0)
-                B = torch.stack([S[i] for i in idx[K // 2:K]]).sum(0)
-                if A.norm() > 0 and B.norm() > 0:
-                    vals.append(float(F.cosine_similarity(A.unsqueeze(0), B.unsqueeze(0))))
-        vals.sort()
-        curve[K] = {'r_mean': sum(vals) / len(vals) if vals else None,
-                    'r_p10': vals[int(0.1 * len(vals))] if vals else None,
-                    'n': len(vals)}
-    r32 = curve.get(32, {}).get('r_mean')
-    kstar = None
-    if r32 is not None and 0 < r32 < 1:
-        kstar = 32 * (1 - r32) / r32
-    rec['R'] = {'r_of_K': curve, 'K_star_for_0.5': kstar,
-                'gate': 'r(32) >= 0.5' if r32 is not None else 'n/a'}
-    print(f'R r(K)={ {k: round(v["r_mean"], 3) for k, v in curve.items()} } K*={kstar}', flush=True)
+    # Reliability via scripts/reliability.py: one convention for the whole repo.
+    #   split-half compares TWO DISJOINT HALVES of size K/2  =>  r(K) ~ K/(K+2*kappa)
+    #   kappa = tr(Sigma)/||g||^2 with an interval from resampling CONTEXTS (the independent unit).
+    from reliability import split_half_curve, noise_scale, bootstrap_kappa
+    W_all = [w_loo_ctx[ci] for ci in range(len(ctx))]
+    curve = split_half_curve([splits[ci] for ci in range(len(ctx))], W_all,
+                             ks=tuple(k for k in (2, 4, 8, 16, 32) if k <= a.rollouts))
+    ns = noise_scale([splits[ci] for ci in range(len(ctx))], W_all)
+    iv = bootstrap_kappa([splits[ci] for ci in range(len(ctx))], W_all)
+    r32 = curve.get(a.rollouts, {}).get('r_mean')
+    rec['R'] = {'r_of_K': curve, 'noise_scale': ns, 'kappa_interval': iv,
+                'convention': 'r(K) ~ K/(K+2*kappa); kappa != 2*kappa and is not the total sample scale',
+                'r_at_Kmax': r32}
+    print('R r(K)=%s' % {k: round(v['r_mean'], 4) for k, v in curve.items()}, flush=True)
+    print('R trSigma=%.4e  ||g||^2=%.4e  kappa=%s  interval=[%s, %s]' % (
+        ns['tr_sigma'], ns['g_sq'],
+        None if ns['kappa'] is None else round(ns['kappa'], 1),
+        iv['kappa_lo'], iv['kappa_hi']), flush=True)
+    if r32 is not None:
+        # solve r = K/(K+2k) for k  =>  k = K(1-r)/(2r).  (The first version had it inverted: 1.2 instead of 217.)
+        kappa_from_curve = (a.rollouts * (1 - r32) / (2 * r32)) if 0 < r32 < 1 else None
+        rec['R']['kappa_implied_by_curve'] = kappa_from_curve
+        rec['R']['consistency'] = (
+            'the curve-implied kappa and the pooled ANOVA kappa are different estimators (per-context halves vs one '
+            'pool of 256 samples with a global baseline); report both, and treat the pooled point estimate as '
+            'unreliable when it falls outside the context-bootstrap interval')
+        print('R kappa implied by r(Kmax)=%.4f is %s; pooled says %s; interval [%s, %s]' % (
+            r32, None if kappa_from_curve is None else round(kappa_from_curve, 1),
+            None if ns['kappa'] is None else round(ns['kappa'], 1), iv['kappa_lo'], iv['kappa_hi']), flush=True)
 
     def flat(d):
         return torch.cat([d[l] for l in layers])
