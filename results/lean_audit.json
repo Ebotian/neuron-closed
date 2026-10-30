@@ -77,8 +77,8 @@
      "Quot.sound"
     ]
    },
-   "role": "plan 2.42's dimensional claim: for a pairwise orthogonal equal-norm family the split-half inner product is (|S|^2 - K c^2)/4 for EVERY split, hence split-independent; isotropy gives |S|^2 ~ K c^2 and therefore cos ~ 0 at every K"
+   "role": "plan 2.42's algebra: for a pairwise orthogonal equal-norm family the split-half inner product is (|S|^2 - K c^2)/4 for EVERY split, hence split-independent. The earlier 'isotropy => cos ~ 0 => K ~ d' reading is RETRACTED: see doc/references/isotropy-and-noise-scale.md - anisotropy is inherent (arXiv:2401.12143, 2602.11185, 2407.11239) and the correct scaling quantity is the noise-to-signal ratio tr(Sigma)/|g|^2, not the ambient dimension."
   }
  },
- "scope": "Gauge.lean = 2.44's algebra. Decomposition.lean = 2.42's pathwise+score identity on a finite outcome set. Dimension.lean = 2.42's dimension argument as an identity about orthogonal families (no probability needed). NOT formalised anywhere: that phi is the right construct, any claim about the model, and the isotropic model itself (the K ~ d*v/s^2 corollary is arithmetic on the identity GIVEN isotropy, and is stated as a comment, not a theorem)."
+ "scope": "Gauge.lean = 2.44's algebra. Decomposition.lean = 2.42's pathwise+score identity on a finite outcome set. Dimension.lean = 2.42's algebra of split-half quantities (orthogonal families). NOT formalised: construct fidelity, any model claim, and the noise-scale relation itself (doc/references/isotropy-and-noise-scale.md records why isotropy is the wrong assumption)."
 }

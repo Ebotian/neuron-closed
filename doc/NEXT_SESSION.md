@@ -256,3 +256,25 @@ v*_l = b · ∇Φ_l / ‖∇Φ‖          ← 一行，没有 Gram、没有 Cho
 于是 `4⟪SA,SB⟫ = ‖Σx‖² − Kc²` **与切分无关**。这就是 `r(K)` 平坦的机制：正交时切分无可变化，
 各向同性下 `‖Σx‖² ≈ Kc²` ⇒ 余弦在每个 K 都 ≈0。**各向同性模型本身是假设，`K ≈ d·v/s²` 是给定假设后的算术，
 写在注释里、不是定理**。
+
+## 2026-10-30：**撤回**"各向同性"解释（文献核对推翻了我的假设）
+
+`lean/Dimension.lean` 文件头原写：逐 rollout score 向量各向同性 ⇒ `‖Σx‖² ≈ Kc²` ⇒ 余弦在每个 K 都 ≈0 ⇒ `K ≈ d·v/s²`。
+查文献后**这条假设是错的**（详见 `doc/references/isotropy-and-noise-scale.md`）：
+
+| 证据 | 结论 |
+|---|---|
+| `2401.12143` | 各向异性是 self-attention 的**固有**性质（原文 "anisotropy **is inherent** to self-attention"） |
+| `2602.11185` (Spectra) | LLM 梯度**高度各向异性**：spike 只占约 **1.5%** 的方向却主导二阶统计量 |
+| `2407.11239` / Aghajanyan et al. 2021 | 梯度子空间**低秩且稳定**（内在维度数百量级） |
+| McCandlish et al. 2018（经二手引用） | 正确的量是 gradient noise scale `tr(Σ)/‖G‖²` |
+
+**改法**：`cos ≈ ‖g‖²/(‖g‖² + tr(Σ)/K)`，临界 `K ≈ tr(Σ)/‖g‖²`；各向同性只是 `tr(Σ)=d·v` 的特例。
+⇒ `r(K)` 平坦应读作"**`tr(Σ)` 没有被 K 个 rollout 平均下去**"，**不是**"K ~ d"。
+
+**五条定理不受影响**（纯内积代数，没有假设各向同性）；只有**解释**错了。已在四处标 RETRACTED：
+`lean/Dimension.lean` 文件头、`lean/README.md`、`results/lean_audit.json`、metadata。
+
+**登记未执行的检验**：用 `p_a2_pathj2` 留下的 **256 个逐 rollout score 向量**（8 上下文 × 32 rollout，各 294,912 维）
+估 `tr(Σ)` 与 `‖g‖²`，看 `tr(Σ)/‖g‖²` 是否与 `r(K)` 曲线反解的 `K*` 同量级（10 倍内即认为同一机制）。
+这一步把"假设各向同性"换成一个**数字**，且不需要新测量。

@@ -2,9 +2,8 @@
 Plan 2.42's dimensional claim, as an identity.
 
 What we measured: the split-half cosine of the accumulated score gradient is FLAT in K
-(r = 0.002, 0.005, 0.016, 0.015, 0.022 for K = 2, 4, 8, 16, 32), so more rollouts buy nothing and the
-"needs K ~ dim" reading is not a sample-size statement. What is formalised here is the reason, which
-needs no probability at all:
+(r = 0.002, 0.005, 0.016, 0.015, 0.022 for K = 2, 4, 8, 16, 32), so more rollouts buy nothing.
+What is formalised here is the part that needs no probability at all:
 
   for a PAIRWISE ORTHOGONAL family x_1..x_K with equal norms c, the split-half inner product is
      4 * ⟪Σ_A x, Σ_B x⟫ = ‖Σ_i x_i‖² − K * c²
@@ -12,13 +11,18 @@ needs no probability at all:
      cos = (‖S‖² − K c²) / (‖S‖² + K c²)          (S = Σ x_i)
   is split-INDEPENDENT: with orthogonal per-rollout vectors there is nothing for the split to vary.
 
-  Two consequences, both arithmetic:
-   * isotropic score vectors have ‖S‖² ≈ Σ‖x_i‖² = K c², so cos ≈ 0 at EVERY K — the flat curve;
-   * a shared signal of norm `s` contributes K²s² to ‖S‖², giving cos = K s²/(K s² + 2c²), i.e. the
-     crossover is K ≈ c²/s². With per-coordinate variance v in d dimensions, c² = d*v, so
-     K ≈ d*v/s² — LINEAR IN THE DIMENSION. That last substitution is arithmetic on the identity
-     above; it is stated in this comment rather than as a theorem because the isotropic model itself
-     is an assumption, not something the identity proves.
+CORRECTION (2026-10-30, after doc/references/isotropy-and-noise-scale.md). An earlier version of this
+header explained the flat curve by "isotropic score vectors, so ‖S‖² ≈ K c², so cos ≈ 0 at every K,
+hence K ≈ d·v/s²". That explanation is WRONG as a description of these models: representation and
+gradient anisotropy is measured and described as inherent (arXiv:2401.12143), with a spike occupying
+about 1.5% of directions while dominating second-order statistics (arXiv:2602.11185), and gradient
+subspaces are low-rank (arXiv:2407.11239, Aghajanyan et al. 2021). The correct general quantity is the
+noise-to-signal ratio, i.e. McCandlish et al.'s gradient noise scale
+     cos ≈ ‖g‖² / (‖g‖² + tr(Σ)/K),     crossover  K ≈ tr(Σ)/‖g‖²,
+of which the isotropic case tr(Σ) = d·v is only the special case. So the flat curve should be read as
+"tr(Σ) is not being averaged down over K rollouts", not as "K ~ d".
+Neither statement is proved here: the theorems below are the algebra, the anisotropy/noise-scale part
+is an assumption plus arithmetic, and it is measurable on our own stored score vectors.
 -/
 import Mathlib
 
