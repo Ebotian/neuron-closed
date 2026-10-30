@@ -1,0 +1,60 @@
+{
+ "status": "MEASURED \u2014 and it closes the score-function route on dimensional grounds",
+ "criterion": "P-A' / plan 2.42. Frozen: C0 phi dynamic range; R r(32)>=0.5 or 'not estimable'; C1' descriptive cos(path,teach); SELF batch-vs-single gate.",
+ "design": {
+  "model": "Qwen3.5-4B bf16",
+  "contexts": "contrasts_v3 hostility_01..08",
+  "K_rollouts": 32,
+  "temperature": 1.0,
+  "max_new": 24,
+  "phi": "path J2 = mean over slot tokens of [log p(slot+ | x, y) - log p(slot- | x, y)] teacher-forced on the model's OWN continuation y, in NATS",
+  "decomposition": "grad E_y[phi] = E_y[grad phi] (pathwise) + E_y[(phi-b) grad log p^(y)] (score term); both terms measured on the SAME 32 rollouts"
+ },
+ "C0": {
+  "phi_mean": -0.8594,
+  "phi_sd_total": 1.3299,
+  "phi_sd_within_mean": 0.4274,
+  "phi_mean_per_context": {
+   "hostility_01": -0.238,
+   "hostility_02": -2.225,
+   "hostility_03": -0.556,
+   "hostility_04": -2.923,
+   "hostility_05": -0.327,
+   "hostility_06": -0.579,
+   "hostility_07": 1.443,
+   "hostility_08": -1.469
+  },
+  "note": "1.33 nat total / 0.43 nat within-context dynamic range, versus 0.0405 +- 0.01 for the saturated judge in plan 2.40: the scale problem is fixed"
+ },
+ "R": {
+  "r_of_K": {
+   "2": 0.002,
+   "4": 0.005,
+   "8": 0.016,
+   "16": 0.015,
+   "32": 0.022
+  },
+  "r32": 0.022,
+  "K_star_for_0.5": 1424,
+  "verdict": "FAILS the frozen gate (r(32) < 0.5). The curve is FLAT in K, so the Spearman-Brown r(K)=K/(K+K0) form does not hold and K*=1424 is not a usable extrapolation: the noise is not independent across rollouts."
+ },
+ "C1p": {
+  "cos_score_teach": 0.1621,
+  "cos_per_layer_range": [
+   0.0808,
+   0.2345
+  ],
+  "norm_score": 666.3483981,
+  "norm_teach": 1355.1928
+ },
+ "C2_split": {
+  "cos_pathwise_teach": 0.4187,
+  "cos_pathwise_score": 0.1862,
+  "norm_pathwise": 25.23,
+  "norm_score": 666.35,
+  "norm_teach": 1355.19,
+  "ratio_score_over_pathwise": 26.41
+ },
+ "verdict": "The score term is NOT estimable at K=32 (r=0.022, flat in K) and it is NOT a small correction (26x the pathwise norm). So the on-policy functional's derivative is dominated by a term we cannot measure, while the measurable part (pathwise, |g|=25.2) is only 0.42-aligned with the teacher-forced gradient of the same construct. Both facts are needed: the measure change is real (0.42, not 1.0), and its main carrier is not accessible by sampling.",
+ "method_note": "The flat r(K) is a dimensional statement, not a sample-size one: per-rollout score vectors live in 294,912 dimensions and are mutually near-orthogonal, so averaging needs K ~ dim rather than K ~ 10^2. Refusing to tune here means refusing the estimator class, not adding rollouts. What remains closed-form-friendly is the pathwise term, whose only randomness is the trajectory (phi sd 0.43 nat within context, so 32 trajectories give SE ~ 0.076 nat)."
+}
