@@ -18,7 +18,7 @@
 ```
 doc/            metadata.json（单一数字来源）、plan-*.md（科学记录）、references/（外部证据）、NEXT_SESSION.md
 results/        GPU/远端运行的原始产物（JSON 为主，MD 为渲染）
-scripts/        实验脚本（每个 = 一个可复现的问题）
+scripts/        薄壳实验脚本（≤120 行）+ core/ estimators/ analysis/ 三层模块（见 doc/ARCHITECTURE.md）
 tools/          check.py（唯一验证入口）、evidence_ledger.py、dedup_check.py
 vendor/         冻结的测量包（带 CHECKSUMS.sha256，不修改）
 lexicons/       词表（只存可再分发的；第三方来源见 NOTICE）

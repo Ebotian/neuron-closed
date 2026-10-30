@@ -5,13 +5,13 @@
   "status": "active",
   "autoContinue": true,
   "usage": {
-    "tokensUsed": 371002,
-    "activeSeconds": 1386
+    "tokensUsed": 384396,
+    "activeSeconds": 1792
   },
   "sisyphus": false,
-  "revision": 77,
+  "revision": 86,
   "createdAt": "2026-10-30T06:55:52.538Z",
-  "updatedAt": "2026-10-30T07:19:33.976Z",
+  "updatedAt": "2026-10-30T07:26:23.428Z",
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
@@ -113,8 +113,8 @@
 - Status: running
 - Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 23m06s
-- Tokens used: 371K (371,002) tokens
+- Time spent: 29m52s
+- Tokens used: 384K (384,396) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->

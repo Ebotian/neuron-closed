@@ -1,32 +1,6 @@
 {
- "toolchain": "leanprover/lean4:v4.33.0-rc1",
- "mathlib_rev": "79d0395a1825a6264ad5d269e35e60537518955e",
- "mathlib_inputRev": "v4.33.0-rc1",
- "verdict": "PROVED for all twenty-five declarations across nine files (opl-leancheck without --evidence-out)",
- "already_in_mathlib": "ContinuousLinearMap.ker_adjoint_comp_self states (T\u2020 \u2218L T).ker = T.ker, i.e. ker_gram is textbook; the load-bearing statement is lift_maps_back",
- "boundary": "formalises the algebra (kernel is a gauge; a solution's residual image is exactly y). It does NOT formalise the model, the construct, or trait fidelity.",
+ "verdict": "PROVED for every declaration listed",
  "files": {
-  "lean/Gauge.lean": {
-   "sha256": "e44b1e78673f15bb17f93883ff9ab689b887a2cc267b8f872768ba81e46870a4",
-   "decls": {
-    "NeuronClosed.ker_gram": [
-     "propext",
-     "Classical.choice",
-     "Quot.sound"
-    ],
-    "NeuronClosed.gauge_invariance": [
-     "propext",
-     "Classical.choice",
-     "Quot.sound"
-    ],
-    "NeuronClosed.lift_maps_back": [
-     "propext",
-     "Classical.choice",
-     "Quot.sound"
-    ]
-   },
-   "role": "plan 2.44: the singular metric is a gauge; a solution's residual image is exactly y"
-  },
   "lean/Decomposition.lean": {
    "sha256": "369354c332666db70435d77391d36bc98c1dd0d6065fc8e4c695c25d0284e2c0",
    "decls": {
@@ -45,8 +19,7 @@
      "Classical.choice",
      "Quot.sound"
     ]
-   },
-   "role": "plan 2.42: the pathwise + score decomposition, and that a baseline is free in expectation"
+   }
   },
   "lean/Dimension.lean": {
    "sha256": "aae5b614ea065f4b77e1a3fe919eebc157b3f5cbe5d9d22f0679c4fe0e2be6ab",
@@ -76,22 +49,30 @@
      "Classical.choice",
      "Quot.sound"
     ]
-   },
-   "role": "plan 2.42's algebra: for a pairwise orthogonal equal-norm family the split-half inner product is (|S|^2 - K c^2)/4 for EVERY split, hence split-independent. The earlier 'isotropy => cos ~ 0 => K ~ d' reading is RETRACTED: see doc/references/isotropy-and-noise-scale.md - anisotropy is inherent (arXiv:2401.12143, 2602.11185, 2407.11239) and the correct scaling quantity is the noise-to-signal ratio tr(Sigma)/|g|^2, not the ambient dimension.",
-   "note": "sha updated 2026-10-30 after a docstring-only edit (the retraction of the isotropy reading); the five declarations were re-audited with opl-leancheck and report PROVED with axioms {propext, Classical.choice, Quot.sound}"
+   }
   },
-  "lean/Ssw.lean": {
+  "lean/Gauge.lean": {
+   "sha256": "e44b1e78673f15bb17f93883ff9ab689b887a2cc267b8f872768ba81e46870a4",
    "decls": {
-    "NeuronClosed.ssw_shift_invariant": [
+    "NeuronClosed.ker_gram": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.gauge_invariance": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.lift_maps_back": [
      "propext",
      "Classical.choice",
      "Quot.sound"
     ]
-   },
-   "role": "R1: the within-group sum of squares is exactly invariant under a common-mode shift (the property the plug-in cosine lacks)",
-   "sha256": "4ee0a9bda545618005494644830358ac594da8b1e796bccb89b8948116381857"
+   }
   },
   "lean/Icc.lean": {
+   "sha256": "4d1f7d0135b98139ea28c1dfa24149ab998f1f759c189499c7a23b735634eb84",
    "decls": {
     "NeuronClosed.icc_bounds": [
      "propext",
@@ -108,36 +89,7 @@
      "Classical.choice",
      "Quot.sound"
     ]
-   },
-   "role": "R2: ICC in [-1/(n-1), 1]; R4: SS_b is nonnegative BY CONSTRUCTION, so the hypothesis 0 <= MSb of R2 is a consequence, not an assumption - which is what the code silently relied on",
-   "sha256": "4d1f7d0135b98139ea28c1dfa24149ab998f1f759c189499c7a23b735634eb84"
-  },
-  "lean/Witness.lean": {
-   "decls": {
-    "NeuronClosed.plug_in_cos_moves": [
-     "propext",
-     "Classical.choice",
-     "Quot.sound"
-    ]
-   },
-   "role": "R5: the plug-in squared cosine moves from 0 to 1/2 under a common shift while SSw does not - the negative half of the argument, previously prose only",
-   "sha256": "d66ce3c368adae1e58c1dbf948f915843819c8eb9e47b30e53af3cf879ae7daf"
-  },
-  "lean/SswNormalised.lean": {
-   "sha256": "5778e33cb3e585b38dd5752a02614c1d7b3f80bd7fe72a9d9acc6eb88ee1cd7f",
-   "decls": {
-    "NeuronClosed.sum_norm_add_sq": [
-     "propext",
-     "Classical.choice",
-     "Quot.sound"
-    ],
-    "NeuronClosed.sswu_shift_invariant": [
-     "propext",
-     "Classical.choice",
-     "Quot.sound"
-    ]
-   },
-   "role": "R3: the code's NORMALISED quantity \u03a3\u2016x_i\u2016\u00b2 \u2212 \u2016\u03a3x_i\u2016\u00b2/K is invariant under a common-mode shift. Closed the gap that Ssw.lean left (that file proves the K\u00b2-scaled variant). The blocker was the order of rewrites: norm_smul, Real.norm_eq_abs, abs_of_pos hK must all fire before ring, otherwise \u2016(K:\u211d)\u2016\u00b2 and K\u00b2 coexist and field_simp cannot reconcile them."
+   }
   },
   "lean/Mean.lean": {
    "sha256": "8ba47a861ade130e5fafec78e9f2346cfbda5a31925835beb862e1c610bf00fb",
@@ -147,13 +99,27 @@
      "Classical.choice",
      "Quot.sound"
     ]
-   },
-   "role": "auxiliary: deviations from the group mean sum to zero (the fact the ANOVA decomposition needs)"
+   }
   },
   "lean/SsDecomp.lean": {
    "sha256": "8b6babfbe1a6776ec96afbd06e6b933d8ba996505f330509a91be5339e0e061e",
    "decls": {
     "NeuronClosed.sum_prod_nested": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.ssb_code_form": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.card_mul_mean_norm_sq": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.ssb_is_between_scatter": [
      "propext",
      "Classical.choice",
      "Quot.sound"
@@ -172,28 +138,44 @@
      "propext",
      "Classical.choice",
      "Quot.sound"
-    ],
-    "NeuronClosed.ssb_is_between_scatter": [
-     "propext",
-     "Classical.choice",
-     "Quot.sound"
-    ],
-    "NeuronClosed.card_mul_mean_norm_sq": [
-     "propext",
-     "Classical.choice",
-     "Quot.sound"
-    ],
-    "NeuronClosed.ssb_code_form": [
+    ]
+   }
+  },
+  "lean/Ssw.lean": {
+   "sha256": "4ee0a9bda545618005494644830358ac594da8b1e796bccb89b8948116381857",
+   "decls": {
+    "NeuronClosed.ssw_shift_invariant": [
      "propext",
      "Classical.choice",
      "Quot.sound"
     ]
-   },
-   "role": "the ANOVA chain in the code's OWN normalised form: ssb_code_form states that the subtraction of the two \u03a3\u2016x\u2016\u00b2 \u2212 \u2016\u03a3x\u2016\u00b2/K quantities equals K\u00b7\u03a3_c\u2016x\u0304_c \u2212 x\u0304\u2016\u00b2, i.e. the code's ss_b IS the nonnegative between-group scatter that Icc.lean proves nonnegative. Support: scatter_split, variance_identity (a), pooled_variance_identity (b), ssb_is_between_scatter (c, deviation form), card_mul_mean_norm_sq (bridge), sum_prod_nested (flat vs nested)."
+   }
+  },
+  "lean/SswNormalised.lean": {
+   "sha256": "5778e33cb3e585b38dd5752a02614c1d7b3f80bd7fe72a9d9acc6eb88ee1cd7f",
+   "decls": {
+    "NeuronClosed.sum_norm_add_sq": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.sswu_shift_invariant": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ]
+   }
+  },
+  "lean/Witness.lean": {
+   "sha256": "d66ce3c368adae1e58c1dbf948f915843819c8eb9e47b30e53af3cf879ae7daf",
+   "decls": {
+    "NeuronClosed.plug_in_cos_moves": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ]
+   }
   }
  },
- "scope": "Gauge.lean = 2.44's algebra. Decomposition.lean = 2.42's pathwise+score identity on a finite outcome set. Dimension.lean = 2.42's algebra of split-half quantities (orthogonal families). NOT formalised: construct fidelity, any model claim, and the noise-scale relation itself (doc/references/isotropy-and-noise-scale.md records why isotropy is the wrong assumption).",
- "audit_date": "2026-10-30",
- "modularisation": "one theorem group per file (Ssw / Icc / Witness), each compiled independently, after three consecutive breakages came from editing a single 91-line file by string slicing. Reliability.lean is gone, superseded by these three.",
  "still_missing": "only the F-quantile implementation used for the intervals is unverified; every algebraic statement the estimator relies on is now proved"
 }

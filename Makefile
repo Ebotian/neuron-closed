@@ -35,3 +35,6 @@ meta-check:
 
 hooks:
 	@git config core.hooksPath .githooks && echo "hooks enabled: .githooks (pre-commit and pre-push run make check)"
+
+certify:
+	bash tools/certify.sh

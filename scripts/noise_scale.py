@@ -19,6 +19,7 @@ for sub in ('core', 'estimators', 'analysis'):
     sys.path.insert(0, str(Path(__file__).resolve().parent / sub))
 import engine as E
 from core.units import column_norms_dev, dose_scale
+from core.loading import load_model_fast
 from core.sampling import generate_rollouts
 from estimators.phi import phi_of
 from estimators.score import per_rollout_scores
@@ -36,7 +37,7 @@ def main():
     dev = 'cuda:0'
     torch.manual_seed(a.seed)
     ctx = [r for r in map(json.loads, open(a.probes)) if r['trait'] == 'hostility'][:a.n_ctx]
-    tok, model, lm = E.load_model(a.model, dev)
+    tok, model, lm = load_model_fast(a.model, dev)
     layers = list(range(32))
     p50 = E.estimate_p50(tok, model, lm, layers, dev)
     norms = column_norms_dev(lm, layers, dev)

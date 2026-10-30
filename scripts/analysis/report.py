@@ -19,8 +19,11 @@ def summarize(layers, g_path, g_teach, g_path_in, S_all, W_all, rollouts, seed, 
     flat = lambda d: _flat(d, layers) if d is not None else None
     Gt = torch.cat(S_all, 0)
     Wf = torch.tensor([w for ws in W_all for w in ws], device=Gt.device)
-    Mw = Gt.double() * Wf.unsqueeze(1)
-    gram = (Mw @ Mw.T).cpu().tolist()
+    # The Gram is (256 x 294,912) @ (294,912 x 256). In float64 on a consumer GPU that matmul runs at 1/64 of the
+    # float32 rate and showed up in the sampler as a multi-second stretch at 0-29% utilisation. float32 for the big
+    # product, float64 only for the 256x256 result, keeps the algebra in the same place and the GPU busy.
+    Mw = Gt.float() * Wf.float().unsqueeze(1)
+    gram = (Mw @ Mw.T).double().cpu().tolist()
     sizes = [int(S.shape[0]) for S in S_all]
     icc = icc_from_gram_py(gram, sizes, k=rollouts)
     mu = sum(phi_all) / len(phi_all)
