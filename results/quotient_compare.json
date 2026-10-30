@@ -1,0 +1,35 @@
+{
+ "status": "HYPOTHESIS FALSIFIED \u2014 the kernel/representative explanation accounts for little; the disagreement is directional",
+ "hypothesis": "ker(M)=ker(Wn) is 6656-dimensional per layer, so position lists that differ by a kernel element are the SAME physical intervention. If the 1.7% exact overlap were representative choice, mapping both lists through v = Wn u (R^2560/layer) would collapse the gap.",
+ "test": "community 164 coordinates vs (a) our 2-layer K=64 list, (b) our full 32-layer K=1024 deliverable; dose-weighted and sign-only; null = 20 random lists matched on layer histogram",
+ "results": {
+  "dose_ours64": {
+   "cos_quotient": 0.077,
+   "cos_coord": 0.009,
+   "layers_touched_both": [
+    13,
+    14
+   ]
+  },
+  "dose_all32_K1024": {
+   "cos_quotient": 0.0083,
+   "cos_coord": 0.0037
+  },
+  "sign_ours64": {
+   "cos_quotient": 0.0537,
+   "cos_coord": 0.0098
+  },
+  "sign_all32_K1024": {
+   "cos_quotient": 0.0058,
+   "cos_coord": 0.0049
+  },
+  "null_matched_layer_histogram": {
+   "median": 0.0023,
+   "max": 0.0279,
+   "n": 20
+  }
+ },
+ "verdict": "Quotienting raises the agreement from 0.0090 to 0.0770 for the 2-layer list (8.5x) but leaves the real 32-layer deliverable at 0.0083 - statistically indistinguishable from the matched random null (median 0.0023, max 0.0279). Sign-only reproduces the same ordering. So the missing 1.7% is NOT representative choice inside a 6656-dimensional kernel; even after removing the gauge freedom the two sets point in unrelated directions.",
+ "what_survives": "A weak above-chance signal at the 2-layer list (0.077 > null max 0.028, ~3x), consistent with the committed small-K enrichment results (7x/21x). Nothing above chance at K=1024.",
+ "reading": "This does not overturn plan 2.44 (the singularity IS a gauge; the quotient form of the closed form stands). It kills the *explanatory* use of that gauge for the position-reproducibility puzzle. What remains is the older, coherent picture: the community's coordinates are selected by a different objective, and the difference is directional, not representational."
+}
