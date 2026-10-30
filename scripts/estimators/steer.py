@@ -45,3 +45,31 @@ def readout(model, lm, tok, ctx, layers, d, b, SC, dev):
                     rid, rpre, rsuf = E.candidate_ids(tok, r['prompt'], sl, dev, 384)
                     tot += sgn * float(E.continuation_logp(model, rid, rpre, rsuf))
     return tot / len(ctx)
+
+
+def phi_teacher_forced(model, lm, ids, slot, n_start, doses, SC, layers, dev):
+    """Teacher-forced mean log p over `slot` after `ids`, with per-coordinate doses injected at (layer, neuron).
+
+    `doses` maps (layer, neuron) -> dose in the repo's unit; `SC` is core.units.dose_scale. Used by the finite-difference
+    gate, which is why the injection is expressed here rather than duplicated in the gate.
+    """
+    hs = []
+    for (L, n), d in doses.items():
+        vec = torch.zeros(lm.layers[L].mlp.down_proj.weight.shape[1], device=dev, dtype=torch.float32)
+        vec[n] = d * float(SC[L][n])
+        def make(v):
+            def hook(_m, inp):
+                act = inp[0].clone()
+                return (act + v.to(device=act.device, dtype=act.dtype),) + inp[1:]
+            return hook
+        hs.append(lm.layers[L].mlp.down_proj.register_forward_pre_hook(make(vec)))
+    try:
+        import torch.nn.functional as F
+        with torch.inference_mode():
+            o = model(input_ids=ids, use_cache=False)
+            lp = F.log_softmax(o.logits[:, :-1].float(), -1)
+            pos = torch.arange(n_start, ids.shape[1], device=dev)
+            return float(lp[0, pos - 1, torch.tensor(slot, device=dev)].mean())
+    finally:
+        for h in hs:
+            h.remove()

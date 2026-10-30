@@ -69,27 +69,11 @@ def main():
     pos = torch.arange(n_slot_start, T, device=dev)
 
     from core.units import dose_scale
+    from estimators.steer import phi_teacher_forced
     SC = {l: v.to(dev) for l, v in dose_scale(p50, norms, layers).items()}
 
     def phi(doses):
-        hs = []
-        for (L, n), d in doses.items():
-            vec = torch.zeros(lm.layers[L].mlp.down_proj.weight.shape[1], device=dev, dtype=torch.float32)
-            vec[n] = float(d * SC[L].float()[n])
-            def mk(v):
-                def hook(_m, inp):
-                    act = inp[0].clone()
-                    return (act + v.to(device=act.device, dtype=act.dtype),) + inp[1:]
-                return hook
-            hs.append(lm.layers[L].mlp.down_proj.register_forward_pre_hook(mk(vec)))
-        try:
-            with torch.inference_mode():
-                o = model(input_ids=ids, use_cache=False)
-                lp = F.log_softmax(o.logits[:, :-1].float(), -1)
-                return float(lp[0, pos - 1, torch.tensor(slot, device=dev)].sum())
-        finally:
-            for h in hs:
-                h.remove()
+        return phi_teacher_forced(model, lm, ids, slot, n_slot_start, doses, SC, layers, dev)
 
     def analytic(mode, want):
         """mode 'new' MUST go through the shipped module; mode 'old' is the inline legacy negative control.
@@ -104,7 +88,7 @@ def main():
                 model.zero_grad(set_to_none=True)
                 o = model(input_ids=ids, use_cache=False)
                 lp = F.log_softmax(o.logits[:, :-1].float(), -1)
-                lp[0, pos - 1, torch.tensor(slot, device=dev)].sum().backward()
+                lp[0, pos - 1, torch.tensor(slot, device=dev)].mean().backward()   # MEAN: the same functional the gate's phi uses
                 flat = cap.dose_grad()          # <- the shipped code path, reduction and scaling included
             out, off = {}, 0
             for L in want:
@@ -128,7 +112,7 @@ def main():
             model.zero_grad(set_to_none=True)
             o = model(input_ids=ids, use_cache=False)
             lp = F.log_softmax(o.logits[:, :-1].float(), -1)
-            lp[0, pos - 1, torch.tensor(slot, device=dev)].sum().backward()
+            lp[0, pos - 1, torch.tensor(slot, device=dev)].mean().backward()   # MEAN: the same functional the gate's phi uses
             out = {}
             for L in want:
                 g = cap_[L].grad

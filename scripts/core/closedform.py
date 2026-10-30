@@ -15,6 +15,20 @@ from pathlib import Path
 import torch
 
 
+def unit_columns(lm, layers, dev):
+    """The unit-norm W_down column matrix per layer - the ONE definition of "the column direction".
+
+    Both the closed form (Gram) and the quotient comparison (mapping a dose list to a residual-space vector) need it, and
+    they must agree on the normalisation or their vectors live in different spaces.
+    """
+    Wn = {}
+    for l in layers:
+        W = lm.layers[l].mlp.down_proj.weight.detach().float().to(dev)
+        Wn[l] = (W / W.norm(dim=0, keepdim=True).clamp(min=1e-12)).cpu().double()
+        del W
+    return Wn
+
+
 def build_gram(lm, layers, dev, cache_path=None):
     """Gram of the unit W_down columns per layer, on the CPU. Cached: 32 layers cost ~20 s and never change."""
     if cache_path is not None and Path(cache_path).exists():

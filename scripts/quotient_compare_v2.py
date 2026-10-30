@@ -32,6 +32,8 @@ import torch
 sys.path.insert(0, '/root/autodl-tmp/scripts/j2space')
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import engine as E
+from core.loading import load_model_fast
+from core.closedform import unit_columns
 from tag_level_dose import L1, L2, EXCLUDED
 
 
@@ -55,13 +57,9 @@ def main():
     ap.add_argument('--out', default='/root/autodl-tmp/runs/quotient_v2.json')
     a = ap.parse_args()
     dev = 'cuda:0'
-    tok, model, lm = E.load_model(a.model, dev)
+    tok, model, lm = load_model_fast(a.model, dev)
     layers = list(range(32))
-    Wn = {}
-    for l in layers:
-        W = lm.layers[l].mlp.down_proj.weight.detach().float().to(dev)
-        Wn[l] = (W / W.norm(dim=0, keepdim=True).clamp(min=1e-12)).cpu().double()
-        del W
+    Wn = unit_columns(lm, layers, dev)      # core.closedform: the ONE definition of the column direction
 
     recs = [r for r in json.load(open(a.recipes)) if r.get('model') == 'Qwen/Qwen3.5-4B' and r.get('neurons')]
     print(f'recipes on Qwen3.5-4B: {len(recs)}', flush=True)
