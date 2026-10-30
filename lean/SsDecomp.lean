@@ -90,8 +90,26 @@ theorem ssb_is_between_scatter (X : γ → ι → V) :
     Finset.sum_congr rfl (fun c (_ : c ∈ Finset.univ) => by rw [hper c]; ring)
   rw [← Finset.sum_sub_distrib, hsum, Finset.mul_sum]
 
+/-- The arithmetic bridge between the code's normalised form and the deviation form:
+`K‖mean f‖² = ‖Σ f‖²/K`. -/
+theorem card_mul_mean_norm_sq (f : ι → V) :
+    (Fintype.card ι : ℝ) * ‖mean f‖ ^ 2 = ‖(∑ i, f i)‖ ^ 2 / (Fintype.card ι : ℝ) := by
+  have hK : (0 : ℝ) < (Fintype.card ι : ℝ) := by exact_mod_cast Fintype.card_pos
+  unfold mean
+  rw [norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.mpr hK)]
+  field_simp
+
+/- (c*) STATUS: NOT PROVED - the composition that would put (c) in the code's literal form. The pieces are all
+in place (`card_mul_mean_norm_sq`, `variance_identity`, `pooled_variance_identity`, `ssb_is_between_scatter`) but the
+`linarith` steps that chain them did not go through in one pass, and I am not leaving a `sorry` in the tree. What is
+proved is: the bridge itself, and (c) in DEVIATION form. Concretely what remains is
+  `((Σ_p‖X_p‖² − ‖Σ_p X_p‖²/K') − Σ_c (Σ_i‖X_ci‖² − ‖Σ_i X_ci‖²/K))  =  K · Σ_c ‖x̄_c − x̄‖²`
+assembled by rewriting each `sswU`-shaped term into deviations with `variance_identity` + `card_mul_mean_norm_sq`. -/
+
 end NeuronClosed
 
+#print axioms NeuronClosed.card_mul_mean_norm_sq
+#print axioms NeuronClosed.ssb_is_between_scatter
 #print axioms NeuronClosed.scatter_split
 #print axioms NeuronClosed.variance_identity
 #print axioms NeuronClosed.pooled_variance_identity

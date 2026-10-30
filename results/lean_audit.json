@@ -2,7 +2,7 @@
  "toolchain": "leanprover/lean4:v4.33.0-rc1",
  "mathlib_rev": "79d0395a1825a6264ad5d269e35e60537518955e",
  "mathlib_inputRev": "v4.33.0-rc1",
- "verdict": "PROVED for all twenty-two declarations across nine files (opl-leancheck without --evidence-out)",
+ "verdict": "PROVED for all twenty-three declarations across nine files (opl-leancheck without --evidence-out)",
  "already_in_mathlib": "ContinuousLinearMap.ker_adjoint_comp_self states (T\u2020 \u2218L T).ker = T.ker, i.e. ker_gram is textbook; the load-bearing statement is lift_maps_back",
  "boundary": "formalises the algebra (kernel is a gauge; a solution's residual image is exactly y). It does NOT formalise the model, the construct, or trait fidelity.",
  "files": {
@@ -151,7 +151,7 @@
    "role": "auxiliary: deviations from the group mean sum to zero (the fact the ANOVA decomposition needs)"
   },
   "lean/SsDecomp.lean": {
-   "sha256": "752c7344a988e5fdecbecd3f18c20fc5b94d24d9d159399e75153a7aff776cd0",
+   "sha256": "1ee0097a4b5286d289774332085c3cc0fed6cdf35237b64d58c4d89c67c2b553",
    "decls": {
     "NeuronClosed.scatter_split": [
      "propext",
@@ -172,13 +172,18 @@
      "propext",
      "Classical.choice",
      "Quot.sound"
+    ],
+    "NeuronClosed.card_mul_mean_norm_sq": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
     ]
    },
-   "role": "the ANOVA decomposition. scatter_split = per-group split; variance_identity = (a) scatter about the mean = raw SS \u2212 K\u2016mean\u2016\u00b2; pooled_variance_identity = (b) the same at the product index, i.e. exactly sswU on the flattened data; ssb_is_between_scatter = (c) \u03a3_c \u03a3_i\u2016X_ci \u2212 x\u0304\u2016\u00b2 \u2212 \u03a3_c \u03a3_i\u2016X_ci \u2212 x\u0304_c\u2016\u00b2 = K\u00b7\u03a3_c\u2016x\u0304_c \u2212 x\u0304\u2016\u00b2, which is the code's SUBTRACTION equalling the nonnegative quantity that Icc.lean proves nonnegative."
+   "role": "ANOVA decomposition + the arithmetic bridge. (a) variance_identity, (b) pooled_variance_identity, (c) ssb_is_between_scatter = the code's subtraction equals K\u00b7\u03a3_c\u2016x\u0304_c \u2212 x\u0304\u2016\u00b2 (deviation forms), and card_mul_mean_norm_sq = K\u2016mean f\u2016\u00b2 = \u2016\u03a3f\u2016\u00b2/K, the bridge from the code's normalised sswU to those deviations. NOT proved: the composed statement in the code's LITERAL sswU form (status note in the file)."
   }
  },
  "scope": "Gauge.lean = 2.44's algebra. Decomposition.lean = 2.42's pathwise+score identity on a finite outcome set. Dimension.lean = 2.42's algebra of split-half quantities (orthogonal families). NOT formalised: construct fidelity, any model claim, and the noise-scale relation itself (doc/references/isotropy-and-noise-scale.md records why isotropy is the wrong assumption).",
  "audit_date": "2026-10-30",
  "modularisation": "one theorem group per file (Ssw / Icc / Witness), each compiled independently, after three consecutive breakages came from editing a single 91-line file by string slicing. Reliability.lean is gone, superseded by these three.",
- "still_missing": "one arithmetic bridge: the code writes sswU as \u03a3\u2016x\u2016\u00b2 \u2212 \u2016\u03a3x\u2016\u00b2/K while SsDecomp works with deviations. The missing link is K\u2016mean f\u2016\u00b2 = \u2016\u03a3 f\u2016\u00b2/K (a two-line corollary of mean = K\u207b\u00b9 \u2022 \u03a3f plus norm_smul/abs_of_pos); with it, (a)+(c) rewrite into the code's literal sswU expressions. Also unproved: the F-quantile implementation used for the intervals."
+ "still_missing": "the composition that states (c) in the code's literal sswU form: all pieces exist (card_mul_mean_norm_sq + variance_identity + pooled_variance_identity + ssb_is_between_scatter) but the chaining linarith steps did not go through in one pass and no sorry was left. Also unproved: the F-quantile implementation."
 }
