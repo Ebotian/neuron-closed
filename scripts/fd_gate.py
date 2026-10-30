@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Finite-difference calibration gate for the gradient readout: does it return dPhi/d(dose)?
+"""Calibration gate: does the gradient readout return dPhi/d(dose)? Criterion and rationale in analysis/fd.py.
 
-Runs in fp32 (bf16 FD is swamped by precision noise), at layers 0/13/31, two step sizes. The shipped module is tested
-through `Capture(...).dose_grad()`; the legacy detach readout comes from `legacy_capture.py` as the negative control, so
-the gate fails if it stops being able to SEE the bug. Criterion G1: min over eps of the relative error < 2% for every
-coordinate; G2: the legacy method must show > 5% somewhere; G3: conjunction over the layers.
+fp32 only (bf16 FD is swamped by noise); layers 0/13/31, two step sizes; the shipped module via Capture().dose_grad(),
+the legacy detach readout from legacy_capture.py as the negative control.
 """
 from __future__ import annotations
 import argparse, json, sys
@@ -82,43 +80,19 @@ def main():
         from legacy_capture import legacy_capture_grads
         return legacy_capture_grads(model, lm, want, ids, pos, slot, SC, dev)
 
-
     want = [int(x) for x in a.layers.split(',')]
     eps_list = [float(x) for x in a.eps.split(',')]
     cur = analytic('new', want)
     leg = analytic('old', want)
 
-    rows_out, ok_new, ok_old_visible = [], True, False
-    summary = []
-    print(f'{"L":>3} {"n":>6} {"analytic":>12} {"legacy":>12} {"FD(eps)":>12} {"eps":>7} {"relerr_new":>11} {"relerr_legacy":>13}')
-    for L in want:
-       for n in torch.topk(cur[L].abs(), a.topn).indices.tolist():
-            best = best_leg = None
-            for eps in eps_list:
-                fd = (phi({(L, n): eps}) - phi({(L, n): -eps})) / (2 * eps)
-                ra = abs(fd - float(cur[L][n])) / max(abs(float(cur[L][n])), 1e-6)
-                rl = abs(fd - float(leg[L][n])) / max(abs(float(leg[L][n])), 1e-6)
-                # the frozen criterion is the MINIMUM over eps: fp32 logp noise (~1e-3 absolute) makes the
-                # smaller step unreliable, while the larger step leaves the linear regime, so neither single
-                # step is a fair test and the criterion was written with min-over-eps for this reason.
-                best = ra if best is None else min(best, ra)
-                best_leg = rl if best_leg is None else min(best_leg, rl)
-                rows_out.append({'layer': L, 'neuron': int(n), 'analytic': float(cur[L][n]),
-                                 'legacy': float(leg[L][n]), 'fd': fd, 'eps': eps,
-                                 'rel_err_new': ra, 'rel_err_legacy': rl})
-                print(f'{L:>3} {int(n):>6} {float(cur[L][n]):>12.4f} {float(leg[L][n]):>12.4f} '
-                      f'{fd:>12.4f} {eps:>7.0e} {ra:>11.2e} {rl:>13.2e}', flush=True)
-            summary.append({'layer': L, 'neuron': int(n), 'min_rel_err_new': best,
-                            'min_rel_err_legacy': best_leg})
-            print(f'    -> min over eps: new {best:.2e}   legacy {best_leg:.2e}', flush=True)
-            if best >= 0.02:
-                ok_new = False
-            if best_leg > 0.05:
-                ok_old_visible = True
-    verdict = {'G1_instrument_passes': ok_new,
-               'G2_legacy_signature_visible': ok_old_visible,
-               'G3_all_layers_ok': ok_new,
-               'gate_passes': bool(ok_new and ok_old_visible)}
+    import analysis.fd as fdmod
+    rows_out, summary, verdict = fdmod.compare(
+        cur, leg, want, eps_list, phi, lambda L, row: torch.topk(row.abs(), a.topn).indices.tolist())
+    for r in rows_out:
+        print(f'{r["layer"]:>3} {r["neuron"]:>6} {r["analytic"]:>12.4f} {r["legacy"]:>12.4f} '
+              f'{r["fd"]:>12.4f} {r["eps"]:>7.0e} {r["rel_err_new"]:>11.2e} {r["rel_err_legacy"]:>13.2e}', flush=True)
+    for sm in summary:
+        print(f'    -> min over eps: new {sm["min_rel_err_new"]:.2e}   legacy {sm["min_rel_err_legacy"]:.2e}', flush=True)
     print(json.dumps(verdict), flush=True)
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     # the gate certifies THIS instrument, so the record must pin its hash; tools/check.py compares it
