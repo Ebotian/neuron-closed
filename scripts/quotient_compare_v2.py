@@ -64,6 +64,14 @@ def main():
     recs = [r for r in json.load(open(a.recipes)) if r.get('model') == 'Qwen/Qwen3.5-4B' and r.get('neurons')]
     print(f'recipes on Qwen3.5-4B: {len(recs)}', flush=True)
 
+    from analysis.quotient import to_v as _to_v, cos_direct as _cos, null_for as _null
+    to_v = lambda items: _to_v(items, Wn, layers)
+    cos_direct = lambda a_, b_: _cos(a_, b_, layers)
+    null_for = lambda items, ref_v, n_null, seed=0: _null(items, ref_v, Wn, layers, n_null, seed)
+
+    recs = [r for r in json.load(open(a.recipes)) if r.get('model') == 'Qwen/Qwen3.5-4B' and r.get('neurons')]
+    print(f'recipes on Qwen3.5-4B: {len(recs)}', flush=True)
+
     def to_v(items):
         v = {l: torch.zeros(Wn[l].shape[0], dtype=torch.float64) for l in layers}
         for (l, n, d) in items:
