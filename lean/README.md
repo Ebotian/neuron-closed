@@ -9,7 +9,8 @@
 | `Gauge.lean` | `ker_gram` / `gauge_invariance` / `lift_maps_back` | 2.44：奇异度量是规范；解在残差空间的像就是 `∇Φ` |
 | `Decomposition.lean` | `expectation_deriv_decomp` / `sum_p_score_eq_zero` / `baseline_free` | 2.42：pathwise + score 分解；baseline 在期望里免费 |
 | `Dimension.lean` | 5 条 | 2.42：正交族下 split-half 与切分无关 |
-| **`Ssw.lean`** | `ssw_shift_invariant` | **R1**：组内平方和对**公共平移精确不变**（plug-in 余弦缺的正是这条） |
+| **`Ssw.lean`** | `ssw_shift_invariant` | **R1**：组内平方和（K² 缩放版）对**公共平移精确不变** |
+| **`SswNormalised.lean`** | `sum_norm_add_sq` / `sswu_shift_invariant` | **R3**：代码实际算的**归一化**形式 `Σ‖xᵢ‖² − ‖Σxᵢ‖²/K` 同样平移不变 |
 | **`Icc.lean`** | `icc_bounds` / `ssbU_nonneg` / `icc_bounds_from_sums` | **R2**：`ICC ∈ [−1/(n−1), 1]`；**R4**：`SS_b` **按构造非负** ⇒ R2 的前提 `MSb ≥ 0` 是推论而非假设 |
 | **`Witness.lean`** | `plug_in_cos_moves` | **R5**：公共平移下 plug-in 平方余弦 **0 → 1/2**，而 `SS_w` 不变——反面论断，此前只是文字 |
 
@@ -18,9 +19,8 @@
 
 ## 仍未形式化（不得当作已证）
 
-- **R3**：代码实际计算的**归一化**形式 `Σ‖xᵢ‖² − ‖Σxᵢ‖²/K`。已证的是 `K²` 缩放版（`SSw`）。缺口在交叉项恒等式
-  `Σ‖xᵢ+c‖² = Σ‖xᵢ‖² + 2⟪Σxᵢ,c⟫ + K‖c‖²` 的展开：`field_simp` 会在 `smul` 展开里造出 `‖(K:ℝ)‖²`（标量的实数绝对值范数）
-  与 `K²` 并存，需要在那一步内部定位 `Real.norm_eq_abs + abs_of_pos`。
-- `SS_b = SS_t − SS_w` 这个**减法恒等式**本身未证（`Icc.lean` 只是把 `SS_b` 定义成不变量，代码里那条减法仍无形式化支撑）。
+- **`SS_b = SS_t − SS_w` 这条减法恒等式**（即 `ss_t − ss_w = k·Σ_c‖x̄_c − x̄‖²`）**仍未证**。`Icc.lean` 证明的是
+  "右手边那个量非负"，但"代码里那条减法等于它"没有形式化支撑 ⇒ 代码的 `ss_b` 在数值上**可能**算出微小负值，没有定理禁止。
+  这是目前最实质的缺口。
 - `‖g‖² = (MS_b − MS_w)/k` 的换算未证。
 - `_f_quantile` 的数值实现未验证。

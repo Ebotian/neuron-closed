@@ -2,7 +2,7 @@
  "toolchain": "leanprover/lean4:v4.33.0-rc1",
  "mathlib_rev": "79d0395a1825a6264ad5d269e35e60537518955e",
  "mathlib_inputRev": "v4.33.0-rc1",
- "verdict": "PROVED for all sixteen declarations across six files (opl-leancheck without --evidence-out)",
+ "verdict": "PROVED for all eighteen declarations across seven files (opl-leancheck without --evidence-out)",
  "already_in_mathlib": "ContinuousLinearMap.ker_adjoint_comp_self states (T\u2020 \u2218L T).ker = T.ker, i.e. ker_gram is textbook; the load-bearing statement is lift_maps_back",
  "boundary": "formalises the algebra (kernel is a gauge; a solution's residual image is exactly y). It does NOT formalise the model, the construct, or trait fidelity.",
  "files": {
@@ -122,10 +122,26 @@
    },
    "role": "R5: the plug-in squared cosine moves from 0 to 1/2 under a common shift while SSw does not - the negative half of the argument, previously prose only",
    "sha256": "d66ce3c368adae1e58c1dbf948f915843819c8eb9e47b30e53af3cf879ae7daf"
+  },
+  "lean/SswNormalised.lean": {
+   "sha256": "5778e33cb3e585b38dd5752a02614c1d7b3f80bd7fe72a9d9acc6eb88ee1cd7f",
+   "decls": {
+    "NeuronClosed.sum_norm_add_sq": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ],
+    "NeuronClosed.sswu_shift_invariant": [
+     "propext",
+     "Classical.choice",
+     "Quot.sound"
+    ]
+   },
+   "role": "R3: the code's NORMALISED quantity \u03a3\u2016x_i\u2016\u00b2 \u2212 \u2016\u03a3x_i\u2016\u00b2/K is invariant under a common-mode shift. Closed the gap that Ssw.lean left (that file proves the K\u00b2-scaled variant). The blocker was the order of rewrites: norm_smul, Real.norm_eq_abs, abs_of_pos hK must all fire before ring, otherwise \u2016(K:\u211d)\u2016\u00b2 and K\u00b2 coexist and field_simp cannot reconcile them."
   }
  },
  "scope": "Gauge.lean = 2.44's algebra. Decomposition.lean = 2.42's pathwise+score identity on a finite outcome set. Dimension.lean = 2.42's algebra of split-half quantities (orthogonal families). NOT formalised: construct fidelity, any model claim, and the noise-scale relation itself (doc/references/isotropy-and-noise-scale.md records why isotropy is the wrong assumption).",
  "audit_date": "2026-10-30",
  "modularisation": "one theorem group per file (Ssw / Icc / Witness), each compiled independently, after three consecutive breakages came from editing a single 91-line file by string slicing. Reliability.lean is gone, superseded by these three.",
- "still_missing": "R3 (the code's NORMALISED form sum||x_i||^2 - ||sum x_i||^2/K) is still not formalised: the proof needs the cross-term identity and its goal ends up containing ||(K : Real)||^2 versus K^2, i.e. the real-absolute norm of a SCALAR inside a smul expansion. What is proved is the K^2-scaled version (Ssw.lean)."
+ "still_missing": "the ANOVA decomposition identity itself: ss_t \u2212 ss_w = k\u00b7\u03a3_c\u2016x\u0304_c \u2212 x\u0304\u2016\u00b2. R4 gives nonnegativity of the RIGHT-hand side by construction, and R3 gives shift invariance of ss_w, but the link \"the code's SUBTRACTION equals that nonnegative quantity\" is still unproved - so the code's numerical ss_b could in principle come out slightly negative and no theorem currently forbids it. Also still unproved: the \u2016g\u2016\u00b2 = (MSb \u2212 MSw)/k conversion and the F-quantile implementation."
 }
