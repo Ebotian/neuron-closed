@@ -5,14 +5,14 @@
   "status": "active",
   "autoContinue": true,
   "usage": {
-    "tokensUsed": 560059,
-    "activeSeconds": 1719
+    "tokensUsed": 588767,
+    "activeSeconds": 1754
   },
   "sisyphus": false,
   "createdAt": "2026-10-30T03:29:45.924Z",
-  "updatedAt": "2026-10-30T03:58:49.801Z",
+  "updatedAt": "2026-10-30T03:59:28.383Z",
   "activePath": ".pi/goals/active_goal_2026103011294592_mvueysp0-os0iln.md",
-  "revision": 59,
+  "revision": 66,
   "scheduler": {
     "version": 1,
     "owner": "01a186de-214e-758c-8987-7241e0406887",
@@ -83,26 +83,34 @@
       {
         "id": "task-7",
         "title": "重跑 2.43（全支撑闭式解、cos_M、读数臂）",
-        "status": "pending",
-        "verificationContract": "SELF：‖Mu−d‖/‖d‖、budget² 检查；cos_M 与读数 ΔJ2 均为新仪器下的值；与旧值的差异显式列出"
+        "status": "complete",
+        "verificationContract": "SELF：‖Mu−d‖/‖d‖、budget² 检查；cos_M 与读数 ΔJ2 均为新仪器下的值；与旧值的差异显式列出",
+        "completedAt": "2026-10-30T03:58:59.610Z",
+        "evidence": "cos_M 0.657 (was 0.431) matching gradient-level 0.6554; top-64 36/64; readout 1.31x/1.15x; SELF residuals 2.5e-5/2.0e-5, budget2 0.99883"
       },
       {
         "id": "task-8",
         "title": "重跑 2.46（噪声尺度），报告 κ 与区间并做一致性检查",
-        "status": "pending",
-        "verificationContract": "κ 与由 r(K) 反解的 κ 同口径比较；报告两估计的区间是否重叠；不再宣称“两条独立路径吻合 5%”"
+        "status": "complete",
+        "verificationContract": "κ 与由 r(K) 反解的 κ 同口径比较；报告两估计的区间是否重叠；不再宣称“两条独立路径吻合 5%”",
+        "completedAt": "2026-10-30T03:58:59.610Z",
+        "evidence": "kappa_curve 217.6 inside bootstrap [120.3,2674.2]; pooled 6403.7 flagged invalid; 5% claim removed; results/noise_scale_v2.json + plan253"
       },
       {
         "id": "task-9",
         "title": "商空间比较重做：完整直和余弦、按各自列表匹配的零分布（含符号与剂量分布）、按 trait 分层",
-        "status": "pending",
-        "verificationContract": "cos_v 覆盖全部 32 层分母；零分布对每个被检列表各自生成 ≥20 个匹配随机列表；跨 trait 配方不再合并求和；结论措辞降级为“本次比较无高对齐”除非证据升级"
+        "status": "complete",
+        "verificationContract": "cos_v 覆盖全部 32 层分母；零分布对每个被检列表各自生成 ≥20 个匹配随机列表；跨 trait 配方不再合并求和；结论措辞降级为“本次比较无高对齐”除非证据升级",
+        "completedAt": "2026-10-30T03:58:59.610Z",
+        "evidence": "direct-sum over 32 layers; per-list matched null (40 draws, own signed doses); 191 recipes compared separately; L1/L2 strata; 2.1%/7.9% above null p95; frozen wording 'no high alignment'"
       },
       {
         "id": "task-10",
         "title": "make check 加固：Lean 审计 sha 与当前文件一致 + 仪器校准门的最近一次通过记录",
-        "status": "pending",
-        "verificationContract": "改一个 .lean 文件头后 make check 必须报 FAIL；缺校准门记录时 make check 报 FAIL；两项均实测触发过一次"
+        "status": "complete",
+        "verificationContract": "改一个 .lean 文件头后 make check 必须报 FAIL；缺校准门记录时 make check 报 FAIL；两项均实测触发过一次",
+        "completedAt": "2026-10-30T03:58:59.610Z",
+        "evidence": "check_instruments added; both failure modes triggered (blank line in lean file; gate_passes=false) then restored; Dimension.lean re-audited PROVED"
       },
       {
         "id": "task-11",
@@ -125,8 +133,8 @@
 - Status: running
 - Auto-continue: on
 - Sisyphus mode: no
-- Time spent: 28m39s
-- Tokens used: 560K (560,059) tokens
+- Time spent: 29m14s
+- Tokens used: 589K (588,767) tokens
 ## Tasks
 
 <!-- blockCompletion: true -->
@@ -136,9 +144,9 @@
 - [x] task-4: baseline 改 leave-one-out，并把含自身均值的 (1−1/K) 偏差作为对照记录 — evidence: b_{-i} in both scripts; scores stored unweighted + both variants post-hoc; bias factors 0.875 (K=8) / 0.969 (K=32) in metadata plan249; numeric diff to be produced by task-6 run
 - [x] task-5: 在新仪器上重跑 2.40（行为梯度 C1） — evidence: 2 seeds on corrected instrument: r(K) ~0/-0.027 and 0.0027-0.0029; pooled kappa undefined (g_sq<=0); bootstrap interval [32,391]/[27,624]; cos=-0.0226/-0.0634; results/reliability_240.json + plan250
 - [x] task-6: 重跑 2.42（r(K)、pathwise/score 分解），按 r(K)≈K/(K+2κ) 报 κ — evidence: r(K) 0.0065..0.0685; kappa curve 217.5 inside bootstrap [108.7,610.2]; pooled 2100.6 flagged untrusted; cos(pw,teach)=0.6554 by layer 0.27->0.90; score/pw ratio 0.797; LOO vs in-sample cos 1.0 ratio 1
-- [ ] task-7: 重跑 2.43（全支撑闭式解、cos_M、读数臂） — contract: SELF：‖Mu−d‖/‖d‖、budget² 检查；cos_M 与读数 ΔJ2 均为新仪器下的值；与旧值的差异显式列出
-- [ ] task-8: 重跑 2.46（噪声尺度），报告 κ 与区间并做一致性检查 — contract: κ 与由 r(K) 反解的 κ 同口径比较；报告两估计的区间是否重叠；不再宣称“两条独立路径吻合 5%”
-- [ ] task-9: 商空间比较重做：完整直和余弦、按各自列表匹配的零分布（含符号与剂量分布）、按 trait 分层 — contract: cos_v 覆盖全部 32 层分母；零分布对每个被检列表各自生成 ≥20 个匹配随机列表；跨 trait 配方不再合并求和；结论措辞降级为“本次比较无高对齐”除非证据升级
-- [ ] task-10: make check 加固：Lean 审计 sha 与当前文件一致 + 仪器校准门的最近一次通过记录 — contract: 改一个 .lean 文件头后 make check 必须报 FAIL；缺校准门记录时 make check 报 FAIL；两项均实测触发过一次
+- [x] task-7: 重跑 2.43（全支撑闭式解、cos_M、读数臂） — evidence: cos_M 0.657 (was 0.431) matching gradient-level 0.6554; top-64 36/64; readout 1.31x/1.15x; SELF residuals 2.5e-5/2.0e-5, budget2 0.99883
+- [x] task-8: 重跑 2.46（噪声尺度），报告 κ 与区间并做一致性检查 — evidence: kappa_curve 217.6 inside bootstrap [120.3,2674.2]; pooled 6403.7 flagged invalid; 5% claim removed; results/noise_scale_v2.json + plan253
+- [x] task-9: 商空间比较重做：完整直和余弦、按各自列表匹配的零分布（含符号与剂量分布）、按 trait 分层 — evidence: direct-sum over 32 layers; per-list matched null (40 draws, own signed doses); 191 recipes compared separately; L1/L2 strata; 2.1%/7.9% above null p95; frozen wording 'no high alignment'
+- [x] task-10: make check 加固：Lean 审计 sha 与当前文件一致 + 仪器校准门的最近一次通过记录 — evidence: check_instruments added; both failure modes triggered (blank line in lean file; gate_passes=false) then restored; Dimension.lean re-audited PROVED
 - [ ] task-11: 文档收尾：audit response §12 标为已完成、metadata 与 NEXT_SESSION 状态同步 — contract: RETRACTED 条目与新版条目一一对应；每个被引数字都能在 results/ 找到；make check 绿
 
