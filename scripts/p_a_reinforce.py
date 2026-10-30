@@ -77,40 +77,7 @@ def p_toxic(gauges, texts, dev, batch=8):
     return res
 
 
-class Capture:
-    """Capture down_proj inputs as leaves (detach first: inputs above the first injection are
-    already non-leaf, which silently produces t.grad=None -- the bug that invalidated the 10-29 run)."""
-
-    def __init__(self, lm, layers):
-        self.lm, self.layers = lm, layers
-        self.cap, self.handles = {}, []
-
-    def __enter__(self):
-        for l in self.layers:
-            def build(idx):
-                def hook(_m, args):
-                    x = args[0]
-                    if idx in self.cap:
-                        return None
-                    x = x.detach().clone().requires_grad_(True)
-                    self.cap[idx] = x
-                    return (x,) + tuple(args[1:])
-                return hook
-            self.handles.append(self.lm.layers[l].mlp.down_proj.register_forward_pre_hook(build(l)))
-        return self
-
-    def grad_sum(self):
-        out = {}
-        for l, t in self.cap.items():
-            g = t.grad
-            out[l] = (g.sum(dim=tuple(range(g.dim() - 1))).double().cpu()
-                      if g is not None else torch.zeros(t.shape[-1], dtype=torch.float64))
-        return out
-
-    def __exit__(self, *a):
-        for h in self.handles:
-            h.remove()
-
+from mlp_capture import Capture  # noqa: E402  (single corrected implementation; see its docstring)
 
 def score_batch(model, ids, lens, weights, n_prompt):
     """Weighted sum over samples of sum_t log p(t) over CONTINUATION positions only.

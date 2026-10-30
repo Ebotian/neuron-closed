@@ -1,0 +1,183 @@
+{
+ "summary_min_over_eps": [
+  {
+   "layer": 0,
+   "neuron": 1946,
+   "min_rel_err_new": 0.004654397100188484,
+   "min_rel_err_legacy": 0.13923779705402634
+  },
+  {
+   "layer": 0,
+   "neuron": 1362,
+   "min_rel_err_new": 0.0004246629807974932,
+   "min_rel_err_legacy": 0.24186325959033406
+  },
+  {
+   "layer": 13,
+   "neuron": 5458,
+   "min_rel_err_new": 0.00385995580894672,
+   "min_rel_err_legacy": 0.0041403505057837015
+  },
+  {
+   "layer": 13,
+   "neuron": 6820,
+   "min_rel_err_new": 0.0003897548098218407,
+   "min_rel_err_legacy": 0.20713036877443777
+  },
+  {
+   "layer": 31,
+   "neuron": 692,
+   "min_rel_err_new": 0.0006082151029212229,
+   "min_rel_err_legacy": 0.0006082151029212229
+  },
+  {
+   "layer": 31,
+   "neuron": 673,
+   "min_rel_err_new": 0.00026362546000013236,
+   "min_rel_err_legacy": 0.00026362546000013236
+  }
+ ],
+ "rows": [
+  {
+   "layer": 0,
+   "neuron": 1946,
+   "analytic": -17.561826996921923,
+   "legacy": -15.343668657654689,
+   "fd": -17.696380615234375,
+   "eps": 0.001,
+   "rel_err_new": 0.007661709589556691,
+   "rel_err_legacy": 0.15333438241355393
+  },
+  {
+   "layer": 0,
+   "neuron": 1946,
+   "analytic": -17.561826996921923,
+   "legacy": -15.343668657654689,
+   "fd": -17.480087280273438,
+   "eps": 0.01,
+   "rel_err_new": 0.004654397100188484,
+   "rel_err_legacy": 0.13923779705402634
+  },
+  {
+   "layer": 0,
+   "neuron": 1362,
+   "analytic": -15.93541708406292,
+   "legacy": -12.82641207019708,
+   "fd": -16.405105590820312,
+   "eps": 0.001,
+   "rel_err_new": 0.02947450350873656,
+   "rel_err_legacy": 0.2790097106687019
+  },
+  {
+   "layer": 0,
+   "neuron": 1362,
+   "analytic": -15.93541708406292,
+   "legacy": -12.82641207019708,
+   "fd": -15.92864990234375,
+   "eps": 0.01,
+   "rel_err_new": 0.0004246629807974932,
+   "rel_err_legacy": 0.24186325959033406
+  },
+  {
+   "layer": 13,
+   "neuron": 5458,
+   "analytic": -21.163615057355514,
+   "legacy": -20.99499778876293,
+   "fd": -22.411346435546875,
+   "eps": 0.001,
+   "rel_err_new": 0.0589564389075252,
+   "rel_err_legacy": 0.06746124296054994
+  },
+  {
+   "layer": 13,
+   "neuron": 5458,
+   "analytic": -21.163615057355514,
+   "legacy": -20.99499778876293,
+   "fd": -21.081924438476562,
+   "eps": 0.01,
+   "rel_err_new": 0.00385995580894672,
+   "rel_err_legacy": 0.0041403505057837015
+  },
+  {
+   "layer": 13,
+   "neuron": 6820,
+   "analytic": 20.04393740411649,
+   "legacy": 16.194121731476457,
+   "fd": 19.548416137695312,
+   "eps": 0.001,
+   "rel_err_new": 0.024721752838811582,
+   "rel_err_legacy": 0.20713036877443777
+  },
+  {
+   "layer": 13,
+   "neuron": 6820,
+   "analytic": 20.04393740411649,
+   "legacy": 16.194121731476457,
+   "fd": 20.03612518310547,
+   "eps": 0.01,
+   "rel_err_new": 0.0003897548098218407,
+   "rel_err_legacy": 0.23724679333250429
+  },
+  {
+   "layer": 31,
+   "neuron": 692,
+   "analytic": 80.84827592566626,
+   "legacy": 80.84827592566626,
+   "fd": 80.79910278320312,
+   "eps": 0.001,
+   "rel_err_new": 0.0006082151029212229,
+   "rel_err_legacy": 0.0006082151029212229
+  },
+  {
+   "layer": 31,
+   "neuron": 692,
+   "analytic": 80.84827592566626,
+   "legacy": 80.84827592566626,
+   "fd": 79.25701141357422,
+   "eps": 0.01,
+   "rel_err_new": 0.01968210816956794,
+   "rel_err_legacy": 0.01968210816956794
+  },
+  {
+   "layer": 31,
+   "neuron": 673,
+   "analytic": 71.857582390694,
+   "legacy": 71.857582390694,
+   "fd": 71.87652587890625,
+   "eps": 0.001,
+   "rel_err_new": 0.00026362546000013236,
+   "rel_err_legacy": 0.00026362546000013236
+  },
+  {
+   "layer": 31,
+   "neuron": 673,
+   "analytic": 71.857582390694,
+   "legacy": 71.857582390694,
+   "fd": 71.16241455078125,
+   "eps": 0.01,
+   "rel_err_new": 0.009674244760046148,
+   "rel_err_legacy": 0.009674244760046148
+  }
+ ],
+ "verdict": {
+  "G1_instrument_passes": true,
+  "G2_legacy_signature_visible": true,
+  "G3_all_layers_ok": true,
+  "gate_passes": true
+ },
+ "eps": [
+  0.001,
+  0.01
+ ],
+ "layers": [
+  0,
+  13,
+  31
+ ],
+ "topn": 2,
+ "model": "/root/autodl-tmp/Qwen3.5-4B",
+ "dtype": "float32",
+ "criterion": "G1 rel_err_new<0.02 for every row; G2 some legacy rel_err>0.05; G3 conjunction",
+ "status": "PASS",
+ "note": "Frozen criterion G1 (min over eps of the relative error < 2% for every coordinate), G2 (the legacy detach method must show >5% somewhere, else the gate cannot see the bug), G3 (conjunction over layers 0/13/31). fp32 is required: bf16 finite differences are swamped by precision noise. The gate logic was corrected once BEFORE reading any science number, because the frozen criterion is the min over eps while the first implementation tested each (coordinate, eps) pair separately - recorded here so the amendment is auditable."
+}

@@ -37,6 +37,7 @@ import torch.nn.functional as F
 
 sys.path.insert(0, '/root/autodl-tmp/scripts/j2space')
 import engine as E
+from mlp_capture import Capture as _Capture
 
 
 def slot_ids(tok, s):
@@ -67,39 +68,20 @@ def main():
     dim = sum(lm.layers[l].mlp.down_proj.weight.shape[1] for l in layers)
 
     class Cap:
+        """Adapter over scripts/mlp_capture.Capture (zero-leaf readout, graph kept intact)."""
+
         def __init__(self):
-            self.cap, self.h = {}, []
+            self._c = None
 
         def __enter__(self):
-            for l in layers:
-                def build(idx):
-                    def hook(_m, args):
-                        x = args[0]
-                        if idx in self.cap:
-                            return None
-                        x = x.detach().clone().requires_grad_(True)
-                        self.cap[idx] = x
-                        return (x,) + tuple(args[1:])
-                    return hook
-                self.h.append(lm.layers[l].mlp.down_proj.register_forward_pre_hook(build(l)))
+            self._c = _Capture(lm, layers, p50, norms).__enter__()
             return self
 
         def dose_grad(self):
-            out = torch.zeros(dim, dtype=torch.float64)
-            off = 0
-            for l in layers:
-                t = self.cap[l]
-                g = t.grad
-                v = (g.sum(dim=tuple(range(g.dim() - 1))).double().cpu() if g is not None
-                     else torch.zeros(t.shape[-1], dtype=torch.float64))
-                d = lm.layers[l].mlp.down_proj.weight.shape[1]
-                out[off:off + d] = v * (p50[l] / norms[l].clamp(min=1e-12)).double()
-                off += d
-            return out
+            return self._c.dose_grad()
 
         def __exit__(self, *x):
-            for h in self.h:
-                h.remove()
+            return self._c.__exit__(*x)
 
     def slot_lp(seq, ids_slot):
         n_s = len(ids_slot)
